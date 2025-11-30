@@ -1,6 +1,8 @@
 export type RootStackParamList = {
     Main: undefined;
-    CreateExercise: undefined;
+    ExerciseForm: { exerciseId?: number };
+    ExerciseDetails: { exerciseId: number };
+    ProgramBuilder: undefined;
 };
 
 export type RootTabParamList = {

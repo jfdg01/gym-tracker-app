@@ -2,7 +2,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { TabNavigator } from './TabNavigator';
 import { RootStackParamList } from './types';
-import { CreateExerciseScreen } from '../screens/CreateExerciseScreen';
+import { ExerciseFormScreen } from '../screens/ExerciseFormScreen';
+import { ExerciseDetailsScreen } from '../screens/ExerciseDetailsScreen';
+import { ProgramBuilderScreen } from '../screens/ProgramBuilderScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -11,7 +13,9 @@ export const RootNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator id="RootStack" screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Main" component={TabNavigator} />
-                <Stack.Screen name="CreateExercise" component={CreateExerciseScreen} />
+                <Stack.Screen name="ExerciseForm" component={ExerciseFormScreen} />
+                <Stack.Screen name="ExerciseDetails" component={ExerciseDetailsScreen} />
+                <Stack.Screen name="ProgramBuilder" component={ProgramBuilderScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

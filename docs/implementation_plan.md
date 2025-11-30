@@ -36,9 +36,19 @@ This document outlines the modular implementation plan for the Gym Tracker App, 
     - [x] Implement "Add Exercise" FAB.
 
 - [ ] **Exercise Details & Management**
-    - [ ] Create "Create/Edit Exercise" Form (Name, Variant, Muscle, Equipment, Notes).
-    - [ ] Implement Delete functionality.
-    - [ ] View Exercise History/Stats on details page.
+    - [ ] **Exercise Form Screen (`src/screens/ExerciseFormScreen.tsx`)**
+        - [ ] Create form with fields: Name, Variant, Muscle Group (Dropdown), Equipment (Dropdown), Description (multiline), Photo URL (optional).
+        - [ ] Implement validation (Name is required).
+        - [ ] Handle "Create" (INSERT into `exercises`) and "Update" (UPDATE `exercises`) logic.
+        - [ ] Handle `is_custom` flag (default to true for user-created).
+    - [ ] **Exercise Details Screen (`src/screens/ExerciseDetailsScreen.tsx`)**
+        - [ ] Display exercise info (Name, Variant, Muscle, Equipment, Description).
+        - [ ] **Action Menu**: "Edit" (navigates to Form) and "Delete" (with confirmation).
+        - [ ] **Delete Logic**: Soft delete or check for dependencies (foreign keys in `performed_sets` or `target_exercises`). *Decision: For now, prevent delete if used in history/programs, or cascade delete if simple.* -> *Refined: Prevent delete if used, or prompt warning.*
+    - [ ] **Exercise History Tab (on Details Screen)**
+        - [ ] Query `performed_sets` joined with `sessions` for this `exercise_id`.
+        - [ ] Display list of recent performances (Date, 1RM estimate, Max Weight).
+        - [ ] (Optional) Simple chart of Max Weight over time.
 
 ## Phase 3: Program Builder (Feature)
 **Goal**: Enable users to create and customize workout routines.

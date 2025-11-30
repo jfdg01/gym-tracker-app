@@ -10,11 +10,11 @@ interface LayoutProps {
 
 export const Layout = ({ children, className = '' }: LayoutProps) => {
     return (
-        <SafeAreaView className="flex-1 bg-white">
-            <View className={`flex-1 px-4 ${className}`}>
+        <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+            <View className={`flex-1 ${className}`}>
                 {children}
             </View>
-            <StatusBar style="auto" />
+            <StatusBar style="light" />
         </SafeAreaView>
     );
 };
