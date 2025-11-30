@@ -2,9 +2,6 @@
 
 En la siguiente lista se recogen los requisitos de la aplicación, así como ejemplos de su funcionamiento, integrando la lógica de negocio y el diseño de interfaz propuesto.
 
-> [!NOTE]
-> **Arquitectura de Datos:** El sistema distingue explícitamente entre "Planificado" (Target) y "Realizado" (Performed). Esto permite mantener un historial fiel de lo que realmente ocurrió, independientemente de cómo cambie el plan futuro.
-
 ## 1. Gestión de Ejercicios
 
 ### 1.1. Quiero poder crear los ejercicios que hago, en cualquier momento. **(Actualizado)**
@@ -33,13 +30,11 @@ El usuario define la estructura de su rutina (e.g., Split PPL). Desde la pantall
 * **Programación temporal:**
     * *Semanal:* Asignar días (A, B, C) a días de la semana (Lunes, Martes...).
     * *Periódica/Rotativa:* Secuencia repetible (e.g., A, B, Rest, C, D) que se repite cada `n` días.
-    * **Implementación:** La secuencia se define mediante una estructura JSON flexible para permitir patrones complejos sin cambios en el esquema.
 
 ### 2.2. Quiero gestionar los ejercicios dentro de un día específico. **(Nuevo)**
 Al entrar en el detalle de un día (e.g., "Día A"), quiero ver la lista de ejercicios asignados y tener opciones para:
 * **Añadir ejercicio** (desde la base de datos).
 * **Ver/Editar/Eliminar** un ejercicio específico de ese día.
-* **Superseries:** Capacidad de agrupar ejercicios en superseries.
 
 ## 3. Contexto y Recordatorios (Dashboard)
 
@@ -85,7 +80,7 @@ Durante la sesión, la pantalla del ejercicio debe mostrar:
 * **Objetivo:** "Hacer 12 reps de 60kg".
 * **Estado:** "He completado un set".
 * **Cronómetro:** Al completar un set, inicia cuenta atrás del descanso definido. Al finalizar, suena alarma.
-* **Historial de la sesión actual:** Un listado visual que se va rellenando conforme completo sets (e.g., "Set 1: 12 reps, 60kg, RPE 8", "Set 2: 11 reps, 60kg, RPE 9").
+* **Historial de la sesión actual:** Un listado visual que se va rellenando conforme completo sets (e.g., "Set 1: 12 reps, 60kg", "Set 2: 11 reps, 60kg", "Set 3: Sin completar").
 
 ### 6.2. Quiero poder saltar al siguiente ejercicio.
 Botón "Saltar" para pasar al siguiente ejercicio sin completar los sets restantes, guardando lo realizado hasta el momento.
@@ -105,7 +100,7 @@ Al marcar un set como "completado", el sistema debe confirmar o pedir el número
 Al acabar todos los sets de un ejercicio (o saltarlo), aparece la pantalla de edición para preparar la siguiente sesión (mantener o progresar).
 
 ## 8. Almacenamiento de Datos (Bandaid)
-Guardado en **JSON local** para simplificar la arquitectura y facilitar la exportación.
+Guardado en CSV maestro de cada set completado para reportes futuros.
 
 ---
 
