@@ -1,4 +1,5 @@
 import './global.css';
+
 import { StatusBar } from 'expo-status-bar';
 import { Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -27,7 +28,7 @@ export default function App() {
     );
   }
 
-  if (!success || !isSeeded) {
+  if (!success) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <Text className="text-blue-500">Initializing Database...</Text>

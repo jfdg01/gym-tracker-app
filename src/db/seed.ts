@@ -1,29 +1,27 @@
 import { db } from './client';
-import { exercises } from './schema';
+import * as schema from './schema';
 
 export const seedDatabase = async () => {
+    console.log('Seeding database...');
     try {
-        console.log('Seeding database...');
-
-        // Check if exercises exist
-        const existingExercises = await db.select().from(exercises).limit(1);
-        if (existingExercises.length > 0) {
-            console.log('Database already seeded.');
-            return;
+        const existingItems = await db.select().from(schema.items).limit(1);
+        if (existingItems.length === 0) {
+            await db.insert(schema.items).values([
+                { name: 'Item 1', description: 'This is the first item' },
+                { name: 'Item 2', description: 'This is the second item' },
+                { name: 'Item 3', description: 'This is the third item' },
+                { name: 'Item 4', description: 'This is the fourth item' },
+                { name: 'Item 5', description: 'This is the fifth item' },
+                { name: 'Item 6', description: 'This is the sixth item' },
+                { name: 'Item 7', description: 'This is the seventh item' },
+                { name: 'Item 8', description: 'This is the eighth item' },
+                { name: 'Item 9', description: 'This is the ninth item' },
+                { name: 'Item 10', description: 'This is the tenth item' },
+            ]);
+            console.log('Database seeded successfully');
+        } else {
+            console.log('Database already seeded');
         }
-
-        await db.insert(exercises).values([
-            { name: 'Bench Press', muscle_group: 'Chest', equipment: 'Barbell', variant: 'Flat' },
-            { name: 'Squat', muscle_group: 'Legs', equipment: 'Barbell', variant: 'Back' },
-            { name: 'Deadlift', muscle_group: 'Back', equipment: 'Barbell', variant: 'Conventional' },
-            { name: 'Overhead Press', muscle_group: 'Shoulders', equipment: 'Barbell', variant: 'Standing' },
-            { name: 'Pull Up', muscle_group: 'Back', equipment: 'Bodyweight' },
-            { name: 'Dumbbell Curl', muscle_group: 'Biceps', equipment: 'Dumbbell' },
-            { name: 'Tricep Extension', muscle_group: 'Triceps', equipment: 'Cable' },
-            { name: 'Leg Press', muscle_group: 'Legs', equipment: 'Machine' },
-        ]);
-
-        console.log('Database seeded successfully.');
     } catch (error) {
         console.error('Error seeding database:', error);
     }

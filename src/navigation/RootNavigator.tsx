@@ -1,21 +1,19 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { TabNavigator } from './TabNavigator';
-import { RootStackParamList } from './types';
-import { ExerciseFormScreen } from '../screens/ExerciseFormScreen';
-import { ExerciseDetailsScreen } from '../screens/ExerciseDetailsScreen';
-import { ProgramBuilderScreen } from '../screens/ProgramBuilderScreen';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { DebugDashboardScreen } from '../screens/DebugDashboardScreen';
+import { TableListScreen } from '../screens/TableListScreen';
+import { EditRecordScreen } from '../screens/EditRecordScreen';
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator();
 
 export const RootNavigator = () => {
     return (
         <NavigationContainer>
-            <Stack.Navigator id="RootStack" screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Main" component={TabNavigator} />
-                <Stack.Screen name="ExerciseForm" component={ExerciseFormScreen} />
-                <Stack.Screen name="ExerciseDetails" component={ExerciseDetailsScreen} />
-                <Stack.Screen name="ProgramBuilder" component={ProgramBuilderScreen} />
+            <Stack.Navigator initialRouteName="DebugDashboard" id="RootStack">
+                <Stack.Screen name="DebugDashboard" component={DebugDashboardScreen} options={{ title: 'Debug Dashboard' }} />
+                <Stack.Screen name="TableList" component={TableListScreen} options={({ route }: any) => ({ title: route.params.tableName })} />
+                <Stack.Screen name="EditRecord" component={EditRecordScreen} options={({ route }: any) => ({ title: route.params.recordId ? 'Edit Record' : 'Add Record' })} />
             </Stack.Navigator>
         </NavigationContainer>
     );
