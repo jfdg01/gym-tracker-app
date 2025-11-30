@@ -1,10 +1,11 @@
-import * as SQLite from 'expo-sqlite';
-
-const db = SQLite.openDatabaseSync('gym_tracker.db');
+import { db, expoDb } from './db';
+import { items } from './db/schema';
 
 export const initDatabase = () => {
     try {
-        db.execSync(`
+        // We still use raw SQL for table creation for simplicity in this step
+        // In a real app, we would use migrations
+        expoDb.execSync(`
       CREATE TABLE IF NOT EXISTS items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
@@ -16,20 +17,20 @@ export const initDatabase = () => {
     }
 };
 
-export const addItem = (name) => {
+export const addItem = async (name) => {
     try {
-        const result = db.runSync('INSERT INTO items (name) VALUES (?)', name);
-        return result.lastInsertRowId;
+        const result = await db.insert(items).values({ name }).returning();
+        return result[0].id;
     } catch (error) {
         console.error('Error adding item:', error);
         throw error;
     }
 };
 
-export const getItems = () => {
+export const getItems = async () => {
     try {
-        const allRows = db.getAllSync('SELECT * FROM items');
-        return allRows;
+        const allItems = await db.select().from(items);
+        return allItems;
     } catch (error) {
         console.error('Error getting items:', error);
         return [];

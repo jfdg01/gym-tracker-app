@@ -13,14 +13,14 @@ export default function App() {
     refreshItems();
   }, []);
 
-  const refreshItems = () => {
-    const data = getItems();
+  const refreshItems = async () => {
+    const data = await getItems();
     setItems(data);
   };
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (!text) return;
-    addItem(text);
+    await addItem(text);
     setText('');
     refreshItems();
   };
