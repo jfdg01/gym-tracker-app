@@ -1,117 +1,112 @@
 # Implementation Plan - Gym Tracker App
 
-This document outlines the modular implementation plan for the Gym Tracker App, based on the requirements (`docs/reqs2.md`), data model (`docs/data_model.md`), and tech stack (`docs/tech_stack.md`).
+This document outlines the modular implementation plan for the Gym Tracker App, based on the requirements (`docs/reqs2.md`) and design system (`docs/design_system.md`).
 
 ## Phase 1: Core Architecture & Database Foundation
-**Goal**: Establish the technical foundation, database schema, and navigation structure, aligning with the `App.tsx` structure.
+**Goal**: Establish the technical foundation, database schema, and navigation structure.
 
 - [x] **Project Restructuring & Configuration**
-    - [x] Create `src` directory structure (`src/db`, `src/screens`, `src/components`, `src/i18n`).
-    - [x] Move existing `db/` contents to `src/db/` and rename to `.ts` for TypeScript.
-    - [x] **Install `drizzle-kit`** (dev dependency) and `babel-plugin-inline-import`.
-    - [x] **Configure `drizzle.config.ts`**: Create this file with `driver: 'expo'` and `dialect: 'sqlite'` (Standard practice).
-    - [x] **Update `babel.config.js`**: Add `babel-plugin-inline-import` to support importing `.sql` migration files (Required for Expo + Drizzle).
-    - [x] **Update `metro.config.js`**: Add `sql` to `resolver.sourceExts` to allow bundling migration files.
-    - [x] **Install & Configure Tailwind CSS (NativeWind v4)**: Dependencies installed, `tailwind.config.js` created, `global.css` added, `babel.config.js` updated.
+    - [x] Create `src` directory structure.
+    - [x] Configure Drizzle ORM and SQLite.
+    - [x] Configure Tailwind CSS (NativeWind v4) with Design System colors.
 
 - [x] **Database Implementation**
-    - [x] Update `src/db/schema.ts` with the new data model (Exercises, Programs, Sessions, etc.).
-    - [x] Generate migrations using `drizzle-kit generate` (creates `drizzle/migrations`).
-    - [x] Implement `src/db/client.ts` (adapting existing `db/index.js` logic).
-    - [x] Implement `src/db/seed.ts` to populate initial exercises.
+    - [x] Update `src/db/schema.ts` with the new data model.
+    - [x] Generate migrations.
+    - [x] Implement `src/db/client.ts`.
+    - [x] Implement `src/db/seed.ts`.
 
 - [x] **Navigation & Layout**
     - [x] Implement `src/navigation/RootNavigator.tsx` (Stack).
-    - [x] Implement `src/navigation/TabNavigator.tsx` (Home, Exercises, History, Settings).
-    - [x] Create `src/components/Layout.tsx` (SafeArea, StatusBar).
-    - [x] Integrate Navigation into `App.tsx`.
+    - [x] Implement `src/navigation/TabNavigator.tsx`.
+    - [x] Create `src/components/Layout.tsx`.
 
-## Phase 2: Exercise Catalog (Feature)
+## Phase 2: Exercise Management (Req 1)
 **Goal**: Allow users to manage their library of exercises.
 
-- [x] **Exercise List Screen**
-    - [x] Implement `FlashList` for performance.
-    - [x] Add Search Bar (filter by name).
-    - [x] Add Filters (Muscle Group, Equipment).
-    - [x] Implement "Add Exercise" FAB.
+- [ ] **Exercise List Screen (`src/screens/ExercisesScreen.tsx`)**
+    - [ ] **Refactor**: Update UI to match "Dark Mode Premium" aesthetic.
+    - [ ] **Req 1.3**: Implement "Master List" view with Search and Filters.
+    - [ ] **Actions**: Add FAB for "Create Exercise".
 
 - [ ] **Exercise Details & Management**
     - [ ] **Exercise Form Screen (`src/screens/ExerciseFormScreen.tsx`)**
-        - [ ] Create form with fields: Name, Variant, Muscle Group (Dropdown), Equipment (Dropdown), Description (multiline), Photo URL (optional).
-        - [ ] Implement validation (Name is required).
-        - [ ] Handle "Create" (INSERT into `exercises`) and "Update" (UPDATE `exercises`) logic.
-        - [ ] Handle `is_custom` flag (default to true for user-created).
+        - [ ] **Req 1.1**: Create/Edit form with fields: Name, Variant, Muscle Group, Equipment, Description, Photo.
+        - [ ] **Validation**: Ensure Name is required.
+        - [ ] **Logic**: Handle INSERT/UPDATE in `exercises` table.
     - [ ] **Exercise Details Screen (`src/screens/ExerciseDetailsScreen.tsx`)**
-        - [ ] Display exercise info (Name, Variant, Muscle, Equipment, Description).
-        - [ ] **Action Menu**: "Edit" (navigates to Form) and "Delete" (with confirmation).
-        - [ ] **Delete Logic**: Soft delete or check for dependencies (foreign keys in `performed_sets` or `target_exercises`). *Decision: For now, prevent delete if used in history/programs, or cascade delete if simple.* -> *Refined: Prevent delete if used, or prompt warning.*
-    - [ ] **Exercise History Tab (on Details Screen)**
-        - [ ] Query `performed_sets` joined with `sessions` for this `exercise_id`.
-        - [ ] Display list of recent performances (Date, 1RM estimate, Max Weight).
-        - [ ] (Optional) Simple chart of Max Weight over time.
+        - [ ] **Req 1.3**: Display exercise info.
+        - [ ] **Actions**: Edit (navigates to Form) and Delete (with confirmation).
+        - [ ] **History**: Show recent performance stats.
 
-## Phase 3: Program Builder (Feature)
+## Phase 3: Program Builder (Req 2)
 **Goal**: Enable users to create and customize workout routines.
 
 - [ ] **Program Management**
-    - [ ] Program List Screen (Active vs Inactive).
-    - [ ] Program Editor (Name, Schedule Type: Weekly vs Periodic).
+    - [ ] **Program List**: Display active/inactive programs (likely in Settings or a dedicated tab if needed, or part of Home). *Decision: Access via Profile/Settings or Home "Edit Program".*
+    - [ ] **Program Builder Screen (`src/screens/ProgramBuilderScreen.tsx`)**
+        - [ ] **Req 2.1**: Manage Days (Add/Edit/Delete Day).
+        - [ ] **Schedule**: Define Weekly (Mon-Sun) or Periodic (Day A, Day B...) schedule.
 
-- [ ] **Day & Routine Editor**
-    - [ ] Day Editor Screen (Name, List of Exercises).
-    - [ ] "Add Exercise to Day" flow (select from Catalog).
-    - [ ] Configure Target Sets/Reps/Weight for each exercise.
-    - [ ] Reorder exercises (Drag & Drop or Up/Down buttons).
+- [ ] **Day Editor**
+    - [ ] **Req 2.2**: Manage Exercises within a Day.
+    - [ ] **Actions**: Add Exercise (from Catalog), Reorder, Remove.
+    - [ ] **Targets**: Set target Sets, Reps, Weight, Rest for each exercise.
 
-## Phase 4: Dashboard & Context (Feature)
+## Phase 4: Dashboard & Context (Req 3)
 **Goal**: Provide immediate context on what to do today.
 
-- [ ] **Home Screen (Dashboard)**
-    - [ ] "Current Status" Card: Show today's assigned workout (or "Rest Day").
-    - [ ] "Quick Actions": Start Workout button.
-    - [ ] "Schedule Preview": Show previous and next sessions.
-    - [ ] "Daily Summary": List exercises for today.
+- [ ] **Home Screen (`src/screens/HomeScreen.tsx`)**
+    - [ ] **Req 3.1**: Display "Context Cards":
+        - [ ] **Last Session**: Summary of previous workout.
+        - [ ] **Today's Session**: Main Call-to-Action ("Start Session").
+        - [ ] **Next Session**: Preview of upcoming workout.
+    - [ ] **Req 3.2**: Show list of exercises for Today's Session in the card.
 
-## Phase 5: Workout Tracker (Core Feature)
-**Goal**: The active session experience ("The Player").
+## Phase 5: Workout Tracker (Req 6)
+**Goal**: The active session experience.
 
-- [ ] **Session Logic (Zustand)**
-    - [ ] Create `useSessionStore` to manage active workout state (current exercise, set, timer).
-    - [ ] Implement State Machine: `Idle` -> `WorkoutInProgress` -> `Resting` -> `Finished`.
+- [ ] **Active Session Screen (`src/screens/ActiveSessionScreen.tsx`)**
+    - [ ] **State Management**: Use Zustand for session state (timer, current set, etc.).
+    - [ ] **Req 6.1**: Interface showing Target vs Actual.
+    - [ ] **Timer**: Auto-start rest timer after set completion.
+    - [ ] **Req 6.2**: "Skip Exercise" button.
+    - [ ] **Req 6.4**: "Edit in Session" (modify targets on the fly).
+    - [ ] **Req 6.5**: Input for Actual Reps/Weight.
 
-- [ ] **Active Session Screen**
-    - [ ] Header: Timer, Current Exercise Name.
-    - [ ] Set List: Render sets for current exercise (Previous stats vs Target).
-    - [ ] Input Fields: Reps, Weight, RPE.
-    - [ ] "Complete Set" Action: Triggers Rest Timer.
-    - [ ] "Rest Timer" Overlay/Component (Background Timer integration).
-    - [ ] "Next Exercise" / "Finish Workout" navigation.
+## Phase 6: History & Progress (Req 4 & 5)
+**Goal**: Visualize progress and plan future sessions.
 
-- [ ] **Post-Workout**
-    - [ ] "Session Summary" Screen.
-    - [ ] Update "Next Day" logic in User Settings.
+- [ ] **History Screen (`src/screens/HistoryScreen.tsx`)**
+    - [ ] **Req 4.3**: List of completed sessions.
+    - [ ] **Charts**: Progress charts for key exercises.
 
-## Phase 6: History & Analytics (Feature)
-**Goal**: Visualize progress.
+- [ ] **Post-Workout Logic**
+    - [ ] **Req 5.1**: "Next Session Planning" (Progress/Maintain).
+    - [ ] **Req 5.2**: Add Notes for next time.
 
-- [ ] **History Screen**
-    - [ ] Calendar View or List View of completed sessions.
-    - [ ] Session Detail View (drill down into sets).
+## Verification Plan
 
-- [ ] **Analytics**
-    - [ ] Implement `Victory Native XL` charts.
-    - [ ] Volume/1RM progress over time for specific exercises.
+### Automated Tests
+- Run `npx expo start` and verify no bundling errors.
+- (Future) Add unit tests for `src/db` logic.
 
-## Phase 7: Polish & Settings
-**Goal**: User preferences and app quality.
-
-- [ ] **User Settings**
-    - [ ] Theme Toggle (Dark/Light).
-    - [ ] Sound Settings (Timer mute).
-    - [ ] Language Selector.
-    - [ ] Data Management (Export DB to file).
-
-- [ ] **Final Polish**
-    - [ ] UI Consistency check (Spacing, Typography).
-    - [ ] Empty States for all lists.
-    - [ ] Loading States & Error Boundaries.
+### Manual Verification
+- **Design System**: Check `global.css` application on all screens.
+- **Exercise Flow**:
+    1. Go to Exercises Tab.
+    2. Create a new Exercise "Test Press".
+    3. Verify it appears in the list.
+    4. Edit it to "Test Press Modified".
+    5. Delete it.
+- **Program Flow**:
+    1. Create a Program "Test Split".
+    2. Add "Day A".
+    3. Add "Test Press" to "Day A".
+- **Session Flow**:
+    1. On Home, see "Day A" is scheduled (or manually start it).
+    2. Start Session.
+    3. Log a set.
+    4. Verify Timer starts.
+    5. Finish Session.
+    6. Check History.

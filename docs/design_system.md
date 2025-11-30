@@ -81,7 +81,14 @@ We use a customized Zinc-based dark palette with a vibrant Electric Blue accent.
 *   **Separators**: `border-b border-zinc-800`
 *   **Item Spacing**: `py-4`
 
-## 5. Tailwind Configuration Guide
+## 5. Spacing & Layout
+*   **Screen Padding**: `px-6` (24px) - Standard horizontal padding for main views.
+*   **Section Spacing**: `mb-8` (32px) - Space between major sections.
+*   **Card Padding**: `p-6` (24px) - Standard internal padding for cards.
+*   **Element Spacing**: `space-x-4` or `space-y-4` - Standard gap between related elements.
+*   **Touch Targets**: Minimum 44x44pt.
+
+## 6. Tailwind Configuration Guide
 
 Extend the Tailwind config to map these semantic names if desired, or stick to the Zinc/Blue scales.
 

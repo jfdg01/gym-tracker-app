@@ -15,7 +15,7 @@ export const ExerciseDetailsScreen = () => {
     const navigation = useNavigation<ExerciseDetailsNavigationProp>();
     const route = useRoute<ExerciseDetailsRouteProp>();
     const { exerciseId } = route.params;
-    const [exercise, setExercise] = useState<any>(null);
+    const [exercise, setExercise] = useState<typeof exercises.$inferSelect | null>(null);
     const [history, setHistory] = useState<any[]>([]);
 
     const loadExercise = async () => {

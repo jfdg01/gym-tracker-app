@@ -1,4 +1,4 @@
-import { Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Modal, FlatList } from 'react-native';
 import { Layout } from '../components/Layout';
 import { useState, useEffect } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -8,6 +8,9 @@ import { eq } from 'drizzle-orm';
 import { RootStackParamList } from '../navigation/types';
 
 type ExerciseFormRouteProp = RouteProp<RootStackParamList, 'ExerciseForm'>;
+
+const MUSCLE_GROUPS = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core", "Cardio", "Full Body"];
+const EQUIPMENT_LIST = ["Barbell", "Dumbbell", "Machine", "Cable", "Bodyweight", "Band", "Kettlebell", "Other"];
 
 export const ExerciseFormScreen = () => {
     const navigation = useNavigation();
@@ -21,6 +24,9 @@ export const ExerciseFormScreen = () => {
     const [equipment, setEquipment] = useState('');
     const [description, setDescription] = useState('');
     const [photoUrl, setPhotoUrl] = useState('');
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalType, setModalType] = useState<'muscle' | 'equipment' | null>(null);
 
     useEffect(() => {
         if (isEditing) {
@@ -77,6 +83,17 @@ export const ExerciseFormScreen = () => {
         }
     };
 
+    const openModal = (type: 'muscle' | 'equipment') => {
+        setModalType(type);
+        setModalVisible(true);
+    };
+
+    const handleSelect = (item: string) => {
+        if (modalType === 'muscle') setMuscle(item);
+        if (modalType === 'equipment') setEquipment(item);
+        setModalVisible(false);
+    };
+
     return (
         <Layout>
             <View className="flex-1 bg-background pt-4">
@@ -117,24 +134,26 @@ export const ExerciseFormScreen = () => {
                         <View className="flex-row space-x-4">
                             <View className="flex-1">
                                 <Text className="text-textMuted mb-2 font-medium ml-1">Muscle Group</Text>
-                                <TextInput
-                                    className="bg-surfaceHighlight p-4 rounded-xl text-textMain border border-surfaceHighlight focus:border-primary"
-                                    placeholder="e.g. Chest"
-                                    placeholderTextColor="#52525b"
-                                    value={muscle}
-                                    onChangeText={setMuscle}
-                                />
+                                <TouchableOpacity
+                                    onPress={() => openModal('muscle')}
+                                    className="bg-surfaceHighlight p-4 rounded-xl border border-surfaceHighlight"
+                                >
+                                    <Text className={muscle ? "text-textMain" : "text-zinc-500"}>
+                                        {muscle || "Select..."}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
 
                             <View className="flex-1">
                                 <Text className="text-textMuted mb-2 font-medium ml-1">Equipment</Text>
-                                <TextInput
-                                    className="bg-surfaceHighlight p-4 rounded-xl text-textMain border border-surfaceHighlight focus:border-primary"
-                                    placeholder="e.g. Barbell"
-                                    placeholderTextColor="#52525b"
-                                    value={equipment}
-                                    onChangeText={setEquipment}
-                                />
+                                <TouchableOpacity
+                                    onPress={() => openModal('equipment')}
+                                    className="bg-surfaceHighlight p-4 rounded-xl border border-surfaceHighlight"
+                                >
+                                    <Text className={equipment ? "text-textMain" : "text-zinc-500"}>
+                                        {equipment || "Select..."}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
 
@@ -164,6 +183,38 @@ export const ExerciseFormScreen = () => {
                         </View>
                     </View>
                 </ScrollView>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => setModalVisible(false)}
+                >
+                    <View className="flex-1 justify-end bg-black/50">
+                        <View className="bg-surface rounded-t-3xl p-6 h-1/2">
+                            <View className="flex-row justify-between items-center mb-4">
+                                <Text className="text-xl font-bold text-textMain">
+                                    Select {modalType === 'muscle' ? 'Muscle Group' : 'Equipment'}
+                                </Text>
+                                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                    <Text className="text-primary font-medium">Close</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <FlatList
+                                data={modalType === 'muscle' ? MUSCLE_GROUPS : EQUIPMENT_LIST}
+                                keyExtractor={(item) => item}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        className="py-4 border-b border-surfaceHighlight"
+                                        onPress={() => handleSelect(item)}
+                                    >
+                                        <Text className="text-textMain text-lg">{item}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                        </View>
+                    </View>
+                </Modal>
             </View>
         </Layout>
     );
