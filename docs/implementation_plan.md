@@ -24,20 +24,20 @@ This document outlines the modular implementation plan for the Gym Tracker App, 
 ## Phase 2: Exercise Management (Req 1)
 **Goal**: Allow users to manage their library of exercises.
 
-- [ ] **Exercise List Screen (`src/screens/ExercisesScreen.tsx`)**
-    - [ ] **Refactor**: Update UI to match "Dark Mode Premium" aesthetic.
-    - [ ] **Req 1.3**: Implement "Master List" view with Search and Filters.
-    - [ ] **Actions**: Add FAB for "Create Exercise".
+- [x] **Exercise List Screen (`src/screens/ExercisesScreen.tsx`)**
+    - [x] **Refactor**: Update UI to match "Dark Mode Premium" aesthetic.
+    - [x] **Req 1.3**: Implement "Master List" view with Search and Filters.
+    - [x] **Actions**: Add FAB for "Create Exercise".
 
-- [ ] **Exercise Details & Management**
-    - [ ] **Exercise Form Screen (`src/screens/ExerciseFormScreen.tsx`)**
-        - [ ] **Req 1.1**: Create/Edit form with fields: Name, Variant, Muscle Group, Equipment, Description, Photo.
-        - [ ] **Validation**: Ensure Name is required.
-        - [ ] **Logic**: Handle INSERT/UPDATE in `exercises` table.
-    - [ ] **Exercise Details Screen (`src/screens/ExerciseDetailsScreen.tsx`)**
-        - [ ] **Req 1.3**: Display exercise info.
-        - [ ] **Actions**: Edit (navigates to Form) and Delete (with confirmation).
-        - [ ] **History**: Show recent performance stats.
+- [x] **Exercise Details & Management**
+    - [x] **Exercise Form Screen (`src/screens/ExerciseFormScreen.tsx`)**
+        - [x] **Req 1.1**: Create/Edit form with fields: Name, Variant, Muscle Group, Equipment, Description, Photo.
+        - [x] **Validation**: Ensure Name is required.
+        - [x] **Logic**: Handle INSERT/UPDATE in `exercises` table.
+    - [x] **Exercise Details Screen (`src/screens/ExerciseDetailsScreen.tsx`)**
+        - [x] **Req 1.3**: Display exercise info.
+        - [x] **Actions**: Edit (navigates to Form) and Delete (with confirmation).
+        - [x] **History**: Show recent performance stats.
 
 ## Phase 3: Program Builder (Req 2)
 **Goal**: Enable users to create and customize workout routines.
