@@ -1,5 +1,5 @@
-import { db, expoDb } from './db';
-import { items } from './db/schema';
+import { db, expoDb } from './src/db/client';
+import { items } from './src/db/schema';
 
 export const initDatabase = () => {
     try {
