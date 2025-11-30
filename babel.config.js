@@ -3,6 +3,9 @@ module.exports = function (api) {
     return {
         presets: [
             ["babel-preset-expo", { jsxImportSource: "nativewind" }],
+        ],
+        plugins: [
+            ["babel-plugin-inline-import", { extensions: [".sql"] }]
         ]
     };
 };

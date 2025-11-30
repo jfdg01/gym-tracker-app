@@ -3,41 +3,37 @@
 This document outlines the modular implementation plan for the Gym Tracker App, based on the requirements (`docs/reqs2.md`), data model (`docs/data_model.md`), and tech stack (`docs/tech_stack.md`).
 
 ## Phase 1: Core Architecture & Database Foundation
-**Goal**: Establish the technical foundation, database schema, and navigation structure.
-
-## Phase 1: Core Architecture & Database Foundation
 **Goal**: Establish the technical foundation, database schema, and navigation structure, aligning with the `App.tsx` structure.
 
-## Phase 1: Core Architecture & Database Foundation
-**Goal**: Establish the technical foundation, database schema, and navigation structure, aligning with the `App.tsx` structure.
+- [x] **Project Restructuring & Configuration**
+    - [x] Create `src` directory structure (`src/db`, `src/screens`, `src/components`, `src/i18n`).
+    - [x] Move existing `db/` contents to `src/db/` and rename to `.ts` for TypeScript.
+    - [x] **Install `drizzle-kit`** (dev dependency) and `babel-plugin-inline-import`.
+    - [x] **Configure `drizzle.config.ts`**: Create this file with `driver: 'expo'` and `dialect: 'sqlite'` (Standard practice).
+    - [x] **Update `babel.config.js`**: Add `babel-plugin-inline-import` to support importing `.sql` migration files (Required for Expo + Drizzle).
+    - [x] **Update `metro.config.js`**: Add `sql` to `resolver.sourceExts` to allow bundling migration files.
+    - [x] **Install & Configure Tailwind CSS (NativeWind v4)**: Dependencies installed, `tailwind.config.js` created, `global.css` added, `babel.config.js` updated.
 
-- [ ] **Project Restructuring & Configuration**
-    - [ ] Create `src` directory structure (`src/db`, `src/screens`, `src/components`, `src/i18n`).
-    - [ ] Move existing `db/` contents to `src/db/` and rename to `.ts` for TypeScript.
-    - [ ] **Install `drizzle-kit`** (dev dependency) and `babel-plugin-inline-import`.
-    - [ ] **Configure `drizzle.config.ts`**: Create this file with `driver: 'expo'` and `dialect: 'sqlite'` (Standard practice).
-    - [ ] **Update `babel.config.js`**: Add `babel-plugin-inline-import` to support importing `.sql` migration files (Required for Expo + Drizzle).
-    - [ ] **Update `metro.config.js`**: Add `sql` to `resolver.sourceExts` to allow bundling migration files.
+- [x] **Database Implementation**
+    - [x] Update `src/db/schema.ts` with the new data model (Exercises, Programs, Sessions, etc.).
+    - [x] Generate migrations using `drizzle-kit generate` (creates `drizzle/migrations`).
+    - [x] Implement `src/db/client.ts` (adapting existing `db/index.js` logic).
+    - [x] Implement `src/db/seed.ts` to populate initial exercises.
 
-- [ ] **Database Implementation**
-    - [ ] Update `src/db/schema.ts` with the new data model (Exercises, Programs, Sessions, etc.).
-    - [ ] Generate migrations using `drizzle-kit generate` (creates `drizzle/migrations`).
-    - [ ] Implement `src/db/client.ts` (adapting existing `db/index.js` logic).
-    - [ ] Implement `src/db/seed.ts` to populate initial exercises.
-
-- [ ] **Navigation & Layout**
-    - [ ] Implement `src/navigation/RootNavigator.tsx` (Stack).
-    - [ ] Implement `src/navigation/TabNavigator.tsx` (Home, Exercises, History, Settings).
-    - [ ] Create `src/components/Layout.tsx` (SafeArea, StatusBar).
+- [x] **Navigation & Layout**
+    - [x] Implement `src/navigation/RootNavigator.tsx` (Stack).
+    - [x] Implement `src/navigation/TabNavigator.tsx` (Home, Exercises, History, Settings).
+    - [x] Create `src/components/Layout.tsx` (SafeArea, StatusBar).
+    - [x] Integrate Navigation into `App.tsx`.
 
 ## Phase 2: Exercise Catalog (Feature)
 **Goal**: Allow users to manage their library of exercises.
 
-- [ ] **Exercise List Screen**
-    - [ ] Implement `FlashList` for performance.
-    - [ ] Add Search Bar (filter by name).
-    - [ ] Add Filters (Muscle Group, Equipment).
-    - [ ] Implement "Add Exercise" FAB.
+- [x] **Exercise List Screen**
+    - [x] Implement `FlashList` for performance.
+    - [x] Add Search Bar (filter by name).
+    - [x] Add Filters (Muscle Group, Equipment).
+    - [x] Implement "Add Exercise" FAB.
 
 - [ ] **Exercise Details & Management**
     - [ ] Create "Create/Edit Exercise" Form (Name, Variant, Muscle, Equipment, Notes).
