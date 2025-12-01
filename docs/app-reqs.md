@@ -77,13 +77,16 @@ Capacidad CRUD sobre notas textuales para un ejercicio (e.g., "Focus en explosiv
 
 ### 6.1. Interfaz de ejecución de ejercicio. **(Actualizado)**
 Durante la sesión, la pantalla del ejercicio debe mostrar:
-* **Objetivo:** "Hacer 12 reps de 60kg".
-* **Estado:** "He completado un set".
-* **Cronómetro:** Al completar un set, inicia cuenta atrás del descanso definido. Al finalizar, suena alarma.
-* **Historial de la sesión actual:** Un listado visual que se va rellenando conforme completo sets (e.g., "Set 1: 12 reps, 60kg", "Set 2: 11 reps, 60kg", "Set 3: Sin completar").
+* **Estado Descanso:** Cronómetro corriendo (lista de sets semi-completa).
+* **Botones Principales:**
+    * **"He completado mi set":** Para registrar el set actual.
+    * **"Saltar":** Para saltar el ejercicio actual y pasar inmediatamente al siguiente (si existe).
+* **Cronómetro:** Cuenta atrás del descanso. Al llegar a 0, suena una alarma indicando el inicio del ejercicio.
 
-### 6.2. Quiero poder saltar al siguiente ejercicio.
-Botón "Saltar" para pasar al siguiente ejercicio sin completar los sets restantes, guardando lo realizado hasta el momento.
+### 6.2. Lógica de "Saltar"
+* Al pulsar "Saltar", el sistema omite los sets restantes del ejercicio actual.
+* Navega inmediatamente al primer set del **siguiente ejercicio** en el plan.
+* Si no hay más ejercicios, lleva al Resumen del Entrenamiento.
 
 ### 6.3. Quiero poder silenciar la alarma.
 Switch on/off para el sonido del cronómetro.
@@ -93,14 +96,28 @@ Si el peso o repeticiones pautados no son realistas para el día de hoy, quiero 
 * Esto me lleva a una pantalla de edición donde puedo cambiar Sets, Descanso, Peso, Reps, etc.
 * Los cambios se aplican al ejercicio actual (sets restantes) y se guardan para el futuro.
 
-### 6.5. Quiero registrar las repeticiones reales.
-Al marcar un set como "completado", el sistema debe confirmar o pedir el número de repeticiones realizadas (por si fallé antes de llegar al objetivo).
+### 6.5. Completar Set (Modal)
+Al pulsar "He completado mi set":
+* Se abre un **Modal** superpuesto.
+* **Input:** El usuario introduce el número de repeticiones realizadas.
+* **Acciones:**
+    * **"Cancelar":** Cierra el modal y vuelve a la pantalla del ejercicio sin guardar cambios (por si fue error).
+    * **"Okay":** Guarda las repeticiones, marca el set como completado y avanza al siguiente set (o finaliza el ejercicio).
 
-## 7. Actualización Post-Ejercicio
-Al acabar todos los sets de un ejercicio (o saltarlo), aparece la pantalla de edición para preparar la siguiente sesión (mantener o progresar).
+## 7. Lógica de Progresión (Progressive Overload)
+Esta lógica se ejecuta automáticamente **solo al finalizar el último set** de un ejercicio:
 
-## 8. Almacenamiento de Datos (Bandaid)
-Guardado en CSV maestro de cada set completado para reportes futuros.
+* **Rango Superior (e.g., >11 reps):** Si las repeticiones realizadas superan el rango superior, el sistema **aumentará el peso** automáticamente para la próxima sesión.
+* **Rango Inferior (e.g., <4 reps):** Si las repeticiones son inferiores al rango menor, el sistema **disminuirá el peso 5kg** para la próxima sesión.
+* **Rango Medio:** Si las repeticiones están dentro del rango, el peso se mantiene igual.
+
+## 8. Resumen del Entrenamiento
+Cuando se completan todos los ejercicios (o se saltan):
+* Se muestra una pantalla de **Resumen**.
+* **Contenido:**
+    * Lista de ejercicios realizados.
+    * Repeticiones totales o por set.
+    * **Ajustes de Peso:** Indicación visual de si el peso ha subido o bajado para la próxima sesión según la lógica de progresión.
 
 ---
 
