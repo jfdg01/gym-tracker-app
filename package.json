@@ -6,7 +6,14 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "i18n:auto-fix": "node scripts/i18n-auto-fix.mjs",
+    "i18n:check-missing": "node scripts/i18n-hygiene.mjs --check-missing",
+    "i18n:validate-json": "node scripts/i18n-validate-json.mjs",
+    "i18n:sort-keys": "node scripts/i18n-sort-keys.mjs",
+    "i18n:remove-unused": "node scripts/i18n-remove-unused.mjs",
+    "i18n:check-empty": "node scripts/i18n-check-empty.mjs",
+    "i18n:hygiene": "node scripts/i18n-hygiene.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

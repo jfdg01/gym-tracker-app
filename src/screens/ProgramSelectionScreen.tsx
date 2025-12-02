@@ -24,6 +24,8 @@ export const ProgramSelectionScreen = () => {
     const [loading, setLoading] = useState(true);
     const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [programToDeleteId, setProgramToDeleteId] = useState<number | null>(null);
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -69,21 +71,15 @@ export const ProgramSelectionScreen = () => {
     };
 
     const handleDeleteProgram = (programId: number) => {
-        Alert.alert(
-            t('programSelection.deleteProgramTitle'),
-            t('programSelection.deleteProgramMessage'),
-            [
-                { text: t('common.cancel'), style: "cancel" },
-                {
-                    text: t('common.delete'),
-                    style: "destructive",
-                    onPress: async () => {
-                        await deletePlan(programId);
-                        loadPrograms();
-                    }
-                }
-            ]
-        );
+        setProgramToDeleteId(programId);
+        setDeleteModalVisible(true);
+    };
+
+    const confirmDelete = async () => {
+        if (programToDeleteId === null) return;
+        await deletePlan(programToDeleteId);
+        loadPrograms();
+        setDeleteModalVisible(false);
     };
 
     return (
@@ -156,6 +152,17 @@ export const ProgramSelectionScreen = () => {
                 onConfirm={confirmSelection}
                 onCancel={() => setModalVisible(false)}
                 confirmButtonColor="blue"
+            />
+
+            <ConfirmationModal
+                visible={deleteModalVisible}
+                title={t('programSelection.deleteProgramTitle')}
+                message={t('programSelection.deleteProgramMessage')}
+                confirmText={t('common.delete')}
+                cancelText={t('common.cancel')}
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteModalVisible(false)}
+                confirmButtonColor="red"
             />
         </SafeAreaView>
     );

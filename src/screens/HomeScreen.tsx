@@ -46,7 +46,13 @@ export const HomeScreen = () => {
     if (!currentDay || program.length === 0) {
         return (
             <SafeAreaView edges={['top', 'left', 'right', 'bottom']} className="flex-1 bg-zinc-950 px-6 justify-center items-center">
-                <Text className="text-zinc-50">{t('common.noProgram')}</Text>
+                <Text className="text-zinc-50 mb-6 text-center text-lg">{t('common.noProgram')}</Text>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Programs' as never)}
+                    className="bg-blue-600 px-6 py-4 rounded-xl"
+                >
+                    <Text className="text-white font-bold">{t('common.programs')}</Text>
+                </TouchableOpacity>
             </SafeAreaView>
         );
     }
