@@ -117,6 +117,7 @@ export const HomeScreen = () => {
                         </View>
                     );
                 })}
+
             </ScrollView>
 
         </SafeAreaView>
