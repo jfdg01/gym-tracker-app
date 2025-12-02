@@ -42,7 +42,7 @@
 		"minReps": "Min Reps",
 		"name": "Name",
 		"nextDays": "Upcoming Days",
-		"noProgram": "No program found. Please restart the app to seed data.",
+		"noProgram": "No active program found. Create or select one.",
 		"programs": "PROGRAMS",
 		"remove": "Remove",
 		"rest": "Rest",
