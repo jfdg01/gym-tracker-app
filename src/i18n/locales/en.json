@@ -95,6 +95,11 @@
 	"home": {
 		"restDayAlert": "It's a rest day! Enjoy your recovery."
 	},
+	"navigation": {
+		"exercises": "Exercises",
+		"home": "Home",
+		"programs": "Programs"
+	},
 	"programEditor": {
 		"addDay": "Add Day",
 		"days": "Days",

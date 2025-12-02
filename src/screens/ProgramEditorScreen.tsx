@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { db } from '../db/client';
 import { programs, days } from '../db/schema';
 import { eq, asc } from 'drizzle-orm';
-import { addDayToPlan, deleteDay, reorderDays, updatePlan } from '../db/plans';
+import { addDayToPlan, deleteDay, reorderDays, updatePlan, deletePlan } from '../db/plans';
 import { useProgram } from '../context/ProgramContext';
 
 type DayItem = typeof days.$inferSelect;
@@ -100,6 +100,24 @@ export const ProgramEditorScreen = () => {
         if (programId === currentProgramId) refreshProgram();
     };
 
+    const handleDeleteProgram = () => {
+        Alert.alert(
+            t('programSelection.deleteProgramTitle'),
+            t('programSelection.deleteProgramMessage'),
+            [
+                { text: t('common.cancel'), style: "cancel" },
+                {
+                    text: t('common.delete'),
+                    style: "destructive",
+                    onPress: async () => {
+                        await deletePlan(programId);
+                        navigation.goBack();
+                    }
+                }
+            ]
+        );
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
             <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center justify-between">
@@ -170,12 +188,20 @@ export const ProgramEditorScreen = () => {
                     </View>
                 )}
                 ListFooterComponent={
-                    <TouchableOpacity
-                        className="bg-blue-600 p-4 rounded-xl items-center mt-4"
-                        onPress={handleAddDay}
-                    >
-                        <Text className="text-white font-bold">{t('programEditor.addDay')}</Text>
-                    </TouchableOpacity>
+                    <View>
+                        <TouchableOpacity
+                            className="bg-blue-600 p-4 rounded-xl items-center mt-4"
+                            onPress={handleAddDay}
+                        >
+                            <Text className="text-white font-bold">{t('programEditor.addDay')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            className="bg-red-500/10 p-4 rounded-xl items-center mt-4 border border-red-500/20"
+                            onPress={handleDeleteProgram}
+                        >
+                            <Text className="text-red-500 font-bold">{t('programSelection.deleteProgramTitle')}</Text>
+                        </TouchableOpacity>
+                    </View>
                 }
             />
         </SafeAreaView>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { createPlan, deletePlan } from '../db/plans';
+import { createPlan } from '../db/plans';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../db/client';
@@ -22,10 +22,8 @@ export const ProgramSelectionScreen = () => {
     const { setProgram: setContextProgram, currentProgramId } = useProgram();
     const [programs, setPrograms] = useState<Program[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-    const [programToDeleteId, setProgramToDeleteId] = useState<number | null>(null);
+    const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null);
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -70,17 +68,7 @@ export const ProgramSelectionScreen = () => {
         (navigation as any).navigate('ProgramEditor', { programId });
     };
 
-    const handleDeleteProgram = (programId: number) => {
-        setProgramToDeleteId(programId);
-        setDeleteModalVisible(true);
-    };
 
-    const confirmDelete = async () => {
-        if (programToDeleteId === null) return;
-        await deletePlan(programToDeleteId);
-        loadPrograms();
-        setDeleteModalVisible(false);
-    };
 
     return (
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
@@ -129,12 +117,6 @@ export const ProgramSelectionScreen = () => {
                                     >
                                         <Text className="text-zinc-300 font-bold text-sm">{t('common.edit')}</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => handleDeleteProgram(prog.id)}
-                                        className="bg-red-500/10 px-5 py-3 rounded-xl mx-1"
-                                    >
-                                        <Text className="text-red-500 font-bold text-sm">{t('common.delete')}</Text>
-                                    </TouchableOpacity>
                                 </View>
                             </View>
                         );
@@ -154,16 +136,7 @@ export const ProgramSelectionScreen = () => {
                 confirmButtonColor="blue"
             />
 
-            <ConfirmationModal
-                visible={deleteModalVisible}
-                title={t('programSelection.deleteProgramTitle')}
-                message={t('programSelection.deleteProgramMessage')}
-                confirmText={t('common.delete')}
-                cancelText={t('common.cancel')}
-                onConfirm={confirmDelete}
-                onCancel={() => setDeleteModalVisible(false)}
-                confirmButtonColor="red"
-            />
+
         </SafeAreaView>
     );
 };

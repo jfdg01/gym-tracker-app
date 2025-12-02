@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ProgramSelectionScreen } from '../screens/ProgramSelectionScreen';
@@ -23,6 +24,8 @@ const TabIcon = ({ name, focused, color }: { name: string; focused: boolean; col
 };
 
 export const TabNavigator = () => {
+    const { t } = useTranslation();
+
     return (
         <Tab.Navigator
             id="TabNavigator"
@@ -49,17 +52,17 @@ export const TabNavigator = () => {
             <Tab.Screen
                 name="Home"
                 component={HomeScreen}
-                options={{ title: 'Inicio' }}
+                options={{ title: t('navigation.home') }}
             />
             <Tab.Screen
                 name="Programs"
                 component={ProgramSelectionScreen}
-                options={{ title: 'Programas' }}
+                options={{ title: t('navigation.programs') }}
             />
             <Tab.Screen
                 name="Exercises"
                 component={ExercisesScreen}
-                options={{ title: 'Ejercicios' }}
+                options={{ title: t('navigation.exercises') }}
             />
         </Tab.Navigator>
     );
