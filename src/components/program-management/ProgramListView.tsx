@@ -1,41 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { createPlan } from '../db/plans';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { db } from '../db/client';
-import * as schema from '../db/schema';
-import { useProgram } from '../context/ProgramContext';
-import { eq } from 'drizzle-orm';
-import { ConfirmationModal } from '../components/ConfirmationModal';
+import { db } from '../../db/client';
+import * as schema from '../../db/schema';
+import { useProgram } from '../../context/ProgramContext';
+import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { ProgramItem } from '../../types/program-management';
 
-type Program = {
-    id: number;
-    name: string;
-    description: string | null;
+type ProgramListViewProps = {
+    onEdit: (id: number) => void;
+    onCreate: () => void;
+    onSelectActive: (id: number) => void;
 };
 
-export const ProgramSelectionScreen = () => {
+export const ProgramListView = ({
+    onEdit,
+    onCreate,
+    onSelectActive
+}: ProgramListViewProps) => {
     const { t } = useTranslation();
-    const navigation = useNavigation();
-    const { setProgram: setContextProgram, currentProgramId } = useProgram();
-    const [programs, setPrograms] = useState<Program[]>([]);
+    const { currentProgramId } = useProgram();
+    const [programList, setProgramList] = useState<ProgramItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null);
+    const [pendingSelectionId, setPendingSelectionId] = useState<number | null>(null);
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            loadPrograms();
-        });
-        return unsubscribe;
-    }, [navigation]);
+        loadPrograms();
+    }, [currentProgramId]); // Reload if active program changes
 
     const loadPrograms = async () => {
         try {
             const allPrograms = await db.select().from(schema.programs);
-            setPrograms(allPrograms);
+            setProgramList(allPrograms);
         } catch (error) {
             console.error('Error loading programs:', error);
         } finally {
@@ -43,38 +40,24 @@ export const ProgramSelectionScreen = () => {
         }
     };
 
-    const handleProgramPress = (programId: number) => {
-        setSelectedProgramId(programId);
+    const handleSelectPress = (id: number) => {
+        setPendingSelectionId(id);
         setModalVisible(true);
     };
 
-    const confirmSelection = async () => {
-        if (selectedProgramId === null) return;
-
-        try {
-            await setContextProgram(selectedProgramId);
+    const confirmSelection = () => {
+        if (pendingSelectionId) {
+            onSelectActive(pendingSelectionId);
             setModalVisible(false);
-        } catch (error) {
-            console.error('Error selecting program:', error);
+            setPendingSelectionId(null);
         }
     };
 
-    const handleCreateProgram = async () => {
-        const newId = await createPlan("New Program", "Description");
-        (navigation as any).navigate('ProgramEditor', { programId: newId });
-    };
-
-    const handleEditProgram = (programId: number) => {
-        (navigation as any).navigate('ProgramEditor', { programId });
-    };
-
-
-
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
+        <View className="flex-1">
             <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center justify-between bg-zinc-950">
                 <Text className="text-zinc-50 text-3xl font-bold">{t('common.programs')}</Text>
-                <TouchableOpacity onPress={handleCreateProgram} className="bg-blue-500 px-5 py-3 rounded-xl">
+                <TouchableOpacity onPress={onCreate} className="bg-blue-500 px-5 py-3 rounded-xl">
                     <Text className="text-white font-bold">{t('programSelection.new')}</Text>
                 </TouchableOpacity>
             </View>
@@ -83,7 +66,7 @@ export const ProgramSelectionScreen = () => {
                 {loading ? (
                     <Text className="text-zinc-500 text-center">{t('common.loading')}</Text>
                 ) : (
-                    programs.map((prog) => {
+                    programList.map((prog) => {
                         const isActive = prog.id === currentProgramId;
                         return (
                             <View
@@ -105,14 +88,14 @@ export const ProgramSelectionScreen = () => {
                                 <View className="flex-row justify-end space-x-3 border-t border-zinc-700/50 pt-4 mt-2">
                                     {!isActive && (
                                         <TouchableOpacity
-                                            onPress={() => handleProgramPress(prog.id)}
+                                            onPress={() => handleSelectPress(prog.id)}
                                             className="bg-blue-500 px-5 py-3 rounded-xl mx-1"
                                         >
                                             <Text className="text-white font-bold text-sm">{t('common.select')}</Text>
                                         </TouchableOpacity>
                                     )}
                                     <TouchableOpacity
-                                        onPress={() => handleEditProgram(prog.id)}
+                                        onPress={() => onEdit(prog.id)}
                                         className="bg-transparent border border-zinc-700 px-5 py-3 rounded-xl mx-1"
                                     >
                                         <Text className="text-zinc-300 font-bold text-sm">{t('common.edit')}</Text>
@@ -135,8 +118,6 @@ export const ProgramSelectionScreen = () => {
                 onCancel={() => setModalVisible(false)}
                 confirmButtonColor="blue"
             />
-
-
-        </SafeAreaView>
+        </View>
     );
 };

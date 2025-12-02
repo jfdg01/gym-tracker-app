@@ -8,9 +8,7 @@ import { LiveWorkoutProvider } from '../context/LiveWorkoutContext';
 
 import { ProgramProvider } from '../context/ProgramContext';
 import { TabNavigator } from './TabNavigator';
-import { ProgramEditorScreen } from '../screens/ProgramEditorScreen';
-import { DayEditorScreen } from '../screens/DayEditorScreen';
-import { ExercisePickerScreen } from '../screens/ExercisePickerScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -23,9 +21,7 @@ export const RootNavigator = () => {
                         <Stack.Screen name="Tabs" component={TabNavigator} options={{ headerShown: false }} />
                         <Stack.Screen name="ActiveExercise" component={ActiveExerciseScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="WorkoutSummary" component={WorkoutSummaryScreen} options={{ headerShown: false }} />
-                        <Stack.Screen name="ProgramEditor" component={ProgramEditorScreen} options={{ headerShown: false }} />
-                        <Stack.Screen name="DayEditor" component={DayEditorScreen} options={{ headerShown: false }} />
-                        <Stack.Screen name="ExercisePicker" component={ExercisePickerScreen} options={{ headerShown: false, presentation: 'modal' }} />
+
                     </Stack.Navigator>
                 </NavigationContainer>
             </ProgramProvider>

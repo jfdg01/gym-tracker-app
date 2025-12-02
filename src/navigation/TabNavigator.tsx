@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeScreen } from '../screens/HomeScreen';
-import { ProgramSelectionScreen } from '../screens/ProgramSelectionScreen';
+import { ProgramManagementScreen } from '../screens/ProgramManagementScreen';
 import { ExercisesScreen } from '../screens/ExercisesScreen';
 import { Text, View } from 'react-native';
 
@@ -56,7 +56,7 @@ export const TabNavigator = () => {
             />
             <Tab.Screen
                 name="Programs"
-                component={ProgramSelectionScreen}
+                component={ProgramManagementScreen}
                 options={{ title: t('navigation.programs') }}
             />
             <Tab.Screen

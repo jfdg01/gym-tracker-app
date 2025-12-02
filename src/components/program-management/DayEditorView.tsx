@@ -1,32 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput, Switch, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, FlatList, Switch, Modal } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { db } from '../db/client';
-import { days, day_exercises, exercises } from '../db/schema';
+import { db } from '../../db/client';
+import * as schema from '../../db/schema';
+import { days, day_exercises, exercises } from '../../db/schema';
 import { eq, asc, like } from 'drizzle-orm';
-import { addExerciseToDay, removeExerciseFromDay, reorderExercisesInDay, updateDay } from '../db/plans';
+import { updateDay, addExerciseToDay, removeExerciseFromDay, reorderExercisesInDay } from '../../db/plans';
+import { DayExerciseItem } from '../../types/program-management';
 
-type DayExerciseItem = {
-    id: number; // day_exercise id
-    exercise_id: number;
-    name: string;
-    sets: number;
-    reps: number;
-    order_index: number;
+type DayEditorViewProps = {
+    dayId: number;
+    onBack: () => void;
 };
 
-export const DayEditorScreen = () => {
+export const DayEditorView = ({
+    dayId,
+    onBack
+}: DayEditorViewProps) => {
     const { t } = useTranslation();
-    const navigation = useNavigation();
-    const route = useRoute();
-    const { dayId } = route.params as { dayId: number };
-
     const [dayName, setDayName] = useState('');
     const [isRestDay, setIsRestDay] = useState(false);
     const [exercisesList, setExercisesList] = useState<DayExerciseItem[]>([]);
-    const [loading, setLoading] = useState(true);
 
     // Picker State
     const [pickerVisible, setPickerVisible] = useState(false);
@@ -35,7 +29,7 @@ export const DayEditorScreen = () => {
 
     useEffect(() => {
         loadDayDetails();
-    }, []);
+    }, [dayId]);
 
     useEffect(() => {
         if (pickerVisible) {
@@ -64,7 +58,6 @@ export const DayEditorScreen = () => {
             .orderBy(asc(day_exercises.order_index));
 
         setExercisesList(exs as any);
-        setLoading(false);
     };
 
     const loadAllExercises = async () => {
@@ -79,10 +72,6 @@ export const DayEditorScreen = () => {
 
     const handleSaveDaySettings = async () => {
         await updateDay(dayId, { name: dayName, is_rest_day: isRestDay });
-    };
-
-    const handleAddExercise = () => {
-        setPickerVisible(true);
     };
 
     const handleSelectExercise = async (exerciseId: number) => {
@@ -120,9 +109,9 @@ export const DayEditorScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
+        <View className="flex-1">
             <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center justify-between">
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <TouchableOpacity onPress={onBack}>
                     <Text className="text-blue-500 text-lg">{t('common.done')}</Text>
                 </TouchableOpacity>
                 <Text className="text-zinc-50 text-xl font-bold">{t('dayEditor.editDay')}</Text>
@@ -192,7 +181,7 @@ export const DayEditorScreen = () => {
                     ListFooterComponent={
                         <TouchableOpacity
                             className="bg-blue-600 p-4 rounded-xl items-center mt-4"
-                            onPress={handleAddExercise}
+                            onPress={() => setPickerVisible(true)}
                         >
                             <Text className="text-white font-bold">{t('dayEditor.addExercise')}</Text>
                         </TouchableOpacity>
@@ -248,6 +237,6 @@ export const DayEditorScreen = () => {
                     />
                 </View>
             </Modal>
-        </SafeAreaView>
+        </View>
     );
 };

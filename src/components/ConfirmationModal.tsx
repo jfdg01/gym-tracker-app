@@ -5,23 +5,25 @@ import { useTranslation } from 'react-i18next';
 interface ConfirmationModalProps {
     visible: boolean;
     title: string;
-    message: string;
+    message?: string;
     confirmText?: string;
     cancelText?: string;
     onConfirm: () => void;
     onCancel: () => void;
     confirmButtonColor?: string; // 'blue' | 'red' | 'emerald' etc. (tailwind class prefix)
+    children?: React.ReactNode;
 }
 
 export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     visible,
     title,
     message,
-    confirmText = 'Confirmar',
-    cancelText = 'Cancelar',
+    confirmText,
+    cancelText,
     onConfirm,
     onCancel,
     confirmButtonColor = 'blue',
+    children,
 }) => {
     const { t } = useTranslation();
     const defaultConfirmText = t('common.confirm');
@@ -33,9 +35,13 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 <View className="w-full max-w-sm bg-zinc-900 p-6 rounded-3xl border border-zinc-800 items-center shadow-2xl shadow-black">
                     <Text className="text-2xl font-bold text-zinc-50 mb-4 text-center">{title}</Text>
 
-                    <Text className="text-zinc-400 text-base text-center mb-8">
-                        {message}
-                    </Text>
+                    {message && (
+                        <Text className="text-zinc-400 text-base text-center mb-8">
+                            {message}
+                        </Text>
+                    )}
+
+                    {children}
 
                     <View className="flex-row justify-between w-full space-x-4">
                         <TouchableOpacity

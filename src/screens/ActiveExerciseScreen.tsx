@@ -5,7 +5,7 @@ import { X, Check } from 'lucide-react-native';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { useProgram } from '../context/ProgramContext';
 import { SetCompletionModal } from '../components/SetCompletionModal';
-import { SkipExerciseModal } from '../components/SkipExerciseModal';
+import { ConfirmationModal } from '../components/ConfirmationModal';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -262,8 +262,12 @@ export const ActiveExerciseScreen = () => {
                 defaultReps={currentExercise.sets[currentSetIndex]?.targetReps || 0}
             />
 
-            <SkipExerciseModal
+            <ConfirmationModal
                 visible={skipModalVisible}
+                title={t('skipExercise.title')}
+                message={t('skipExercise.message')}
+                confirmText={t('common.skip')}
+                cancelText={t('common.cancel')}
                 onConfirm={() => {
                     skipExercise();
                     setSkipModalVisible(false);

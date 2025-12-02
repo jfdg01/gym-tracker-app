@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { db } from '../db/client';
-import { programs, days } from '../db/schema';
+import { db } from '../../db/client';
+import * as schema from '../../db/schema';
+import { programs, days } from '../../db/schema';
 import { eq, asc } from 'drizzle-orm';
-import { addDayToPlan, deleteDay, reorderDays, updatePlan, deletePlan } from '../db/plans';
-import { useProgram } from '../context/ProgramContext';
+import { updatePlan, addDayToPlan, deleteDay, reorderDays, deletePlan } from '../../db/plans';
+import { useProgram } from '../../context/ProgramContext';
+import { DayItem } from '../../types/program-management';
 
-type DayItem = typeof days.$inferSelect;
+type ProgramEditorViewProps = {
+    programId: number;
+    onBack: () => void;
+    onEditDay: (dayId: number) => void;
+};
 
-export const ProgramEditorScreen = () => {
+export const ProgramEditorView = ({
+    programId,
+    onBack,
+    onEditDay
+}: ProgramEditorViewProps) => {
     const { t } = useTranslation();
-    const navigation = useNavigation();
-    const route = useRoute();
-    const { programId } = route.params as { programId: number };
     const { currentProgramId, refreshProgram } = useProgram();
-
     const [programName, setProgramName] = useState('');
     const [programDesc, setProgramDesc] = useState('');
     const [daysList, setDaysList] = useState<DayItem[]>([]);
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            loadProgramDetails();
-        });
-        return unsubscribe;
-    }, [navigation]);
+        loadProgramDetails();
+    }, [programId]);
 
     const loadProgramDetails = async () => {
         const prog = await db.select().from(programs).where(eq(programs.id, programId)).get();
@@ -50,11 +51,7 @@ export const ProgramEditorScreen = () => {
     const handleAddDay = async () => {
         const newDayId = await addDayToPlan(programId, `Day ${daysList.length + 1}`);
         if (programId === currentProgramId) refreshProgram();
-        (navigation as any).navigate('DayEditor', { dayId: newDayId });
-    };
-
-    const handleEditDay = (dayId: number) => {
-        (navigation as any).navigate('DayEditor', { dayId });
+        onEditDay(newDayId);
     };
 
     const handleDeleteDay = async (dayId: number) => {
@@ -111,7 +108,7 @@ export const ProgramEditorScreen = () => {
                     style: "destructive",
                     onPress: async () => {
                         await deletePlan(programId);
-                        navigation.goBack();
+                        onBack();
                     }
                 }
             ]
@@ -119,9 +116,9 @@ export const ProgramEditorScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
+        <View className="flex-1">
             <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center justify-between">
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <TouchableOpacity onPress={onBack}>
                     <Text className="text-blue-500 text-lg">{t('common.done')}</Text>
                 </TouchableOpacity>
                 <Text className="text-zinc-50 text-xl font-bold">{t('programEditor.editProgram')}</Text>
@@ -157,7 +154,7 @@ export const ProgramEditorScreen = () => {
                         <View className="flex-row justify-between items-center mb-2">
                             <Text className="text-zinc-50 font-bold text-lg">{item.name}</Text>
                             <View className="flex-row space-x-2">
-                                <TouchableOpacity onPress={() => handleEditDay(item.id)} className="bg-blue-900/30 px-3 py-1 rounded mr-2">
+                                <TouchableOpacity onPress={() => onEditDay(item.id)} className="bg-blue-900/30 px-3 py-1 rounded mr-2">
                                     <Text className="text-blue-400 text-xs font-bold">{t('common.edit')}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => handleDeleteDay(item.id)} className="bg-red-900/30 px-3 py-1 rounded">
@@ -204,6 +201,6 @@ export const ProgramEditorScreen = () => {
                     </View>
                 }
             />
-        </SafeAreaView>
+        </View>
     );
 };
