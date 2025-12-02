@@ -1,0 +1,23 @@
+{
+    "common": {
+        "loading": "Memuat program...",
+        "noProgram": "Program tidak ditemukan. Silakan mulai ulang aplikasi untuk memuat data.",
+        "appName": "Pelacak Gym",
+        "greeting": "Halo, Pengguna",
+        "programs": "PROGRAM",
+        "completed": "Selesai",
+        "today": "Latihan Hari Ini",
+        "restDay": "Hari Istirahat",
+        "restDayMessage": "Hari pemulihan aktif. Peregangan, jalan kaki, atau istirahat saja.",
+        "exercisesCount": "{{count}} latihan direncanakan",
+        "startWorkout": "Mulai Sesi",
+        "markComplete": "Tandai Selesai",
+        "nextDays": "Hari Mendatang",
+        "rest": "Istirahat",
+        "exercises": "Latihan",
+        "lastWorkout": "Latihan Terakhir"
+    },
+    "home": {
+        "restDayAlert": "Ini hari istirahat! Nikmati pemulihan Anda."
+    }
+}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useProgram } from '../context/ProgramContext';
@@ -7,13 +8,14 @@ import { useLiveWorkout } from '../context/LiveWorkoutContext';
 
 export const HomeScreen = () => {
     const navigation = useNavigation();
+    const { t } = useTranslation();
     const { getCurrentDay, program, currentDayIndex, isLoading, completeDay } = useProgram();
     const { startWorkout } = useLiveWorkout();
 
     if (isLoading) {
         return (
             <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-zinc-950 px-6 justify-center items-center">
-                <Text className="text-zinc-50">Loading program...</Text>
+                <Text className="text-zinc-50">{t('common.loading')}</Text>
             </SafeAreaView>
         );
     }
@@ -23,7 +25,7 @@ export const HomeScreen = () => {
     if (!currentDay || program.length === 0) {
         return (
             <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-zinc-950 px-6 justify-center items-center">
-                <Text className="text-zinc-50">No program found. Please restart the app to seed data.</Text>
+                <Text className="text-zinc-50">{t('common.noProgram')}</Text>
             </SafeAreaView>
         );
     }
@@ -36,7 +38,7 @@ export const HomeScreen = () => {
         if (currentDay.isRestDay) {
             // If it's a rest day, maybe just mark as complete or skip?
             // For now, let's just alert
-            alert("It's a rest day! Enjoy your recovery.");
+            alert(t('home.restDayAlert'));
             return;
         }
 
@@ -48,14 +50,14 @@ export const HomeScreen = () => {
         <SafeAreaView className="flex-1 bg-zinc-950 px-6" edges={['top', 'left', 'right']}>
             <View className="mt-8 mb-8 flex-row justify-between items-center">
                 <View>
-                    <Text className="text-zinc-400 text-sm uppercase tracking-wider font-bold mb-1">Gym Tracker</Text>
-                    <Text className="text-3xl font-bold text-zinc-50">Hola, Usuario</Text>
+                    <Text className="text-zinc-400 text-sm uppercase tracking-wider font-bold mb-1">{t('common.appName')}</Text>
+                    <Text className="text-3xl font-bold text-zinc-50">{t('common.greeting')}</Text>
                 </View>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('Programs' as never)}
                     className="bg-zinc-800 p-2 rounded-lg border border-zinc-700"
                 >
-                    <Text className="text-zinc-400 font-bold text-xs">PROGRAMS</Text>
+                    <Text className="text-zinc-400 font-bold text-xs">{t('common.programs')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -63,23 +65,23 @@ export const HomeScreen = () => {
             <View className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 mb-8">
                 <View className="flex-row justify-between items-center mb-4">
                     <View>
-                        <Text className="text-zinc-400 text-xs uppercase font-bold mb-1">Último Entrenamiento</Text>
+                        <Text className="text-zinc-400 text-xs uppercase font-bold mb-1">{t('common.lastWorkout')}</Text>
                         <Text className="text-zinc-50 font-bold text-lg">{prevDay.name}</Text>
                     </View>
                     <View className="bg-emerald-500/20 px-3 py-1 rounded-full">
-                        <Text className="text-emerald-500 text-xs font-bold">Completado</Text>
+                        <Text className="text-emerald-500 text-xs font-bold">{t('common.completed')}</Text>
                     </View>
                 </View>
 
                 <View className="h-[1px] bg-zinc-800 my-2" />
 
                 <View className="mt-2">
-                    <Text className="text-zinc-400 text-xs uppercase font-bold mb-1">Te toca hoy</Text>
+                    <Text className="text-zinc-400 text-xs uppercase font-bold mb-1">{t('common.today')}</Text>
                     <Text className="text-blue-500 font-bold text-2xl">{currentDay.name}</Text>
                     {currentDay.isRestDay ? (
-                        <Text className="text-zinc-500 mt-2">Día de recuperación activa. Estira, camina o simplemente descansa.</Text>
+                        <Text className="text-zinc-500 mt-2">{t('common.restDayMessage')}</Text>
                     ) : (
-                        <Text className="text-zinc-500 mt-2">{currentDay.exercises.length} ejercicios planificados</Text>
+                        <Text className="text-zinc-500 mt-2">{t('common.exercisesCount', { count: currentDay.exercises.length })}</Text>
                     )}
                 </View>
             </View>
@@ -90,7 +92,7 @@ export const HomeScreen = () => {
                     className="bg-blue-600 p-4 rounded-2xl items-center shadow-lg shadow-blue-500/20 active:bg-blue-500 mb-8"
                     onPress={handleStartWorkout}
                 >
-                    <Text className="text-white font-bold text-lg">Comenzar Sesión</Text>
+                    <Text className="text-white font-bold text-lg">{t('common.startWorkout')}</Text>
                 </TouchableOpacity>
             )}
 
@@ -99,12 +101,12 @@ export const HomeScreen = () => {
                     className="bg-zinc-800 p-4 rounded-2xl items-center border border-zinc-700 active:bg-zinc-700 mb-8"
                     onPress={() => completeDay()}
                 >
-                    <Text className="text-zinc-300 font-bold text-lg">Marcar como Completado</Text>
+                    <Text className="text-zinc-300 font-bold text-lg">{t('common.markComplete')}</Text>
                 </TouchableOpacity>
             )}
 
             {/* Upcoming Schedule Preview */}
-            <Text className="text-zinc-50 text-lg font-bold mb-4">Próximos Días</Text>
+            <Text className="text-zinc-50 text-lg font-bold mb-4">{t('common.nextDays')}</Text>
             <ScrollView className="flex-1">
                 {program.map((day, index) => {
                     // Simple logic to show next few days
@@ -113,7 +115,7 @@ export const HomeScreen = () => {
                     return (
                         <View key={day.id} className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 mb-3 flex-row justify-between items-center">
                             <Text className="text-zinc-300 font-medium">{day.name}</Text>
-                            <Text className="text-zinc-500 text-xs">{day.isRestDay ? 'Descanso' : `${day.exercises.length} Ejercicios`}</Text>
+                            <Text className="text-zinc-500 text-xs">{day.isRestDay ? t('common.rest') : `${day.exercises.length} ${t('common.exercises')}`}</Text>
                         </View>
                     );
                 })}

@@ -1,5 +1,7 @@
 import './global.css';
 
+import './src/i18n';
+import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { Text, View, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';

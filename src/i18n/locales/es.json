@@ -1,0 +1,23 @@
+{
+    "common": {
+        "loading": "Cargando programa...",
+        "noProgram": "No se encontró programa. Por favor reinicia la app para cargar datos.",
+        "appName": "Gym Tracker",
+        "greeting": "Hola, Usuario",
+        "programs": "PROGRAMAS",
+        "completed": "Completado",
+        "today": "Te toca hoy",
+        "restDay": "Día de Descanso",
+        "restDayMessage": "Día de recuperación activa. Estira, camina o simplemente descansa.",
+        "exercisesCount": "{{count}} ejercicios planificados",
+        "startWorkout": "Comenzar Sesión",
+        "markComplete": "Marcar como Completado",
+        "nextDays": "Próximos Días",
+        "rest": "Descanso",
+        "exercises": "Ejercicios",
+        "lastWorkout": "Último Entrenamiento"
+    },
+    "home": {
+        "restDayAlert": "¡Es día de descanso! Disfruta tu recuperación."
+    }
+}

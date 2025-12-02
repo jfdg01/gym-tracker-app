@@ -1,0 +1,23 @@
+{
+    "common": {
+        "loading": "正在加载计划...",
+        "noProgram": "未找到计划。请重启应用以加载数据。",
+        "appName": "健身追踪器",
+        "greeting": "你好，用户",
+        "programs": "计划",
+        "completed": "已完成",
+        "today": "今日训练",
+        "restDay": "休息日",
+        "restDayMessage": "积极恢复日。拉伸、散步或休息。",
+        "exercisesCount": "计划了 {{count}} 个动作",
+        "startWorkout": "开始训练",
+        "markComplete": "标记为完成",
+        "nextDays": "接下来的日程",
+        "rest": "休息",
+        "exercises": "动作",
+        "lastWorkout": "上次训练"
+    },
+    "home": {
+        "restDayAlert": "今天是休息日！享受你的恢复时间。"
+    }
+}
