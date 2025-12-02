@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { createPlan, deletePlan } from '../db/plans';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../db/client';
@@ -23,19 +24,22 @@ export const ProgramSelectionScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
-        const loadPrograms = async () => {
-            try {
-                const allPrograms = await db.select().from(schema.programs);
-                setPrograms(allPrograms);
-            } catch (error) {
-                console.error('Error loading programs:', error);
-                console.error('Error loading programs:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadPrograms();
-    }, []);
+        const unsubscribe = navigation.addListener('focus', () => {
+            loadPrograms();
+        });
+        return unsubscribe;
+    }, [navigation]);
+
+    const loadPrograms = async () => {
+        try {
+            const allPrograms = await db.select().from(schema.programs);
+            setPrograms(allPrograms);
+        } catch (error) {
+            console.error('Error loading programs:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleProgramPress = (programId: number) => {
         setSelectedProgramId(programId);
@@ -53,11 +57,41 @@ export const ProgramSelectionScreen = () => {
         }
     };
 
+    const handleCreateProgram = async () => {
+        const newId = await createPlan("New Program", "Description");
+        (navigation as any).navigate('ProgramEditor', { programId: newId });
+    };
+
+    const handleEditProgram = (programId: number) => {
+        (navigation as any).navigate('ProgramEditor', { programId });
+    };
+
+    const handleDeleteProgram = (programId: number) => {
+        Alert.alert(
+            "Delete Program",
+            "Are you sure? This will delete all days and history associated with this program.",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        await deletePlan(programId);
+                        loadPrograms();
+                    }
+                }
+            ]
+        );
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
-            < View className="px-6 py-4 border-b border-zinc-900 flex-row items-center bg-zinc-950" >
-                <Text className="text-zinc-50 text-3xl font-bold">Programas</Text>
-            </View >
+            <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center justify-between bg-zinc-950">
+                <Text className="text-zinc-50 text-3xl font-bold">Programs</Text>
+                <TouchableOpacity onPress={handleCreateProgram} className="bg-blue-600 px-4 py-2 rounded-lg">
+                    <Text className="text-white font-bold">+ New</Text>
+                </TouchableOpacity>
+            </View>
 
             <ScrollView className="flex-1 px-6 pt-6">
                 {loading ? (
@@ -66,39 +100,55 @@ export const ProgramSelectionScreen = () => {
                     programs.map((prog) => {
                         const isActive = prog.id === currentProgramId;
                         return (
-                            <TouchableOpacity
+                            <View
                                 key={prog.id}
-                                onPress={() => handleProgramPress(prog.id)}
-                                className={`p-6 rounded-2xl border mb-4 active:bg-zinc-800 ${isActive ? 'bg-zinc-800 border-blue-500' : 'bg-zinc-900 border-zinc-800'
-                                    }`}
+                                className={`p-6 rounded-2xl border mb-4 ${isActive ? 'bg-zinc-800 border-blue-500' : 'bg-zinc-900 border-zinc-800'}`}
                             >
-                                <View className="flex-row justify-between items-center mb-2">
-                                    <Text className="text-zinc-50 text-xl font-bold">{prog.name}</Text>
-                                    {isActive ? (
-                                        <Text className="text-blue-500 font-bold text-sm">Activo</Text>
-                                    ) : (
-                                        <Text className="text-zinc-400 font-bold text-sm">Seleccionar</Text>
+                                <TouchableOpacity onPress={() => handleProgramPress(prog.id)}>
+                                    <View className="flex-row justify-between items-center mb-2">
+                                        <Text className="text-zinc-50 text-xl font-bold">{prog.name}</Text>
+                                        {isActive ? (
+                                            <Text className="text-blue-500 font-bold text-sm">Active</Text>
+                                        ) : (
+                                            <Text className="text-zinc-500 font-bold text-sm">Select</Text>
+                                        )}
+                                    </View>
+                                    {prog.description && (
+                                        <Text className="text-zinc-400 text-base leading-relaxed mb-4">{prog.description}</Text>
                                     )}
+                                </TouchableOpacity>
+
+                                <View className="flex-row justify-end space-x-3 border-t border-zinc-700/50 pt-4 mt-2">
+                                    <TouchableOpacity
+                                        onPress={() => handleEditProgram(prog.id)}
+                                        className="bg-zinc-700 px-4 py-2 rounded-lg"
+                                    >
+                                        <Text className="text-zinc-300 font-bold text-sm">Edit</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => handleDeleteProgram(prog.id)}
+                                        className="bg-red-900/30 px-4 py-2 rounded-lg"
+                                    >
+                                        <Text className="text-red-400 font-bold text-sm">Delete</Text>
+                                    </TouchableOpacity>
                                 </View>
-                                {prog.description && (
-                                    <Text className="text-zinc-400 text-base leading-relaxed">{prog.description}</Text>
-                                )}
-                            </TouchableOpacity>
+                            </View>
                         );
                     })
                 )}
+                <View className="h-20" />
             </ScrollView>
 
             <ConfirmationModal
                 visible={modalVisible}
-                title="Cambiar Programa"
-                message="¿Estás seguro de que quieres cambiar tu programa de entrenamiento actual? Esto actualizará tu rutina diaria."
-                confirmText="Cambiar"
-                cancelText="Cancelar"
+                title="Change Program"
+                message="Are you sure you want to switch your active program?"
+                confirmText="Switch"
+                cancelText="Cancel"
                 onConfirm={confirmSelection}
                 onCancel={() => setModalVisible(false)}
                 confirmButtonColor="blue"
             />
-        </SafeAreaView >
+        </SafeAreaView>
     );
 };

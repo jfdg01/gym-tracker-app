@@ -19,6 +19,7 @@ type ProgramContextType = {
     isLoading: boolean;
     setProgram: (programId: number) => Promise<void>;
     currentProgramId: number | null;
+    refreshProgram: () => Promise<void>;
 };
 
 const ProgramContext = createContext<ProgramContextType | undefined>(undefined);
@@ -247,6 +248,12 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return program[currentDayIndex];
     };
 
+    const refreshProgram = async () => {
+        if (currentProgramId) {
+            await loadProgramData(currentProgramId);
+        }
+    };
+
     return (
         <ProgramContext.Provider
             value={{
@@ -257,6 +264,7 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 isLoading,
                 setProgram,
                 currentProgramId,
+                refreshProgram,
             }}
         >
             {children}
