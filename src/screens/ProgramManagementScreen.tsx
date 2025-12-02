@@ -5,13 +5,12 @@ import { useProgram } from '../context/ProgramContext';
 import { ViewState } from '../types/program-management';
 import { ProgramListView } from '../components/program-management/ProgramListView';
 import { ProgramEditorView } from '../components/program-management/ProgramEditorView';
-import { DayEditorView } from '../components/program-management/DayEditorView';
+
 
 export const ProgramManagementScreen = () => {
     const { setProgram: setContextProgram } = useProgram();
     const [view, setView] = useState<ViewState>('LIST');
     const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null);
-    const [selectedDayId, setSelectedDayId] = useState<number | null>(null);
 
     const handleCreateProgram = async () => {
         const newId = await createPlan("New Program", "Description");
@@ -24,17 +23,12 @@ export const ProgramManagementScreen = () => {
         setView('PROGRAM_EDIT');
     };
 
-    const handleEditDay = (dayId: number) => {
-        setSelectedDayId(dayId);
-        setView('DAY_EDIT');
-    };
-
     const handleSelectActiveProgram = async (id: number) => {
         await setContextProgram(id);
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
             {view === 'LIST' && (
                 <ProgramListView
                     onCreate={handleCreateProgram}
@@ -46,13 +40,6 @@ export const ProgramManagementScreen = () => {
                 <ProgramEditorView
                     programId={selectedProgramId}
                     onBack={() => setView('LIST')}
-                    onEditDay={handleEditDay}
-                />
-            )}
-            {view === 'DAY_EDIT' && selectedDayId && (
-                <DayEditorView
-                    dayId={selectedDayId}
-                    onBack={() => setView('PROGRAM_EDIT')}
                 />
             )}
         </SafeAreaView>

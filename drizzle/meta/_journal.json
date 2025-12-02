@@ -8,6 +8,13 @@
       "when": 1764684334484,
       "tag": "0000_goofy_cardiac",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1764718410395,
+      "tag": "0001_futuristic_rockslide",
+      "breakpoints": true
     }
   ]
 }

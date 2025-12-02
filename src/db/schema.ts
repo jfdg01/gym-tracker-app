@@ -36,6 +36,7 @@ export const user_settings = sqliteTable('user_settings', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     current_program_id: integer('current_program_id').references(() => programs.id),
     current_day_index: integer('current_day_index').default(0),
+    language: text('language').default('en'),
 });
 
 export const workout_logs = sqliteTable('workout_logs', {

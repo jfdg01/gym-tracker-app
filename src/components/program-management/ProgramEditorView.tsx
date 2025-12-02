@@ -1,34 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Plus, ChevronUp, ChevronDown } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../db/client';
-import * as schema from '../../db/schema';
-import { programs, days } from '../../db/schema';
+import { programs, days, day_exercises, exercises } from '../../db/schema';
 import { eq, asc } from 'drizzle-orm';
-import { updatePlan, addDayToPlan, deleteDay, reorderDays, deletePlan } from '../../db/plans';
+import { updatePlan, addDayToPlan, deleteDay, reorderDays, deletePlan, addExerciseToDay } from '../../db/plans';
 import { useProgram } from '../../context/ProgramContext';
-import { DayItem } from '../../types/program-management';
+import { DayItem, DayExerciseItem } from '../../types/program-management';
 import { ScreenHeader } from '../ScreenHeader';
 import { HeaderAction } from '../HeaderAction';
 import { ConfirmationModal } from '../ConfirmationModal';
+import { DayCard } from './DayCard';
+import { ExercisePickerModal } from './ExercisePickerModal';
+import { ExerciseFormModal } from '../ExerciseFormModal';
+import { getExerciseById, updateExercise, Exercise, NewExercise } from '../../db/exercises';
+import { useNavigation } from '@react-navigation/native';
 
 type ProgramEditorViewProps = {
     programId: number;
     onBack: () => void;
-    onEditDay: (dayId: number) => void;
 };
 
 export const ProgramEditorView = ({
     programId,
-    onBack,
-    onEditDay
+    onBack
 }: ProgramEditorViewProps) => {
+    const insets = useSafeAreaInsets();
     const { t } = useTranslation();
+    const navigation = useNavigation();
     const { currentProgramId, refreshProgram } = useProgram();
     const [programName, setProgramName] = useState('');
     const [programDesc, setProgramDesc] = useState('');
     const [daysList, setDaysList] = useState<DayItem[]>([]);
+    const [daysExercises, setDaysExercises] = useState<Record<number, DayExerciseItem[]>>({});
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [isDaysListCollapsed, setIsDaysListCollapsed] = useState(false);
+
+    // Picker State
+    const [pickerVisible, setPickerVisible] = useState(false);
+    const [activeDayId, setActiveDayId] = useState<number | null>(null);
+
+    // Edit Exercise State
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
 
     useEffect(() => {
         loadProgramDetails();
@@ -44,7 +60,27 @@ export const ProgramEditorView = ({
         const d = await db.select().from(days)
             .where(eq(days.program_id, programId))
             .orderBy(asc(days.order_index));
+
         setDaysList(d);
+
+        // Load exercises for all days
+        const exercisesMap: Record<number, DayExerciseItem[]> = {};
+        for (const day of d) {
+            const exs = await db.select({
+                id: day_exercises.id,
+                exercise_id: exercises.id,
+                name: exercises.name,
+                sets: exercises.sets,
+                reps: exercises.max_reps,
+                order_index: day_exercises.order_index
+            })
+                .from(day_exercises)
+                .innerJoin(exercises, eq(day_exercises.exercise_id, exercises.id))
+                .where(eq(day_exercises.day_id, day.id))
+                .orderBy(asc(day_exercises.order_index));
+            exercisesMap[day.id] = exs as any;
+        }
+        setDaysExercises(exercisesMap);
     };
 
     const handleSaveMeta = async () => {
@@ -53,9 +89,9 @@ export const ProgramEditorView = ({
     };
 
     const handleAddDay = async () => {
-        const newDayId = await addDayToPlan(programId, `Day ${daysList.length + 1}`);
+        await addDayToPlan(programId, `Day ${daysList.length + 1}`);
         if (programId === currentProgramId) refreshProgram();
-        onEditDay(newDayId);
+        loadProgramDetails();
     };
 
     const handleDeleteDay = async (dayId: number) => {
@@ -111,6 +147,53 @@ export const ProgramEditorView = ({
         onBack();
     };
 
+    const handleAddExercise = (dayId: number) => {
+        setActiveDayId(dayId);
+        setPickerVisible(true);
+    };
+
+    const handleSelectExercise = async (exerciseId: number) => {
+        if (activeDayId) {
+            await addExerciseToDay(activeDayId, exerciseId);
+            setPickerVisible(false);
+            setActiveDayId(null);
+            loadProgramDetails();
+        }
+    };
+
+    const handleCreateExercise = () => {
+        setPickerVisible(false);
+        // Navigate to Exercises screen to create new exercise
+        // We might need to pass a param to know we should return here, 
+        // but for now let's just navigate. The user can manually come back.
+        // Ideally we would have a stack navigator and push the create screen.
+        // Assuming 'Exercises' is a tab, we might need a specific stack screen for creation.
+        // For now, let's just navigate to the Exercises tab/screen.
+        // @ts-ignore
+        navigation.navigate('Exercises');
+    };
+
+    const handleEditExercise = async (exerciseId: number) => {
+        const exercise = await getExerciseById(exerciseId);
+        if (exercise) {
+            setEditingExercise(exercise);
+            setEditModalVisible(true);
+        }
+    };
+
+    const handleSaveExercise = async (data: NewExercise) => {
+        if (editingExercise) {
+            await updateExercise(editingExercise.id, data);
+            setEditModalVisible(false);
+            setEditingExercise(null);
+            loadProgramDetails();
+        }
+    };
+
+    // const [isDaysListCollapsed, setIsDaysListCollapsed] = useState(false); // Removed duplicate
+
+    // ... existing code ...
+
     return (
         <View className="flex-1">
             <ScreenHeader
@@ -125,79 +208,83 @@ export const ProgramEditorView = ({
                 }
             />
 
-            <View className="p-4 border-b border-zinc-900">
-                <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('programEditor.programName')}</Text>
-                <TextInput
-                    className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800 mb-4"
-                    value={programName}
-                    onChangeText={setProgramName}
-                    onEndEditing={handleSaveMeta}
-                />
-                <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('common.description')}</Text>
-                <TextInput
-                    className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800"
-                    value={programDesc}
-                    onChangeText={setProgramDesc}
-                    onEndEditing={handleSaveMeta}
-                />
-            </View>
-
             <FlatList
-                data={daysList}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+                data={isDaysListCollapsed ? [] : daysList}
+                keyExtractor={(item) => `day-${item.id}`}
+                contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 100 }}
                 ListHeaderComponent={
-                    <Text className="text-zinc-500 text-xs uppercase font-bold mb-4">{t('programEditor.days')}</Text>
+                    <View className="mb-6">
+                        <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('programEditor.programName')}</Text>
+                        <TextInput
+                            className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800 mb-4"
+                            value={programName}
+                            onChangeText={setProgramName}
+                            onEndEditing={handleSaveMeta}
+                        />
+                        <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('common.description')}</Text>
+                        <TextInput
+                            className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800"
+                            value={programDesc}
+                            onChangeText={setProgramDesc}
+                            onEndEditing={handleSaveMeta}
+                        />
+                        <View className="h-px bg-zinc-800 my-6" />
+
+                        <TouchableOpacity
+                            className="flex-row items-center justify-between mb-2"
+                            onPress={() => setIsDaysListCollapsed(!isDaysListCollapsed)}
+                        >
+                            <Text className="text-zinc-500 text-xs uppercase font-bold">{t('programEditor.days')}</Text>
+                            <View className="bg-zinc-900 p-1 rounded border border-zinc-800">
+                                {isDaysListCollapsed ? (
+                                    <ChevronDown size={14} color="#71717a" />
+                                ) : (
+                                    <ChevronUp size={14} color="#71717a" />
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    </View>
                 }
                 renderItem={({ item, index }) => (
-                    <View className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 mb-3">
-                        <View className="flex-row justify-between items-center mb-2">
-                            <Text className="text-zinc-50 font-bold text-lg">{item.name}</Text>
-                            <View className="flex-row space-x-2">
-                                <TouchableOpacity onPress={() => onEditDay(item.id)} className="bg-blue-900/30 px-3 py-1 rounded mr-2">
-                                    <Text className="text-blue-400 text-xs font-bold">{t('common.edit')}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => handleDeleteDay(item.id)} className="bg-red-900/30 px-3 py-1 rounded">
-                                    <Text className="text-red-400 text-xs font-bold">{t('common.delete')}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-
-                        <View className="flex-row justify-between items-center">
-                            <Text className="text-zinc-500 text-xs">{item.is_rest_day ? t('common.restDay') : t('programEditor.workoutDay')}</Text>
-                            <View className="flex-row space-x-2">
-                                <TouchableOpacity
-                                    onPress={() => handleMoveUp(index)}
-                                    disabled={index === 0}
-                                    className={`p-2 rounded ${index === 0 ? 'opacity-30' : 'bg-zinc-800'}`}
-                                >
-                                    <Text className="text-zinc-400 font-bold">↑</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    onPress={() => handleMoveDown(index)}
-                                    disabled={index === daysList.length - 1}
-                                    className={`p-2 rounded ${index === daysList.length - 1 ? 'opacity-30' : 'bg-zinc-800'}`}
-                                >
-                                    <Text className="text-zinc-400 font-bold">↓</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
+                    <DayCard
+                        day={item}
+                        exercises={daysExercises[item.id] || []}
+                        onDelete={() => handleDeleteDay(item.id)}
+                        onMoveUp={() => handleMoveUp(index)}
+                        onMoveDown={() => handleMoveDown(index)}
+                        isFirst={index === 0}
+                        isLast={index === daysList.length - 1}
+                        onAddExercise={() => handleAddExercise(item.id)}
+                        onRefresh={loadProgramDetails}
+                        onEditExercise={handleEditExercise}
+                    />
                 )}
                 ListFooterComponent={
                     <View>
-                        <TouchableOpacity
-                            className="bg-blue-600 p-4 rounded-xl items-center mt-4"
-                            onPress={handleAddDay}
-                        >
-                            <Text className="text-white font-bold">{t('programEditor.addDay')}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            className="bg-red-500/10 p-4 rounded-xl items-center mt-4 border border-red-500/20"
-                            onPress={handleDeleteProgram}
-                        >
-                            <Text className="text-red-500 font-bold">{t('programSelection.deleteProgramTitle')}</Text>
-                        </TouchableOpacity>
+                        {!isDaysListCollapsed && (
+                            <TouchableOpacity
+                                className="flex-row items-center justify-center bg-blue-600/10 p-4 rounded-xl border border-blue-600/30 mt-4"
+                                onPress={handleAddDay}
+                            >
+                                <Plus size={20} color="#3b82f6" className="mr-2" />
+                                <Text className="text-blue-500 font-bold">{t('programEditor.addDay')}</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        <View className="mt-8">
+                            <TouchableOpacity
+                                className="bg-blue-600 p-4 rounded-xl items-center mb-3"
+                                onPress={onBack}
+                            >
+                                <Text className="text-white font-bold">{t('common.save')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                className="bg-red-500/10 p-4 rounded-xl items-center border border-red-500/20"
+                                onPress={handleDeleteProgram}
+                            >
+                                <Text className="text-red-500 font-bold">{t('programSelection.deleteProgramTitle')}</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 }
             />
@@ -211,6 +298,21 @@ export const ProgramEditorView = ({
                 onConfirm={confirmDeleteProgram}
                 onCancel={() => setDeleteModalVisible(false)}
                 confirmButtonColor="red"
+            />
+
+            <ExercisePickerModal
+                visible={pickerVisible}
+                onClose={() => setPickerVisible(false)}
+                onSelect={handleSelectExercise}
+                onCreateExercise={handleCreateExercise}
+            />
+
+            <ExerciseFormModal
+                visible={editModalVisible}
+                onClose={() => setEditModalVisible(false)}
+                onSave={handleSaveExercise}
+                onDelete={async () => { }} // We don't want to delete exercises from here, just edit
+                initialData={editingExercise}
             />
         </View>
     );

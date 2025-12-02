@@ -53,6 +53,7 @@
 		"select": "Select",
 		"selectLanguage": "Select Language",
 		"sets": "Sets",
+		"skip": "Skip",
 		"startWorkout": "Start Session",
 		"targetReps": "Target Reps",
 		"targetSets": "Target Sets",
@@ -61,6 +62,7 @@
 	"dayEditor": {
 		"addExercise": "Add Exercise",
 		"dayName": "Day Name",
+		"exercises": "Exercises",
 		"editDay": "Edit Day",
 		"isRestDay": "This is a Rest Day.",
 		"noExercises": "No exercises can be added.",

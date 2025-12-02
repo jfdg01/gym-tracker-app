@@ -93,7 +93,7 @@ export const ActiveExerciseScreen = () => {
 
                             return (
                                 <TouchableOpacity
-                                    key={ex.id}
+                                    key={`${ex.id}-${idx}`}
                                     onPress={() => {
                                         goToExercise(idx);
                                         setListModalVisible(false);
@@ -182,7 +182,7 @@ export const ActiveExerciseScreen = () => {
 
                         return (
                             <View
-                                key={set.id}
+                                key={`${set.id}-${index}`}
                                 className={`flex-row items-center py-4 mb-2 rounded-xl border ${isCurrentSet
                                     ? 'bg-blue-900/10 border-blue-500/50'
                                     : 'bg-zinc-900 border-zinc-800'

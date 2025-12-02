@@ -8,6 +8,9 @@ import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { Globe, X, Dumbbell } from 'lucide-react-native';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { HeaderAction } from '../components/HeaderAction';
+import { db } from '../db/client';
+import * as schema from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 const LANGUAGES = [
     { code: 'en', label: 'English' },
@@ -54,9 +57,22 @@ export const HomeScreen = () => {
         navigation.navigate('ActiveExercise' as never);
     };
 
-    const changeLanguage = (langCode: string) => {
-        i18n.changeLanguage(langCode);
+    const changeLanguage = async (langCode: string) => {
+        await i18n.changeLanguage(langCode);
         setLanguageModalVisible(false);
+        try {
+            const settings = await db.select().from(schema.user_settings).limit(1);
+            if (settings.length > 0) {
+                await db.update(schema.user_settings)
+                    .set({ language: langCode })
+                    .where(eq(schema.user_settings.id, settings[0].id));
+            } else {
+                // Should ideally exist if App.tsx/ProgramContext initialized it, but safe to insert if missing
+                await db.insert(schema.user_settings).values({ language: langCode });
+            }
+        } catch (error) {
+            console.error('Failed to save language preference', error);
+        }
     };
 
     return (

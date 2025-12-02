@@ -50,8 +50,8 @@ export const WorkoutSummaryScreen = () => {
 
                 <Text className="text-zinc-50 text-lg font-bold mb-4">{t('workoutSummary.exerciseDetails')}</Text>
 
-                {workout.exercises.map((exercise) => (
-                    <View key={exercise.id} className="bg-zinc-900 p-4 rounded-2xl mb-4 border border-zinc-800">
+                {workout.exercises.map((exercise, exIndex) => (
+                    <View key={`${exercise.id}-${exIndex}`} className="bg-zinc-900 p-4 rounded-2xl mb-4 border border-zinc-800">
                         <View className="flex-row justify-between items-start mb-3">
                             <View className="flex-1">
                                 <Text className="text-lg font-bold text-zinc-50">{exercise.name}</Text>
@@ -72,7 +72,7 @@ export const WorkoutSummaryScreen = () => {
                         {/* Sets Summary Grid */}
                         <View className="flex-row flex-wrap gap-2">
                             {exercise.sets.map((set, index) => (
-                                <View key={set.id} className={`items-center justify-center w-10 h-10 rounded-lg ${set.completed ? 'bg-zinc-800' : 'bg-zinc-900 border border-zinc-800'}`}>
+                                <View key={`${set.id}-${index}`} className={`items-center justify-center w-10 h-10 rounded-lg ${set.completed ? 'bg-zinc-800' : 'bg-zinc-900 border border-zinc-800'}`}>
                                     <Text className={`font-bold text-xs ${set.completed ? 'text-zinc-50' : 'text-zinc-600'}`}>
                                         {set.completed ? set.actualReps : '-'}
                                     </Text>
