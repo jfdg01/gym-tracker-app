@@ -85,9 +85,10 @@ export const ExercisesScreen = () => {
                     <Text className="text-zinc-50 text-3xl font-bold">Ejercicios</Text>
                     <TouchableOpacity
                         onPress={openCreateModal}
-                        className="bg-blue-500 p-3 rounded-full"
+                        className="bg-blue-500 px-4 py-2 rounded-full flex-row items-center"
                     >
-                        <Plus size={24} color="white" />
+                        <Plus size={20} color="white" className="mr-2" />
+                        <Text className="text-white font-bold">Añadir</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -111,7 +112,17 @@ export const ExercisesScreen = () => {
                     ListEmptyComponent={
                         <View className="items-center justify-center py-20">
                             <Text className="text-zinc-500 text-lg">No hay ejercicios aún.</Text>
-                            <Text className="text-zinc-600 text-sm mt-2">Pulsa + para crear uno.</Text>
+                            <Text className="text-zinc-600 text-sm mt-2">Pulsa el botón de abajo para crear uno.</Text>
+                        </View>
+                    }
+                    ListFooterComponent={
+                        <View className="items-center mt-4">
+                            <TouchableOpacity
+                                onPress={openCreateModal}
+                                className="bg-blue-500 p-3 rounded-full"
+                            >
+                                <Plus size={24} color="white" />
+                            </TouchableOpacity>
                         </View>
                     }
                 />
