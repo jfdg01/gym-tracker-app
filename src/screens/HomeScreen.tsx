@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useProgram } from '../context/ProgramContext';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
@@ -24,7 +24,13 @@ export const HomeScreen = () => {
     const navigation = useNavigation();
     const { t, i18n } = useTranslation();
     const [languageModalVisible, setLanguageModalVisible] = useState(false);
-    const { getCurrentDay, program, currentDayIndex, isLoading, completeDay } = useProgram();
+    const { getCurrentDay, program, currentDayIndex, isLoading, completeDay, refreshProgram } = useProgram();
+
+    useFocusEffect(
+        useCallback(() => {
+            refreshProgram();
+        }, [refreshProgram])
+    );
     const { startWorkout } = useLiveWorkout();
 
     if (isLoading) {
