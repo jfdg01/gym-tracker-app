@@ -8,6 +8,8 @@ import { SetCompletionModal } from '../components/SetCompletionModal';
 import { ConfirmationModal } from '../components/ConfirmationModal';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScreenHeader } from '../components/ScreenHeader';
+import { HeaderAction } from '../components/HeaderAction';
 
 export const ActiveExerciseScreen = () => {
     const { t } = useTranslation();
@@ -56,20 +58,18 @@ export const ActiveExerciseScreen = () => {
     return (
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
             {/* Header */}
-            <View className="px-6 py-4 border-b border-zinc-900 flex-row justify-between items-center">
-                <View>
-                    <Text className="text-zinc-400 text-xs uppercase tracking-widest font-bold mb-1">
-                        {t('activeExercise.exerciseProgress', { current: currentExerciseIndex + 1, total: workout.exercises.length })}
-                    </Text>
-                    <Text className="text-zinc-50 text-2xl font-bold">{currentExercise.name}</Text>
-                </View>
-                <TouchableOpacity
-                    onPress={() => setListModalVisible(true)}
-                    className="p-2 bg-zinc-900 rounded-lg border border-zinc-800"
-                >
-                    <Text className="text-zinc-400 font-bold text-xs">{t('activeExercise.list')}</Text>
-                </TouchableOpacity>
-            </View>
+            {/* Header */}
+            <ScreenHeader
+                title={currentExercise.name}
+                subtitle={t('activeExercise.exerciseProgress', { current: currentExerciseIndex + 1, total: workout.exercises.length })}
+                rightAction={
+                    <HeaderAction
+                        label={t('activeExercise.list')}
+                        onPress={() => setListModalVisible(true)}
+                        variant="secondary"
+                    />
+                }
+            />
 
             {/* Exercise List Modal */}
             <Modal visible={listModalVisible} animationType="slide" presentationStyle="pageSheet">

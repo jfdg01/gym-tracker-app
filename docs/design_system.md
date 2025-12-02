@@ -88,7 +88,24 @@ We use a customized Zinc-based dark palette with a vibrant Electric Blue accent.
 *   **Element Spacing**: `space-x-4` or `space-y-4` - Standard gap between related elements.
 *   **Touch Targets**: Minimum 44x44pt.
 
-## 6. Tailwind Configuration Guide
+## 6. Screen Headers
+
+### Main Views (Default)
+*   **Layout**: Left-aligned large title, actions on the right.
+*   **Title**: `text-3xl font-bold text-zinc-50`
+*   **Subtitle**: `text-zinc-400 text-xs uppercase tracking-wider font-bold` (Optional, above title)
+*   **Padding**: `px-6 py-4`
+*   **Background**: `bg-zinc-950` (matches app background)
+*   **Border**: `border-b border-zinc-900` (Optional, for definition)
+
+### Detail / Modal Views
+*   **Layout**: Center-aligned title, actions on left (Back/Cancel) and right (Save/Action).
+*   **Title**: `text-xl font-bold text-zinc-50`
+*   **Padding**: `px-4 py-2`
+*   **Background**: `bg-zinc-950`
+*   **Border**: `border-b border-zinc-900`
+
+## 7. Tailwind Configuration Guide
 
 Extend the Tailwind config to map these semantic names if desired, or stick to the Zinc/Blue scales.
 

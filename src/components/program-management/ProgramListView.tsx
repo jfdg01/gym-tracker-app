@@ -6,6 +6,8 @@ import * as schema from '../../db/schema';
 import { useProgram } from '../../context/ProgramContext';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { ProgramItem } from '../../types/program-management';
+import { ScreenHeader } from '../ScreenHeader';
+import { HeaderAction } from '../HeaderAction';
 
 type ProgramListViewProps = {
     onEdit: (id: number) => void;
@@ -55,12 +57,16 @@ export const ProgramListView = ({
 
     return (
         <View className="flex-1">
-            <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center justify-between bg-zinc-950">
-                <Text className="text-zinc-50 text-3xl font-bold">{t('common.programs')}</Text>
-                <TouchableOpacity onPress={onCreate} className="bg-blue-500 px-5 py-3 rounded-xl">
-                    <Text className="text-white font-bold">{t('programSelection.new')}</Text>
-                </TouchableOpacity>
-            </View>
+            <ScreenHeader
+                title={t('common.programs')}
+                rightAction={
+                    <HeaderAction
+                        label={t('programSelection.new')}
+                        onPress={onCreate}
+                        variant="primary"
+                    />
+                }
+            />
 
             <ScrollView className="flex-1 px-6 pt-6">
                 {loading ? (

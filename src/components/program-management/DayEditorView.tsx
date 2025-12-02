@@ -7,6 +7,8 @@ import { days, day_exercises, exercises } from '../../db/schema';
 import { eq, asc, like } from 'drizzle-orm';
 import { updateDay, addExerciseToDay, removeExerciseFromDay, reorderExercisesInDay } from '../../db/plans';
 import { DayExerciseItem } from '../../types/program-management';
+import { ScreenHeader } from '../ScreenHeader';
+import { HeaderAction } from '../HeaderAction';
 
 type DayEditorViewProps = {
     dayId: number;
@@ -110,13 +112,17 @@ export const DayEditorView = ({
 
     return (
         <View className="flex-1">
-            <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center justify-between">
-                <TouchableOpacity onPress={onBack}>
-                    <Text className="text-blue-500 text-lg">{t('common.done')}</Text>
-                </TouchableOpacity>
-                <Text className="text-zinc-50 text-xl font-bold">{t('dayEditor.editDay')}</Text>
-                <View className="w-10" />
-            </View>
+            <ScreenHeader
+                title={t('dayEditor.editDay')}
+                variant="modal"
+                leftAction={
+                    <HeaderAction
+                        label={t('common.done')}
+                        onPress={onBack}
+                        variant="link"
+                    />
+                }
+            />
 
             <View className="p-4 border-b border-zinc-900">
                 <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('dayEditor.dayName')}</Text>

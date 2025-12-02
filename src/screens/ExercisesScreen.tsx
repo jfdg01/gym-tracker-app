@@ -6,6 +6,8 @@ import { Plus, Search, Dumbbell } from 'lucide-react-native';
 import { getAllExercises, createExercise, updateExercise, deleteExercise, Exercise, NewExercise } from '../db/exercises';
 import { ExerciseFormModal } from '../components/ExerciseFormModal';
 import { useFocusEffect } from '@react-navigation/native';
+import { ScreenHeader } from '../components/ScreenHeader';
+import { HeaderAction } from '../components/HeaderAction';
 
 export const ExercisesScreen = () => {
     const { t } = useTranslation();
@@ -84,16 +86,17 @@ export const ExercisesScreen = () => {
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
             <View className="px-6 flex-1">
                 {/* titulo Ejercicios */}
-                <View className="flex-row justify-between items-center my-6">
-                    <Text className="text-zinc-50 text-3xl font-bold">{t('common.exercises')}</Text>
-                    <TouchableOpacity
-                        onPress={openCreateModal}
-                        className="bg-blue-500 px-4 py-2 rounded-full flex-row items-center"
-                    >
-                        <Plus size={20} color="white" className="mr-2" />
-                        <Text className="text-white font-bold">{t('common.add')}</Text>
-                    </TouchableOpacity>
-                </View>
+                <ScreenHeader
+                    title={t('common.exercises')}
+                    rightAction={
+                        <HeaderAction
+                            icon={<Plus size={20} color="white" />}
+                            label={t('common.add')}
+                            onPress={openCreateModal}
+                            variant="primary"
+                        />
+                    }
+                />
 
                 {/* buscador */}
                 <View className="bg-zinc-900 p-3 rounded-xl flex-row items-center mb-6 border border-zinc-800">

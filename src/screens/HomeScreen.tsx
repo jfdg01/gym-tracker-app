@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useProgram } from '../context/ProgramContext';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { Globe, X, Dumbbell } from 'lucide-react-native';
+import { ScreenHeader } from '../components/ScreenHeader';
+import { HeaderAction } from '../components/HeaderAction';
 
 const LANGUAGES = [
     { code: 'en', label: 'English' },
@@ -59,26 +61,24 @@ export const HomeScreen = () => {
 
     return (
         <SafeAreaView className="flex-1 bg-zinc-950 px-6" edges={['top', 'left', 'right', 'bottom']}>
-            <View className="mt-8 mb-8 flex-row justify-between items-center">
-                <View>
-                    <Text className="text-zinc-400 text-sm uppercase tracking-wider font-bold mb-1">{t('common.appName')}</Text>
-                    <Text className="text-3xl font-bold text-zinc-50">{t('common.greeting')}</Text>
-                </View>
-                <View className="flex-row space-x-2">
-                    <TouchableOpacity
-                        onPress={() => setLanguageModalVisible(true)}
-                        className="bg-zinc-800 p-2 rounded-lg border border-zinc-700"
-                    >
-                        <Globe size={20} color="#a1a1aa" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('Programs' as never)}
-                        className="bg-zinc-800 p-2 rounded-lg border border-zinc-700"
-                    >
-                        <Text className="text-zinc-400 font-bold text-xs">{t('common.programs')}</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+            <ScreenHeader
+                title={t('common.greeting')}
+                subtitle={t('common.appName')}
+                rightAction={
+                    <View className="flex-row">
+                        <HeaderAction
+                            icon={<Globe size={20} color="#a1a1aa" />}
+                            onPress={() => setLanguageModalVisible(true)}
+                            variant="icon"
+                        />
+                        <HeaderAction
+                            label={t('common.programs')}
+                            onPress={() => navigation.navigate('Programs' as never)}
+                            variant="secondary"
+                        />
+                    </View>
+                }
+            />
 
             {hasProgram ? (
                 <>

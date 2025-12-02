@@ -29,6 +29,14 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     const defaultConfirmText = t('common.confirm');
     const defaultCancelText = t('common.cancel');
 
+    const colorVariants: Record<string, string> = {
+        blue: 'bg-blue-600 shadow-blue-500/20 active:bg-blue-500',
+        red: 'bg-red-600 shadow-red-500/20 active:bg-red-500',
+        emerald: 'bg-emerald-600 shadow-emerald-500/20 active:bg-emerald-500',
+    };
+
+    const buttonStyle = colorVariants[confirmButtonColor] || colorVariants.blue;
+
     return (
         <Modal visible={visible} transparent animationType="fade">
             <View className="flex-1 bg-black/80 justify-center items-center px-6">
@@ -52,7 +60,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            className={`flex-[2] bg-${confirmButtonColor}-600 py-4 rounded-2xl items-center shadow-lg shadow-${confirmButtonColor}-500/20 active:bg-${confirmButtonColor}-500`}
+                            className={`flex-[2] py-4 rounded-2xl items-center shadow-lg ${buttonStyle}`}
                             onPress={onConfirm}
                         >
                             <Text className="text-white font-bold text-lg">{confirmText || defaultConfirmText}</Text>

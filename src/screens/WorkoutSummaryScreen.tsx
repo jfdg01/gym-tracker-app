@@ -5,6 +5,7 @@ import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useProgram } from '../context/ProgramContext';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 export const WorkoutSummaryScreen = () => {
     const { t } = useTranslation();
@@ -30,8 +31,10 @@ export const WorkoutSummaryScreen = () => {
     return (
         <SafeAreaView edges={['top', 'left', 'right', 'bottom']} className="flex-1 bg-zinc-950">
             <ScrollView className="flex-1 px-6">
-                <Text className="text-3xl font-bold text-zinc-50 mt-8 mb-1">{t('workoutSummary.summary')}</Text>
-                <Text className="text-zinc-400 text-base mb-8">{t('workoutSummary.goodJob')}</Text>
+                <ScreenHeader
+                    title={t('workoutSummary.summary')}
+                    subtitle={t('workoutSummary.goodJob')}
+                />
 
                 {/* Stats Row */}
                 <View className="flex-row justify-between mb-8 bg-zinc-900 p-4 rounded-2xl border border-zinc-800">

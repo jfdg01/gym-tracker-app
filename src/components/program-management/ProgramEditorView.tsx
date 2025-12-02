@@ -8,6 +8,9 @@ import { eq, asc } from 'drizzle-orm';
 import { updatePlan, addDayToPlan, deleteDay, reorderDays, deletePlan } from '../../db/plans';
 import { useProgram } from '../../context/ProgramContext';
 import { DayItem } from '../../types/program-management';
+import { ScreenHeader } from '../ScreenHeader';
+import { HeaderAction } from '../HeaderAction';
+import { ConfirmationModal } from '../ConfirmationModal';
 
 type ProgramEditorViewProps = {
     programId: number;
@@ -25,6 +28,7 @@ export const ProgramEditorView = ({
     const [programName, setProgramName] = useState('');
     const [programDesc, setProgramDesc] = useState('');
     const [daysList, setDaysList] = useState<DayItem[]>([]);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
     useEffect(() => {
         loadProgramDetails();
@@ -98,32 +102,28 @@ export const ProgramEditorView = ({
     };
 
     const handleDeleteProgram = () => {
-        Alert.alert(
-            t('programSelection.deleteProgramTitle'),
-            t('programSelection.deleteProgramMessage'),
-            [
-                { text: t('common.cancel'), style: "cancel" },
-                {
-                    text: t('common.delete'),
-                    style: "destructive",
-                    onPress: async () => {
-                        await deletePlan(programId);
-                        onBack();
-                    }
-                }
-            ]
-        );
+        setDeleteModalVisible(true);
+    };
+
+    const confirmDeleteProgram = async () => {
+        await deletePlan(programId);
+        setDeleteModalVisible(false);
+        onBack();
     };
 
     return (
         <View className="flex-1">
-            <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center justify-between">
-                <TouchableOpacity onPress={onBack}>
-                    <Text className="text-blue-500 text-lg">{t('common.done')}</Text>
-                </TouchableOpacity>
-                <Text className="text-zinc-50 text-xl font-bold">{t('programEditor.editProgram')}</Text>
-                <View className="w-10" />
-            </View>
+            <ScreenHeader
+                title={t('programEditor.editProgram')}
+                variant="modal"
+                leftAction={
+                    <HeaderAction
+                        label={t('common.done')}
+                        onPress={onBack}
+                        variant="link"
+                    />
+                }
+            />
 
             <View className="p-4 border-b border-zinc-900">
                 <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('programEditor.programName')}</Text>
@@ -200,6 +200,17 @@ export const ProgramEditorView = ({
                         </TouchableOpacity>
                     </View>
                 }
+            />
+
+            <ConfirmationModal
+                visible={deleteModalVisible}
+                title={t('programSelection.deleteProgramTitle')}
+                message={t('programSelection.deleteProgramMessage')}
+                confirmText={t('common.delete')}
+                cancelText={t('common.cancel')}
+                onConfirm={confirmDeleteProgram}
+                onCancel={() => setDeleteModalVisible(false)}
+                confirmButtonColor="red"
             />
         </View>
     );
