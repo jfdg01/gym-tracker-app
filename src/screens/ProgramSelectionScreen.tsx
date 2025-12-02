@@ -88,7 +88,7 @@ export const ProgramSelectionScreen = () => {
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
             <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center justify-between bg-zinc-950">
                 <Text className="text-zinc-50 text-3xl font-bold">Programs</Text>
-                <TouchableOpacity onPress={handleCreateProgram} className="bg-blue-600 px-4 py-2 rounded-lg">
+                <TouchableOpacity onPress={handleCreateProgram} className="bg-blue-500 px-5 py-3 rounded-xl">
                     <Text className="text-white font-bold">+ New</Text>
                 </TouchableOpacity>
             </View>
@@ -102,34 +102,40 @@ export const ProgramSelectionScreen = () => {
                         return (
                             <View
                                 key={prog.id}
-                                className={`p-6 rounded-2xl border mb-4 ${isActive ? 'bg-zinc-800 border-blue-500' : 'bg-zinc-900 border-zinc-800'}`}
+                                className={`p-6 rounded-2xl border mb-4 shadow-sm ${isActive ? 'bg-zinc-800 border-blue-500' : 'bg-zinc-900 border-zinc-800'}`}
                             >
-                                <TouchableOpacity onPress={() => handleProgramPress(prog.id)}>
+                                <View>
                                     <View className="flex-row justify-between items-center mb-2">
-                                        <Text className="text-zinc-50 text-xl font-bold">{prog.name}</Text>
-                                        {isActive ? (
-                                            <Text className="text-blue-500 font-bold text-sm">Active</Text>
-                                        ) : (
-                                            <Text className="text-zinc-500 font-bold text-sm">Select</Text>
+                                        <Text className="text-zinc-50 text-xl font-semibold">{prog.name}</Text>
+                                        {isActive && (
+                                            <Text className="text-blue-500 font-semibold text-sm">Active</Text>
                                         )}
                                     </View>
                                     {prog.description && (
                                         <Text className="text-zinc-400 text-base leading-relaxed mb-4">{prog.description}</Text>
                                     )}
-                                </TouchableOpacity>
+                                </View>
 
                                 <View className="flex-row justify-end space-x-3 border-t border-zinc-700/50 pt-4 mt-2">
+                                    {!isActive && (
+                                        <TouchableOpacity
+                                            onPress={() => handleProgramPress(prog.id)}
+                                            className="bg-blue-500 px-5 py-3 rounded-xl mx-1"
+                                        >
+                                            <Text className="text-white font-bold text-sm">Select</Text>
+                                        </TouchableOpacity>
+                                    )}
                                     <TouchableOpacity
                                         onPress={() => handleEditProgram(prog.id)}
-                                        className="bg-zinc-700 px-4 py-2 rounded-lg"
+                                        className="bg-transparent border border-zinc-700 px-5 py-3 rounded-xl mx-1"
                                     >
                                         <Text className="text-zinc-300 font-bold text-sm">Edit</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => handleDeleteProgram(prog.id)}
-                                        className="bg-red-900/30 px-4 py-2 rounded-lg"
+                                        className="bg-red-500/10 px-5 py-3 rounded-xl mx-1"
                                     >
-                                        <Text className="text-red-400 font-bold text-sm">Delete</Text>
+                                        <Text className="text-red-500 font-bold text-sm">Delete</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
