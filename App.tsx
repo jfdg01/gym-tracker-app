@@ -8,20 +8,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { db, expoDb } from './src/db/client';
 import migrations from './drizzle/migrations';
-import { useEffect, useState } from 'react';
-import { seedDatabase } from './src/db/seed';
+import { useEffect } from 'react';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import * as SQLite from 'expo-sqlite';
 
 export default function App() {
   const { success, error } = useMigrations(db, migrations);
-  const [isSeeded, setIsSeeded] = useState(false);
-
-  useEffect(() => {
-    if (success) {
-      seedDatabase().then(() => setIsSeeded(true));
-    }
-  }, [success]);
 
   const resetDatabase = async () => {
     try {
