@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, TextInput, Switch, Modal } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { db } from '../db/client';
@@ -17,6 +18,7 @@ type DayExerciseItem = {
 };
 
 export const DayEditorScreen = () => {
+    const { t } = useTranslation();
     const navigation = useNavigation();
     const route = useRoute();
     const { dayId } = route.params as { dayId: number };
@@ -121,14 +123,14 @@ export const DayEditorScreen = () => {
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
             <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center justify-between">
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Text className="text-blue-500 text-lg">Done</Text>
+                    <Text className="text-blue-500 text-lg">{t('common.done')}</Text>
                 </TouchableOpacity>
-                <Text className="text-zinc-50 text-xl font-bold">Edit Day</Text>
+                <Text className="text-zinc-50 text-xl font-bold">{t('dayEditor.editDay')}</Text>
                 <View className="w-10" />
             </View>
 
             <View className="p-4 border-b border-zinc-900">
-                <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">Day Name</Text>
+                <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('dayEditor.dayName')}</Text>
                 <TextInput
                     className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800 mb-4"
                     value={dayName}
@@ -137,7 +139,7 @@ export const DayEditorScreen = () => {
                 />
 
                 <View className="flex-row justify-between items-center bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-                    <Text className="text-zinc-50 font-bold">Rest Day</Text>
+                    <Text className="text-zinc-50 font-bold">{t('common.restDay')}</Text>
                     <Switch
                         value={isRestDay}
                         onValueChange={(val) => {
@@ -155,17 +157,17 @@ export const DayEditorScreen = () => {
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
                     ListHeaderComponent={
-                        <Text className="text-zinc-500 text-xs uppercase font-bold mb-4">Exercises</Text>
+                        <Text className="text-zinc-500 text-xs uppercase font-bold mb-4">{t('common.exercises')}</Text>
                     }
                     renderItem={({ item, index }) => (
                         <View className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 mb-3">
                             <View className="flex-row justify-between items-start mb-2">
                                 <View className="flex-1">
                                     <Text className="text-zinc-50 font-bold text-lg">{item.name}</Text>
-                                    <Text className="text-zinc-500">{item.sets} sets x {item.reps} reps</Text>
+                                    <Text className="text-zinc-500">{t('dayEditor.setsReps', { sets: item.sets, reps: item.reps })}</Text>
                                 </View>
                                 <TouchableOpacity onPress={() => handleRemoveExercise(item.id)} className="bg-red-900/30 px-3 py-1 rounded">
-                                    <Text className="text-red-400 text-xs font-bold">Remove</Text>
+                                    <Text className="text-red-400 text-xs font-bold">{t('common.remove')}</Text>
                                 </TouchableOpacity>
                             </View>
 
@@ -192,14 +194,14 @@ export const DayEditorScreen = () => {
                             className="bg-blue-600 p-4 rounded-xl items-center mt-4"
                             onPress={handleAddExercise}
                         >
-                            <Text className="text-white font-bold">Add Exercise</Text>
+                            <Text className="text-white font-bold">{t('dayEditor.addExercise')}</Text>
                         </TouchableOpacity>
                     }
                 />
             ) : (
                 <View className="flex-1 justify-center items-center p-8">
-                    <Text className="text-zinc-500 text-center text-lg">This is a Rest Day.</Text>
-                    <Text className="text-zinc-600 text-center mt-2">No exercises can be added.</Text>
+                    <Text className="text-zinc-500 text-center text-lg">{t('dayEditor.isRestDay')}</Text>
+                    <Text className="text-zinc-600 text-center mt-2">{t('dayEditor.noExercises')}</Text>
                 </View>
             )}
 
@@ -212,16 +214,16 @@ export const DayEditorScreen = () => {
             >
                 <View className="flex-1 bg-zinc-950">
                     <View className="px-4 py-4 border-b border-zinc-900 flex-row items-center justify-between">
-                        <Text className="text-zinc-50 text-xl font-bold">Select Exercise</Text>
+                        <Text className="text-zinc-50 text-xl font-bold">{t('dayEditor.selectExercise')}</Text>
                         <TouchableOpacity onPress={() => setPickerVisible(false)}>
-                            <Text className="text-blue-500 text-lg font-bold">Close</Text>
+                            <Text className="text-blue-500 text-lg font-bold">{t('common.close')}</Text>
                         </TouchableOpacity>
                     </View>
 
                     <View className="p-4">
                         <TextInput
                             className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800"
-                            placeholder="Search exercises..."
+                            placeholder={t('dayEditor.searchPlaceholder')}
                             placeholderTextColor="#71717a"
                             value={search}
                             onChangeText={setSearch}

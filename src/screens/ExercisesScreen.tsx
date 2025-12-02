@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, Search, Dumbbell } from 'lucide-react-native';
 import { getAllExercises, createExercise, updateExercise, deleteExercise, Exercise, NewExercise } from '../db/exercises';
@@ -7,6 +8,7 @@ import { ExerciseFormModal } from '../components/ExerciseFormModal';
 import { useFocusEffect } from '@react-navigation/native';
 
 export const ExercisesScreen = () => {
+    const { t } = useTranslation();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -72,7 +74,7 @@ export const ExercisesScreen = () => {
             <View className="flex-1">
                 <Text className="text-zinc-50 font-bold text-lg">{item.name}</Text>
                 <Text className="text-zinc-400 text-sm">
-                    {item.sets} sets • {item.min_reps}-{item.max_reps} reps • {item.weight ? `${item.weight}kg` : 'Peso libre'}
+                    {t('exercises.exerciseDetails', { sets: item.sets, min: item.min_reps, max: item.max_reps, weight: item.weight ? item.weight : t('exercises.freeWeight') })}
                 </Text>
             </View>
         </TouchableOpacity>
@@ -83,13 +85,13 @@ export const ExercisesScreen = () => {
             <View className="px-6 flex-1">
                 {/* titulo Ejercicios */}
                 <View className="flex-row justify-between items-center my-6">
-                    <Text className="text-zinc-50 text-3xl font-bold">Ejercicios</Text>
+                    <Text className="text-zinc-50 text-3xl font-bold">{t('common.exercises')}</Text>
                     <TouchableOpacity
                         onPress={openCreateModal}
                         className="bg-blue-500 px-4 py-2 rounded-full flex-row items-center"
                     >
                         <Plus size={20} color="white" className="mr-2" />
-                        <Text className="text-white font-bold">Añadir</Text>
+                        <Text className="text-white font-bold">{t('common.add')}</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -98,7 +100,7 @@ export const ExercisesScreen = () => {
                     <Search size={20} color="#71717a" className="mr-3" />
                     <TextInput
                         className="flex-1 text-zinc-50 text-base"
-                        placeholder="Buscar ejercicios..."
+                        placeholder={t('dayEditor.searchPlaceholder')}
                         placeholderTextColor="#71717a"
                         value={searchQuery}
                         onChangeText={setSearchQuery}
@@ -113,8 +115,8 @@ export const ExercisesScreen = () => {
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
                         <View className="items-center justify-center py-20">
-                            <Text className="text-zinc-500 text-lg">No hay ejercicios aún.</Text>
-                            <Text className="text-zinc-600 text-sm mt-2">Pulsa el botón de abajo para crear uno.</Text>
+                            <Text className="text-zinc-500 text-lg">{t('exercises.noExercises')}</Text>
+                            <Text className="text-zinc-600 text-sm mt-2">{t('exercises.createPrompt')}</Text>
                         </View>
                     }
                     // add button

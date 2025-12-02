@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { createPlan, deletePlan } from '../db/plans';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -16,6 +17,7 @@ type Program = {
 };
 
 export const ProgramSelectionScreen = () => {
+    const { t } = useTranslation();
     const navigation = useNavigation();
     const { setProgram: setContextProgram, currentProgramId } = useProgram();
     const [programs, setPrograms] = useState<Program[]>([]);
@@ -68,12 +70,12 @@ export const ProgramSelectionScreen = () => {
 
     const handleDeleteProgram = (programId: number) => {
         Alert.alert(
-            "Delete Program",
-            "Are you sure? This will delete all days and history associated with this program.",
+            t('programSelection.deleteProgramTitle'),
+            t('programSelection.deleteProgramMessage'),
             [
-                { text: "Cancel", style: "cancel" },
+                { text: t('common.cancel'), style: "cancel" },
                 {
-                    text: "Delete",
+                    text: t('common.delete'),
                     style: "destructive",
                     onPress: async () => {
                         await deletePlan(programId);
@@ -87,15 +89,15 @@ export const ProgramSelectionScreen = () => {
     return (
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
             <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center justify-between bg-zinc-950">
-                <Text className="text-zinc-50 text-3xl font-bold">Programs</Text>
+                <Text className="text-zinc-50 text-3xl font-bold">{t('common.programs')}</Text>
                 <TouchableOpacity onPress={handleCreateProgram} className="bg-blue-500 px-5 py-3 rounded-xl">
-                    <Text className="text-white font-bold">+ New</Text>
+                    <Text className="text-white font-bold">{t('programSelection.new')}</Text>
                 </TouchableOpacity>
             </View>
 
             <ScrollView className="flex-1 px-6 pt-6">
                 {loading ? (
-                    <Text className="text-zinc-500 text-center">Loading programs...</Text>
+                    <Text className="text-zinc-500 text-center">{t('common.loading')}</Text>
                 ) : (
                     programs.map((prog) => {
                         const isActive = prog.id === currentProgramId;
@@ -108,7 +110,7 @@ export const ProgramSelectionScreen = () => {
                                     <View className="flex-row justify-between items-center mb-2">
                                         <Text className="text-zinc-50 text-xl font-semibold">{prog.name}</Text>
                                         {isActive && (
-                                            <Text className="text-blue-500 font-semibold text-sm">Active</Text>
+                                            <Text className="text-blue-500 font-semibold text-sm">{t('programSelection.active')}</Text>
                                         )}
                                     </View>
                                     {prog.description && (
@@ -122,20 +124,20 @@ export const ProgramSelectionScreen = () => {
                                             onPress={() => handleProgramPress(prog.id)}
                                             className="bg-blue-500 px-5 py-3 rounded-xl mx-1"
                                         >
-                                            <Text className="text-white font-bold text-sm">Select</Text>
+                                            <Text className="text-white font-bold text-sm">{t('common.select')}</Text>
                                         </TouchableOpacity>
                                     )}
                                     <TouchableOpacity
                                         onPress={() => handleEditProgram(prog.id)}
                                         className="bg-transparent border border-zinc-700 px-5 py-3 rounded-xl mx-1"
                                     >
-                                        <Text className="text-zinc-300 font-bold text-sm">Edit</Text>
+                                        <Text className="text-zinc-300 font-bold text-sm">{t('common.edit')}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => handleDeleteProgram(prog.id)}
                                         className="bg-red-500/10 px-5 py-3 rounded-xl mx-1"
                                     >
-                                        <Text className="text-red-500 font-bold text-sm">Delete</Text>
+                                        <Text className="text-red-500 font-bold text-sm">{t('common.delete')}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -147,10 +149,10 @@ export const ProgramSelectionScreen = () => {
 
             <ConfirmationModal
                 visible={modalVisible}
-                title="Change Program"
-                message="Are you sure you want to switch your active program?"
-                confirmText="Switch"
-                cancelText="Cancel"
+                title={t('programSelection.changeProgramTitle')}
+                message={t('programSelection.changeProgramMessage')}
+                confirmText={t('programSelection.switch')}
+                cancelText={t('common.cancel')}
                 onConfirm={confirmSelection}
                 onCancel={() => setModalVisible(false)}
                 confirmButtonColor="blue"

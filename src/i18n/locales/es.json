@@ -8,16 +8,113 @@
         "completed": "Completado",
         "today": "Te toca hoy",
         "restDay": "Día de Descanso",
-        "restDayMessage": "Día de recuperación activa. Estira, camina o simplemente descansa.",
+        "restDayMessage": "Día de descanso. Recupera tu energía",
         "exercisesCount": "{{count}} ejercicios planificados",
         "startWorkout": "Comenzar Sesión",
         "markComplete": "Marcar como Completado",
         "nextDays": "Próximos Días",
         "rest": "Descanso",
         "exercises": "Ejercicios",
-        "lastWorkout": "Último Entrenamiento"
+        "lastWorkout": "Último Entrenamiento",
+        "done": "Listo",
+        "remove": "Eliminar",
+        "close": "Cerrar",
+        "error": "Error",
+        "save": "Guardar",
+        "confirm": "Confirmar",
+        "sets": "Series",
+        "language": "Idioma",
+        "selectLanguage": "Seleccionar Idioma",
+        "cancel": "Cancelar",
+        "add": "Añadir",
+        "name": "Nombre",
+        "description": "Descripción",
+        "createdAt": "Creado el",
+        "targetSets": "Series Objetivo",
+        "targetReps": "Reps Objetivo",
+        "restTimeSeconds": "Tiempo de Descanso (s)",
+        "minReps": "Reps Mín",
+        "maxReps": "Reps Máx",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "select": "Seleccionar",
+        "areYouSure": "¿Estás seguro?"
     },
     "home": {
         "restDayAlert": "¡Es día de descanso! Disfruta tu recuperación."
+    },
+    "activeExercise": {
+        "noExercise": "No hay ejercicio",
+        "exerciseProgress": "Ejercicio {{current}} de {{total}}",
+        "list": "LISTA",
+        "sessionSummary": "Resumen de Sesión",
+        "current": "Actual",
+        "setsCount": "{{count}} Series",
+        "completedSets": "{{count}} Completadas",
+        "finishWorkout": "Finalizar Entrenamiento",
+        "setHeader": "Set",
+        "targetHeader": "Objetivo",
+        "doneHeader": "Hecho",
+        "rest": "Descanso",
+        "skipRest": "Saltar descanso",
+        "skip": "Saltar",
+        "resting": "Descansando...",
+        "completeSet": "He completado mi set"
+    },
+    "dayEditor": {
+        "editDay": "Editar Día",
+        "dayName": "Nombre del Día",
+        "setsReps": "{{sets}} series x {{reps}} reps",
+        "addExercise": "Añadir Ejercicio",
+        "isRestDay": "Este es un día de descanso.",
+        "noExercises": "No se pueden añadir ejercicios.",
+        "selectExercise": "Seleccionar Ejercicio",
+        "searchPlaceholder": "Buscar ejercicios..."
+    },
+    "debug": {
+        "databaseTables": "Tablas de Base de Datos"
+    },
+    "editRecord": {
+        "enterPlaceholder": "Ingresar {{key}}",
+        "soundEnabled": "Sonido Activado"
+    },
+    "exercises": {
+        "noExercises": "No hay ejercicios aún.",
+        "createPrompt": "Pulsa el botón de abajo para crear uno.",
+        "freeWeight": "Peso libre",
+        "exerciseDetails": "{{sets}} series • {{min}}-{{max}} reps • {{weight}}kg"
+    },
+    "programEditor": {
+        "editProgram": "Editar Programa",
+        "programName": "Nombre del Programa",
+        "days": "Días",
+        "workoutDay": "Día de Entrenamiento",
+        "addDay": "Añadir Día",
+        "deleteDayTitle": "Eliminar Día"
+    },
+    "programSelection": {
+        "new": "+ Nuevo",
+        "active": "Activo",
+        "deleteProgramTitle": "Eliminar Programa",
+        "deleteProgramMessage": "¿Estás seguro? Esto eliminará todos los días e historial asociados con este programa.",
+        "changeProgramTitle": "Cambiar Programa",
+        "changeProgramMessage": "¿Estás seguro de que quieres cambiar tu programa activo?",
+        "switch": "Cambiar"
+    },
+    "tableList": {
+        "id": "ID: {{id}}",
+        "addNew": "Añadir Nuevo",
+        "noRecords": "No se encontraron registros"
+    },
+    "workoutSummary": {
+        "noData": "No hay datos de entrenamiento",
+        "summary": "Resumen",
+        "goodJob": "¡Buen trabajo! Aquí tienes tu resumen.",
+        "time": "Tiempo",
+        "exerciseDetails": "Detalle de Ejercicios",
+        "setsCompleted": "{{count}} sets completados",
+        "increaseWeight": "Subir Peso",
+        "decreaseWeight": "Bajar Peso",
+        "nextSession": "Próxima sesión:"
     }
 }

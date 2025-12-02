@@ -10,7 +10,7 @@ interface LayoutProps {
 
 export const Layout = ({ children, className = '' }: LayoutProps) => {
     return (
-        <SafeAreaView className="flex-1 bg-red-500" edges={['top']}>
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top']}>
             <View className={`flex-1 ${className}`}>
                 {children}
             </View>

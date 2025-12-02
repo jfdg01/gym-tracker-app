@@ -1,14 +1,29 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Modal, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useProgram } from '../context/ProgramContext';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
+import { Globe, X } from 'lucide-react-native';
+
+const LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Español' },
+    { code: 'zh', label: '中文' },
+    { code: 'hi', label: 'हिन्दी' },
+    { code: 'ar', label: 'العربية' },
+    { code: 'fr', label: 'Français' },
+    { code: 'bn', label: 'বাংলা' },
+    { code: 'pt', label: 'Português' },
+    { code: 'ru', label: 'Русский' },
+    { code: 'id', label: 'Bahasa Indonesia' },
+];
 
 export const HomeScreen = () => {
     const navigation = useNavigation();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const [languageModalVisible, setLanguageModalVisible] = useState(false);
     const { getCurrentDay, program, currentDayIndex, isLoading, completeDay } = useProgram();
     const { startWorkout } = useLiveWorkout();
 
@@ -46,6 +61,11 @@ export const HomeScreen = () => {
         navigation.navigate('ActiveExercise' as never);
     };
 
+    const changeLanguage = (langCode: string) => {
+        i18n.changeLanguage(langCode);
+        setLanguageModalVisible(false);
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-zinc-950 px-6" edges={['top', 'left', 'right']}>
             <View className="mt-8 mb-8 flex-row justify-between items-center">
@@ -53,12 +73,20 @@ export const HomeScreen = () => {
                     <Text className="text-zinc-400 text-sm uppercase tracking-wider font-bold mb-1">{t('common.appName')}</Text>
                     <Text className="text-3xl font-bold text-zinc-50">{t('common.greeting')}</Text>
                 </View>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Programs' as never)}
-                    className="bg-zinc-800 p-2 rounded-lg border border-zinc-700"
-                >
-                    <Text className="text-zinc-400 font-bold text-xs">{t('common.programs')}</Text>
-                </TouchableOpacity>
+                <View className="flex-row space-x-2">
+                    <TouchableOpacity
+                        onPress={() => setLanguageModalVisible(true)}
+                        className="bg-zinc-800 p-2 rounded-lg border border-zinc-700"
+                    >
+                        <Globe size={20} color="#a1a1aa" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Programs' as never)}
+                        className="bg-zinc-800 p-2 rounded-lg border border-zinc-700"
+                    >
+                        <Text className="text-zinc-400 font-bold text-xs">{t('common.programs')}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {/* Status Card */}
@@ -122,6 +150,33 @@ export const HomeScreen = () => {
 
             </ScrollView>
 
+            <Modal visible={languageModalVisible} animationType="slide" transparent>
+                <View className="flex-1 bg-black/80 justify-end">
+                    <View className="bg-zinc-900 rounded-t-3xl h-[70%] p-6">
+                        <View className="flex-row justify-between items-center mb-6">
+                            <Text className="text-zinc-50 text-xl font-bold">{t('common.selectLanguage')}</Text>
+                            <TouchableOpacity onPress={() => setLanguageModalVisible(false)} className="p-2 bg-zinc-800 rounded-full">
+                                <X size={20} color="#a1a1aa" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <FlatList
+                            data={LANGUAGES}
+                            keyExtractor={(item) => item.code}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    className={`p-4 rounded-xl mb-3 border ${i18n.language === item.code ? 'bg-blue-600 border-blue-500' : 'bg-zinc-800 border-zinc-700'}`}
+                                    onPress={() => changeLanguage(item.code)}
+                                >
+                                    <Text className={`text-lg font-bold ${i18n.language === item.code ? 'text-white' : 'text-zinc-300'}`}>
+                                        {item.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        />
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 };

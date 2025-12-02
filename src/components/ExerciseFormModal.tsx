@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { NewExercise, Exercise } from '../db/exercises';
 import { X } from 'lucide-react-native';
 
@@ -12,6 +13,7 @@ interface ExerciseFormModalProps {
 }
 
 export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, onClose, onSave, onDelete, initialData }) => {
+    const { t } = useTranslation();
     const [name, setName] = useState('');
     const [sets, setSets] = useState('3');
     const [minReps, setMinReps] = useState('4');
@@ -72,7 +74,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                 <View className="bg-zinc-900 rounded-t-3xl h-[90%] p-6">
                     <View className="flex-row justify-between items-center mb-6">
                         <Text className="text-zinc-50 text-xl font-bold">
-                            {initialData ? 'Editar Ejercicio' : 'Nuevo Ejercicio'}
+                            {initialData ? t('exerciseForm.editTitle') : t('exerciseForm.newTitle')}
                         </Text>
                         <TouchableOpacity onPress={onClose} className="p-2 bg-zinc-800 rounded-full">
                             <X size={20} color="#a1a1aa" />
@@ -82,10 +84,10 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                         <View className="space-y-6 pb-10">
                             <View>
-                                <Text className="text-zinc-400 mb-2 text-sm">Nombre *</Text>
+                                <Text className="text-zinc-400 mb-2 text-sm">{t('exerciseForm.nameLabel')}</Text>
                                 <TextInput
                                     className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
-                                    placeholder="Ej. Press de Banca"
+                                    placeholder={t('exerciseForm.namePlaceholder')}
                                     placeholderTextColor="#52525b"
                                     value={name}
                                     onChangeText={setName}
@@ -93,11 +95,11 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                             </View>
 
                             <View className="h-px bg-zinc-800 my-4" />
-                            <Text className="text-zinc-50 font-semibold text-lg">Configuración</Text>
+                            <Text className="text-zinc-50 font-semibold text-lg">{t('exerciseForm.configuration')}</Text>
 
                             <View className="flex-row space-x-4">
                                 <View className="flex-1 mr-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">Sets</Text>
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('common.sets')}</Text>
                                     <TextInput
                                         className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
                                         value={sets}
@@ -106,7 +108,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                                     />
                                 </View>
                                 <View className="flex-1 ml-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">Peso (kg)</Text>
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.weightLabel')}</Text>
                                     <TextInput
                                         className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
                                         placeholder="0"
@@ -120,7 +122,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
 
                             <View className="flex-row space-x-4">
                                 <View className="flex-1 mr-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">Min Reps</Text>
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('common.minReps')}</Text>
                                     <TextInput
                                         className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
                                         value={minReps}
@@ -129,7 +131,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                                     />
                                 </View>
                                 <View className="flex-1 ml-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">Max Reps</Text>
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('common.maxReps')}</Text>
                                     <TextInput
                                         className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
                                         value={maxReps}
@@ -140,7 +142,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                             </View>
 
                             <View>
-                                <Text className="text-zinc-400 my-2 text-sm">Descanso (seg)</Text>
+                                <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.restTimeLabel')}</Text>
                                 <TextInput
                                     className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
                                     value={restTimeSeconds}
@@ -156,7 +158,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                             onPress={handleSave}
                             className="bg-blue-500 p-4 rounded-xl items-center mb-4"
                         >
-                            <Text className="text-white font-bold text-lg">Guardar Ejercicio</Text>
+                            <Text className="text-white font-bold text-lg">{t('exerciseForm.save')}</Text>
                         </TouchableOpacity>
 
                         {initialData && (
@@ -164,7 +166,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                                 onPress={handleDelete}
                                 className="bg-red-500/10 p-4 rounded-xl items-center border border-red-500/20"
                             >
-                                <Text className="text-red-500 font-bold text-lg">Eliminar Ejercicio</Text>
+                                <Text className="text-red-500 font-bold text-lg">{t('exerciseForm.delete')}</Text>
                             </TouchableOpacity>
                         )}
                     </View>

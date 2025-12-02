@@ -1,23 +1,137 @@
 {
     "common": {
-        "loading": "正在加载计划...",
-        "noProgram": "未找到计划。请重启应用以加载数据。",
-        "appName": "健身追踪器",
-        "greeting": "你好，用户",
-        "programs": "计划",
-        "completed": "已完成",
-        "today": "今日训练",
-        "restDay": "休息日",
-        "restDayMessage": "积极恢复日。拉伸、散步或休息。",
-        "exercisesCount": "计划了 {{count}} 个动作",
-        "startWorkout": "开始训练",
-        "markComplete": "标记为完成",
-        "nextDays": "接下来的日程",
-        "rest": "休息",
-        "exercises": "动作",
-        "lastWorkout": "上次训练"
+        "loading": "Loading program...",
+        "noProgram": "No program found. Please restart the app to seed data.",
+        "appName": "Gym Tracker",
+        "greeting": "Hello, User",
+        "programs": "PROGRAMS",
+        "completed": "Completed",
+        "today": "Today's Workout",
+        "restDay": "Rest Day",
+        "restDayMessage": "Active recovery day. Stretch, walk, or just rest.",
+        "exercisesCount": "{{count}} exercises planned",
+        "startWorkout": "Start Session",
+        "markComplete": "Mark as Complete",
+        "nextDays": "Upcoming Days",
+        "rest": "Rest",
+        "exercises": "Exercises",
+        "lastWorkout": "Last Workout",
+        "done": "Done",
+        "remove": "Remove",
+        "close": "Close",
+        "error": "Error",
+        "save": "Save",
+        "cancel": "Cancel",
+        "add": "Add",
+        "name": "Name",
+        "description": "Description",
+        "createdAt": "Created At",
+        "targetSets": "Target Sets",
+        "targetReps": "Target Reps",
+        "restTimeSeconds": "Rest Time (s)",
+        "minReps": "Min Reps",
+        "maxReps": "Max Reps",
+        "edit": "Edit",
+        "delete": "Delete",
+        "select": "Select",
+        "areYouSure": "Are you sure?",
+        "confirm": "Confirm",
+        "sets": "Sets"
     },
     "home": {
-        "restDayAlert": "今天是休息日！享受你的恢复时间。"
+        "restDayAlert": "It's a rest day! Enjoy your recovery."
+    },
+    "activeExercise": {
+        "noExercise": "No exercise",
+        "exerciseProgress": "Exercise {{current}} of {{total}}",
+        "list": "LIST",
+        "sessionSummary": "Session Summary",
+        "current": "Current",
+        "setsCount": "{{count}} Sets",
+        "completedSets": "{{count}} Completed",
+        "finishWorkout": "Finish Workout",
+        "setHeader": "Set",
+        "targetHeader": "Target",
+        "doneHeader": "Done",
+        "rest": "Rest",
+        "skipRest": "Skip Rest",
+        "skip": "Skip",
+        "resting": "Resting...",
+        "completeSet": "I completed my set"
+    },
+    "dayEditor": {
+        "editDay": "Edit Day",
+        "dayName": "Day Name",
+        "setsReps": "{{sets}} sets x {{reps}} reps",
+        "addExercise": "Add Exercise",
+        "isRestDay": "This is a Rest Day.",
+        "noExercises": "No exercises can be added.",
+        "selectExercise": "Select Exercise",
+        "searchPlaceholder": "Search exercises..."
+    },
+    "debug": {
+        "databaseTables": "Database Tables"
+    },
+    "editRecord": {
+        "enterPlaceholder": "Enter {{key}}",
+        "soundEnabled": "Sound Enabled"
+    },
+    "exercises": {
+        "noExercises": "No exercises yet.",
+        "createPrompt": "Tap the button below to create one.",
+        "freeWeight": "Free Weight",
+        "exerciseDetails": "{{sets}} sets • {{min}}-{{max}} reps • {{weight}}kg"
+    },
+    "programEditor": {
+        "editProgram": "Edit Program",
+        "programName": "Program Name",
+        "days": "Days",
+        "workoutDay": "Workout Day",
+        "addDay": "Add Day",
+        "deleteDayTitle": "Delete Day"
+    },
+    "programSelection": {
+        "new": "+ New",
+        "active": "Active",
+        "deleteProgramTitle": "Delete Program",
+        "deleteProgramMessage": "Are you sure? This will delete all days and history associated with this program.",
+        "changeProgramTitle": "Change Program",
+        "changeProgramMessage": "Are you sure you want to switch your active program?",
+        "switch": "Switch"
+    },
+    "tableList": {
+        "id": "ID: {{id}}",
+        "addNew": "Add New",
+        "noRecords": "No records found"
+    },
+    "workoutSummary": {
+        "noData": "No workout data",
+        "summary": "Summary",
+        "goodJob": "Good job! Here is your summary.",
+        "time": "Time",
+        "exerciseDetails": "Exercise Details",
+        "setsCompleted": "{{count}} sets completed",
+        "increaseWeight": "Increase Weight",
+        "decreaseWeight": "Decrease Weight",
+        "nextSession": "Next Session:"
+    },
+    "exerciseForm": {
+        "editTitle": "Edit Exercise",
+        "newTitle": "New Exercise",
+        "nameLabel": "Name *",
+        "namePlaceholder": "E.g. Bench Press",
+        "configuration": "Configuration",
+        "weightLabel": "Weight (kg)",
+        "restTimeLabel": "Rest (sec)",
+        "save": "Save Exercise",
+        "delete": "Delete Exercise"
+    },
+    "setCompletion": {
+        "title": "Set Completed",
+        "repsLabel": "Repetitions"
+    },
+    "skipExercise": {
+        "title": "Skip Exercise",
+        "message": "Are you sure you want to skip this exercise? Current progress will not be saved."
     }
 }

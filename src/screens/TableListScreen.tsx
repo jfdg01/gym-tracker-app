@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { db } from '../db/client';
@@ -7,6 +8,7 @@ import { sql } from 'drizzle-orm';
 import * as schema from '../db/schema';
 
 export const TableListScreen = ({ route, navigation }: any) => {
+    const { t } = useTranslation();
     const { tableName } = route.params;
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export const TableListScreen = ({ route, navigation }: any) => {
             onPress={() => navigation.navigate('EditRecord', { tableName, recordId: item.id })}
         >
             <View className="flex-1">
-                <Text className="font-bold">ID: {item.id}</Text>
+                <Text className="font-bold">{t('tableList.id', { id: item.id })}</Text>
                 <Text numberOfLines={1} className="text-gray-600">
                     {JSON.stringify(item)}
                 </Text>
@@ -61,7 +63,7 @@ export const TableListScreen = ({ route, navigation }: any) => {
                 className="bg-red-500 p-2 rounded ml-2"
                 onPress={() => handleDelete(item.id)}
             >
-                <Text className="text-white text-xs">Delete</Text>
+                <Text className="text-white text-xs">{t('common.delete')}</Text>
             </TouchableOpacity>
         </TouchableOpacity>
     );
@@ -74,7 +76,7 @@ export const TableListScreen = ({ route, navigation }: any) => {
                     className="bg-blue-500 p-2 rounded"
                     onPress={() => navigation.navigate('EditRecord', { tableName })}
                 >
-                    <Text className="text-white">Add New</Text>
+                    <Text className="text-white">{t('tableList.addNew')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -85,7 +87,7 @@ export const TableListScreen = ({ route, navigation }: any) => {
                     data={data}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderItem}
-                    ListEmptyComponent={<Text className="text-center text-gray-500 mt-4">No records found</Text>}
+                    ListEmptyComponent={<Text className="text-center text-gray-500 mt-4">{t('tableList.noRecords')}</Text>}
                 />
             )}
         </SafeAreaView>

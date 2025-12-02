@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, TextInput } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { db } from '../db/client';
@@ -7,6 +8,7 @@ import { exercises } from '../db/schema';
 import { like } from 'drizzle-orm';
 
 export const ExercisePickerScreen = () => {
+    const { t } = useTranslation();
     const navigation = useNavigation();
     const route = useRoute();
     const { onSelect } = route.params as { onSelect: (exerciseId: number) => void };
@@ -37,15 +39,15 @@ export const ExercisePickerScreen = () => {
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
             <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center">
                 <TouchableOpacity onPress={() => navigation.goBack()} className="mr-4">
-                    <Text className="text-blue-500 text-lg">Cancel</Text>
+                    <Text className="text-blue-500 text-lg">{t('common.cancel')}</Text>
                 </TouchableOpacity>
-                <Text className="text-zinc-50 text-xl font-bold">Select Exercise</Text>
+                <Text className="text-zinc-50 text-xl font-bold">{t('dayEditor.selectExercise')}</Text>
             </View>
 
             <View className="p-4">
                 <TextInput
                     className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800"
-                    placeholder="Search exercises..."
+                    placeholder={t('dayEditor.searchPlaceholder')}
                     placeholderTextColor="#71717a"
                     value={search}
                     onChangeText={setSearch}

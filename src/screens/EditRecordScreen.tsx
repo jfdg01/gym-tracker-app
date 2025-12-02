@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Switch, Alert, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { db } from '../db/client';
 import { sql } from 'drizzle-orm';
 import * as schema from '../db/schema';
 
 export const EditRecordScreen = ({ route, navigation }: any) => {
+    const { t } = useTranslation();
     const { tableName, recordId } = route.params;
     const isEditing = !!recordId;
     const [formData, setFormData] = useState<any>({});
@@ -89,7 +91,7 @@ export const EditRecordScreen = ({ route, navigation }: any) => {
             navigation.goBack();
         } catch (error: any) {
             console.error('Error saving record:', error);
-            Alert.alert('Error', error.message);
+            Alert.alert(t('common.error'), error.message);
         }
     };
 
@@ -100,7 +102,7 @@ export const EditRecordScreen = ({ route, navigation }: any) => {
         if (isBoolean) {
             return (
                 <View key={key} className="mb-4 flex-row justify-between items-center">
-                    <Text className="font-bold capitalize">{key.replace('_', ' ')}</Text>
+                    <Text className="font-bold capitalize">{t(`common.${key}`) || key.replace('_', ' ')}</Text>
                     <Switch
                         value={!!value}
                         onValueChange={(val) => setFormData({ ...formData, [key]: val })}
@@ -113,12 +115,12 @@ export const EditRecordScreen = ({ route, navigation }: any) => {
 
         return (
             <View key={key} className="mb-4">
-                <Text className="font-bold mb-1 capitalize">{key.replace('_', ' ')}</Text>
+                <Text className="font-bold mb-1 capitalize">{t(`common.${key}`) || key.replace('_', ' ')}</Text>
                 <TextInput
                     className="bg-white p-3 rounded border border-gray-300"
                     value={stringValue}
                     onChangeText={(text) => setFormData({ ...formData, [key]: text })}
-                    placeholder={`Enter ${key}`}
+                    placeholder={t('editRecord.enterPlaceholder', { key: t(`common.${key}`) || key })}
                 />
             </View>
         );
@@ -141,7 +143,7 @@ export const EditRecordScreen = ({ route, navigation }: any) => {
                 className="bg-blue-600 p-4 rounded-lg mt-4 items-center"
                 onPress={handleSave}
             >
-                <Text className="text-white font-bold text-lg">Save</Text>
+                <Text className="text-white font-bold text-lg">{t('common.save')}</Text>
             </TouchableOpacity>
         </SafeAreaView>
     );

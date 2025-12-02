@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { X, Check } from 'lucide-react-native';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { useProgram } from '../context/ProgramContext';
@@ -9,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const ActiveExerciseScreen = () => {
+    const { t } = useTranslation();
     const {
         workout,
         currentExerciseIndex,
@@ -35,12 +37,12 @@ export const ActiveExerciseScreen = () => {
         }
     }, [workout?.completed]);
 
-    if (!workout) return <View className="flex-1 bg-zinc-950 justify-center items-center"><Text className="text-zinc-50">Cargando...</Text></View>;
+    if (!workout) return <View className="flex-1 bg-zinc-950 justify-center items-center"><Text className="text-zinc-50">{t('common.loading')}</Text></View>;
 
     const currentExercise = workout.exercises[currentExerciseIndex];
     const currentSet = currentExercise?.sets[currentSetIndex];
 
-    if (!currentExercise) return <View className="flex-1 bg-zinc-950 justify-center items-center"><Text className="text-zinc-50">No hay ejercicio</Text></View>;
+    if (!currentExercise) return <View className="flex-1 bg-zinc-950 justify-center items-center"><Text className="text-zinc-50">{t('activeExercise.noExercise')}</Text></View>;
 
     const handleCompleteSet = () => {
         setModalVisible(true);
@@ -57,7 +59,7 @@ export const ActiveExerciseScreen = () => {
             <View className="px-6 py-4 border-b border-zinc-900 flex-row justify-between items-center">
                 <View>
                     <Text className="text-zinc-400 text-xs uppercase tracking-widest font-bold mb-1">
-                        Ejercicio {currentExerciseIndex + 1} de {workout.exercises.length}
+                        {t('activeExercise.exerciseProgress', { current: currentExerciseIndex + 1, total: workout.exercises.length })}
                     </Text>
                     <Text className="text-zinc-50 text-2xl font-bold">{currentExercise.name}</Text>
                 </View>
@@ -65,7 +67,7 @@ export const ActiveExerciseScreen = () => {
                     onPress={() => setListModalVisible(true)}
                     className="p-2 bg-zinc-900 rounded-lg border border-zinc-800"
                 >
-                    <Text className="text-zinc-400 font-bold text-xs">LISTA</Text>
+                    <Text className="text-zinc-400 font-bold text-xs">{t('activeExercise.list')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -74,7 +76,7 @@ export const ActiveExerciseScreen = () => {
                 <View className="flex-1 bg-zinc-950">
                     {/* Modal Header */}
                     <View className="px-6 py-4 border-b border-zinc-900 flex-row justify-between items-center bg-zinc-950">
-                        <Text className="text-zinc-50 text-xl font-bold">Resumen de Sesión</Text>
+                        <Text className="text-zinc-50 text-xl font-bold">{t('activeExercise.sessionSummary')}</Text>
                         <TouchableOpacity
                             onPress={() => setListModalVisible(false)}
                             className="w-8 h-8 items-center justify-center bg-zinc-900 rounded-full"
@@ -117,13 +119,13 @@ export const ActiveExerciseScreen = () => {
 
                                         <View className="pl-9 flex-row items-center">
                                             <Text className="text-zinc-500 text-xs font-medium">
-                                                {ex.sets.length} Series
+                                                {t('activeExercise.setsCount', { count: ex.sets.length })}
                                             </Text>
                                             {completedSets > 0 && (
                                                 <>
                                                     <Text className="text-zinc-700 mx-2">•</Text>
                                                     <Text className={isCompleted ? 'text-emerald-500 text-xs' : 'text-zinc-500 text-xs'}>
-                                                        {completedSets} Completadas
+                                                        {t('activeExercise.completedSets', { count: completedSets })}
                                                     </Text>
                                                 </>
                                             )}
@@ -137,7 +139,7 @@ export const ActiveExerciseScreen = () => {
                                     )}
                                     {isCurrent && (
                                         <View className="bg-blue-500/10 px-3 py-1 rounded-full">
-                                            <Text className="text-blue-400 text-xs font-bold">Actual</Text>
+                                            <Text className="text-blue-400 text-xs font-bold">{t('activeExercise.current')}</Text>
                                         </View>
                                     )}
                                 </TouchableOpacity>
@@ -158,7 +160,7 @@ export const ActiveExerciseScreen = () => {
                             }}
                             className="w-full bg-blue-600 py-4 rounded-2xl items-center shadow-lg shadow-blue-500/20 active:bg-blue-500"
                         >
-                            <Text className="text-white font-bold text-lg">Finalizar Entrenamiento</Text>
+                            <Text className="text-white font-bold text-lg">{t('activeExercise.finishWorkout')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -169,9 +171,9 @@ export const ActiveExerciseScreen = () => {
                 <View className="px-6 py-6">
                     {/* Header Row */}
                     <View className="flex-row mb-4 px-2">
-                        <Text className="text-zinc-500 text-xs uppercase font-bold w-12 text-center">Set</Text>
-                        <Text className="text-zinc-500 text-xs uppercase font-bold flex-1 text-center">Objetivo</Text>
-                        <Text className="text-zinc-500 text-xs uppercase font-bold w-16 text-center">Hecho</Text>
+                        <Text className="text-zinc-500 text-xs uppercase font-bold w-12 text-center">{t('activeExercise.setHeader')}</Text>
+                        <Text className="text-zinc-500 text-xs uppercase font-bold flex-1 text-center">{t('activeExercise.targetHeader')}</Text>
+                        <Text className="text-zinc-500 text-xs uppercase font-bold w-16 text-center">{t('activeExercise.doneHeader')}</Text>
                     </View>
 
                     {currentExercise.sets.map((set, index) => {
@@ -214,7 +216,7 @@ export const ActiveExerciseScreen = () => {
 
             {/* Rest Timer Area */}
             <View className="px-6 py-4 bg-zinc-900/50 border-t border-zinc-800 items-center">
-                <Text className="text-zinc-400 text-xs uppercase tracking-widest mb-1">Descanso</Text>
+                <Text className="text-zinc-400 text-xs uppercase tracking-widest mb-1">{t('activeExercise.rest')}</Text>
                 <Text className={`text-5xl font-bold tabular-nums ${isResting ? 'text-zinc-50' : 'text-zinc-700'}`}>
                     {isResting ? restTimer : currentExercise.restTimeSeconds}s
                 </Text>
@@ -224,7 +226,7 @@ export const ActiveExerciseScreen = () => {
                     disabled={!isResting}
                     style={{ opacity: isResting ? 1 : 0 }}
                 >
-                    <Text className="text-zinc-500 text-sm font-medium">Saltar descanso</Text>
+                    <Text className="text-zinc-500 text-sm font-medium">{t('activeExercise.skipRest')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -235,7 +237,7 @@ export const ActiveExerciseScreen = () => {
                         onPress={() => setSkipModalVisible(true)}
                         className="flex-1 bg-zinc-900 py-4 rounded-2xl items-center border border-zinc-800 active:bg-zinc-800"
                     >
-                        <Text className="text-zinc-400 font-bold text-lg">Saltar</Text>
+                        <Text className="text-zinc-400 font-bold text-lg">{t('activeExercise.skip')}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -244,7 +246,7 @@ export const ActiveExerciseScreen = () => {
                         disabled={isResting} // Re-added disabled prop based on original logic
                     >
                         <Text className={`font-bold text-lg ${isResting ? 'text-zinc-500' : 'text-white'}`}>
-                            {isResting ? 'Descansando...' : 'He completado mi set'}
+                            {isResting ? t('activeExercise.resting') : t('activeExercise.completeSet')}
                         </Text>
                     </TouchableOpacity>
                 </View>
