@@ -177,27 +177,27 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                         let newWeight = currentConfig.weight || 0;
                         let weightChanged = false;
 
-                        // Check the last completed set (or average? usually last set performance drives overload)
-                        // The user said: "if the reps are below the min threshold... decreases... if above max... increases"
-                        // We'll look at the sets performed.
-                        // Simple logic: if ANY set was < min, decrease. If ALL sets were > max, increase? 
-                        // Or just check the last set?
-                        // "when an user performs a set they input the amount of reps they did."
-                        // Let's assume we check the sets.
-                        // Common logic: Check the last set.
+                        // Use the adjustment calculated during the workout if available
+                        if (exercise.nextSessionWeightAdjustment !== undefined && exercise.nextSessionWeightAdjustment !== 0) {
+                            newWeight += exercise.nextSessionWeightAdjustment;
+                            if (newWeight < 0) newWeight = 0;
+                            weightChanged = true;
+                        } else {
+                            // Fallback logic if no adjustment was calculated (e.g. legacy or error)
+                            // We'll stick to the simple logic: check last set
+                            const lastSet = exercise.sets[exercise.sets.length - 1];
+                            if (lastSet && lastSet.completed && lastSet.actualReps !== undefined) {
+                                const minReps = currentConfig.min_reps || 4;
+                                const maxReps = currentConfig.max_reps || 12;
 
-                        const lastSet = exercise.sets[exercise.sets.length - 1];
-                        if (lastSet && lastSet.completed && lastSet.actualReps !== undefined) {
-                            const minReps = currentConfig.min_reps || 4;
-                            const maxReps = currentConfig.max_reps || 12;
-
-                            if (lastSet.actualReps < minReps) {
-                                newWeight -= 2.5; // Default decrement
-                                if (newWeight < 0) newWeight = 0;
-                                weightChanged = true;
-                            } else if (lastSet.actualReps > maxReps) {
-                                newWeight += 2.5; // Default increment
-                                weightChanged = true;
+                                if (lastSet.actualReps < minReps) {
+                                    newWeight -= 2.5; // Default decrement
+                                    if (newWeight < 0) newWeight = 0;
+                                    weightChanged = true;
+                                } else if (lastSet.actualReps > maxReps) {
+                                    newWeight += 2.5; // Default increment
+                                    weightChanged = true;
+                                }
                             }
                         }
 

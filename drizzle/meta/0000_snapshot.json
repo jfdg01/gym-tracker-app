@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0187f606-48e7-41b4-a59f-3ebf9d896292",
+  "id": "b766646b-17d4-4295-8ed9-283466a15f56",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "day_exercises": {
@@ -177,12 +177,13 @@
           "autoincrement": false,
           "default": 4
         },
-        "default_weight": {
-          "name": "default_weight",
+        "weight": {
+          "name": "weight",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 20
         },
         "rest_time_seconds": {
           "name": "rest_time_seconds",
@@ -306,7 +307,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "'\"2025-12-02T13:43:54.061Z\"'"
+          "default": "'\"2025-12-02T14:05:34.476Z\"'"
         },
         "duration_seconds": {
           "name": "duration_seconds",

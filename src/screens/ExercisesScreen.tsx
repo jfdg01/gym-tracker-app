@@ -29,8 +29,7 @@ export const ExercisesScreen = () => {
         if (searchQuery) {
             const lower = searchQuery.toLowerCase();
             const filtered = exercises.filter(ex =>
-                ex.name.toLowerCase().includes(lower) ||
-                ex.muscle_group?.toLowerCase().includes(lower)
+                ex.name.toLowerCase().includes(lower)
             );
             setFilteredExercises(filtered);
         } else {

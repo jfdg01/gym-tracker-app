@@ -13,15 +13,15 @@ export const seedDatabase = async () => {
         console.log('Seeding database...');
         console.log('Inserting exercises...');
         const exercisesData = [
-            { name: 'Bench Press', muscle_group: 'chest', equipment: 'barbell' },
-            { name: 'Overhead Press', muscle_group: 'shoulders', equipment: 'barbell' },
-            { name: 'Tricep Pushdown', muscle_group: 'triceps', equipment: 'cable' },
-            { name: 'Pull Ups', muscle_group: 'back', equipment: 'bodyweight' },
-            { name: 'Barbell Row', muscle_group: 'back', equipment: 'barbell' },
-            { name: 'Bicep Curls', muscle_group: 'biceps', equipment: 'dumbbell' },
-            { name: 'Squats', muscle_group: 'legs', equipment: 'barbell' },
-            { name: 'Lunges', muscle_group: 'legs', equipment: 'dumbbell' },
-            { name: 'Calf Raises', muscle_group: 'legs', equipment: 'machine' },
+            { name: 'Bench Press', sets: 3, min_reps: 4, max_reps: 12, weight: 60, rest_time_seconds: 60 },
+            { name: 'Overhead Press', sets: 3, min_reps: 6, max_reps: 15, weight: 40, rest_time_seconds: 60 },
+            { name: 'Tricep Pushdown', sets: 3, min_reps: 8, max_reps: 15, weight: 20, rest_time_seconds: 45 },
+            { name: 'Pull Ups', sets: 3, min_reps: 3, max_reps: 8, weight: 0, rest_time_seconds: 90 },
+            { name: 'Barbell Row', sets: 3, min_reps: 6, max_reps: 12, weight: 50, rest_time_seconds: 60 },
+            { name: 'Bicep Curls', sets: 3, min_reps: 8, max_reps: 15, weight: 15, rest_time_seconds: 45 },
+            { name: 'Squats', sets: 5, min_reps: 3, max_reps: 8, weight: 80, rest_time_seconds: 90 },
+            { name: 'Lunges', sets: 3, min_reps: 6, max_reps: 12, weight: 20, rest_time_seconds: 60 },
+            { name: 'Calf Raises', sets: 3, min_reps: 10, max_reps: 20, weight: 40, rest_time_seconds: 45 },
         ];
 
         const insertedExercises = await db.insert(schema.exercises).values(exercisesData).returning();
@@ -48,21 +48,21 @@ export const seedDatabase = async () => {
 
             if (day.name === 'Push Day') {
                 await db.insert(schema.day_exercises).values([
-                    { day_id: day.id, exercise_id: exerciseMap.get('Bench Press')!, order_index: 0, target_sets: 3, target_reps: 8, rest_time_seconds: 60, min_reps: 4, max_reps: 12 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Overhead Press')!, order_index: 1, target_sets: 3, target_reps: 10, rest_time_seconds: 60, min_reps: 6, max_reps: 15 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Tricep Pushdown')!, order_index: 2, target_sets: 3, target_reps: 12, rest_time_seconds: 45, min_reps: 8, max_reps: 15 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Bench Press')!, order_index: 0 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Overhead Press')!, order_index: 1 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Tricep Pushdown')!, order_index: 2 },
                 ]);
             } else if (day.name === 'Pull Day') {
                 await db.insert(schema.day_exercises).values([
-                    { day_id: day.id, exercise_id: exerciseMap.get('Pull Ups')!, order_index: 0, target_sets: 3, target_reps: 5, rest_time_seconds: 90, min_reps: 3, max_reps: 8 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Barbell Row')!, order_index: 1, target_sets: 3, target_reps: 8, rest_time_seconds: 60, min_reps: 6, max_reps: 12 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Bicep Curls')!, order_index: 2, target_sets: 3, target_reps: 12, rest_time_seconds: 45, min_reps: 8, max_reps: 15 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Pull Ups')!, order_index: 0 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Barbell Row')!, order_index: 1 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Bicep Curls')!, order_index: 2 },
                 ]);
             } else if (day.name === 'Legs Day') {
                 await db.insert(schema.day_exercises).values([
-                    { day_id: day.id, exercise_id: exerciseMap.get('Squats')!, order_index: 0, target_sets: 5, target_reps: 5, rest_time_seconds: 90, min_reps: 3, max_reps: 8 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Lunges')!, order_index: 1, target_sets: 3, target_reps: 10, rest_time_seconds: 60, min_reps: 6, max_reps: 12 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Calf Raises')!, order_index: 2, target_sets: 3, target_reps: 15, rest_time_seconds: 45, min_reps: 10, max_reps: 20 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Squats')!, order_index: 0 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Lunges')!, order_index: 1 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Calf Raises')!, order_index: 2 },
                 ]);
             }
         }
@@ -86,8 +86,8 @@ export const seedDatabase = async () => {
 
             if (day.name === 'Active Day') {
                 await db.insert(schema.day_exercises).values([
-                    { day_id: day.id, exercise_id: exerciseMap.get('Bench Press')!, order_index: 0, target_sets: 2, target_reps: 5, rest_time_seconds: 30 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Squats')!, order_index: 1, target_sets: 2, target_reps: 5, rest_time_seconds: 30 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Bench Press')!, order_index: 0 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Squats')!, order_index: 1 },
                 ]);
             }
         }

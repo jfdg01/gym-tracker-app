@@ -13,7 +13,9 @@ export const WorkoutSummaryScreen = () => {
     if (!workout) return <View className="flex-1 bg-zinc-950 justify-center items-center"><Text className="text-zinc-50">No workout data</Text></View>;
 
     const handleFinish = () => {
-        completeDay();
+        if (workout) {
+            completeDay(workout.exercises);
+        }
         (navigation as any).navigate('Tabs', { screen: 'Home' });
     };
 

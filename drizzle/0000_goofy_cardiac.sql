@@ -23,7 +23,7 @@ CREATE TABLE `exercises` (
 	`sets` integer DEFAULT 3,
 	`max_reps` integer DEFAULT 12,
 	`min_reps` integer DEFAULT 4,
-	`default_weight` integer,
+	`weight` integer DEFAULT 20,
 	`rest_time_seconds` integer DEFAULT 60
 );
 --> statement-breakpoint
@@ -44,7 +44,7 @@ CREATE TABLE `workout_logs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`program_id` integer,
 	`day_id` integer,
-	`completed_at` integer DEFAULT '"2025-12-02T13:43:54.061Z"',
+	`completed_at` integer DEFAULT '"2025-12-02T14:05:34.476Z"',
 	`duration_seconds` integer,
 	FOREIGN KEY (`program_id`) REFERENCES `programs`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`day_id`) REFERENCES `days`(`id`) ON UPDATE no action ON DELETE no action
