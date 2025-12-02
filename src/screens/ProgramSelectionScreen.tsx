@@ -48,19 +48,16 @@ export const ProgramSelectionScreen = () => {
         try {
             await setContextProgram(selectedProgramId);
             setModalVisible(false);
-
-            // Optional: Navigate to Home or show success feedback
-            // navigation.navigate('Home' as never);
         } catch (error) {
             console.error('Error selecting program:', error);
         }
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950">
-            <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center bg-zinc-950">
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
+            < View className="px-6 py-4 border-b border-zinc-900 flex-row items-center bg-zinc-950" >
                 <Text className="text-zinc-50 text-3xl font-bold">Programas</Text>
-            </View>
+            </View >
 
             <ScrollView className="flex-1 px-6 pt-6">
                 {loading ? (

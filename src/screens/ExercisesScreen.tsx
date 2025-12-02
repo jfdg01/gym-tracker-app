@@ -79,9 +79,10 @@ export const ExercisesScreen = () => {
     );
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950">
-            <View className="p-6 flex-1">
-                <View className="flex-row justify-between items-center mb-6">
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
+            <View className="px-6 flex-1">
+                {/* titulo Ejercicios */}
+                <View className="flex-row justify-between items-center my-6">
                     <Text className="text-zinc-50 text-3xl font-bold">Ejercicios</Text>
                     <TouchableOpacity
                         onPress={openCreateModal}
@@ -92,6 +93,7 @@ export const ExercisesScreen = () => {
                     </TouchableOpacity>
                 </View>
 
+                {/* buscador */}
                 <View className="bg-zinc-900 p-3 rounded-xl flex-row items-center mb-6 border border-zinc-800">
                     <Search size={20} color="#71717a" className="mr-3" />
                     <TextInput
@@ -115,6 +117,7 @@ export const ExercisesScreen = () => {
                             <Text className="text-zinc-600 text-sm mt-2">Pulsa el botón de abajo para crear uno.</Text>
                         </View>
                     }
+                    // add button
                     ListFooterComponent={
                         <View className="items-center mt-4">
                             <TouchableOpacity
