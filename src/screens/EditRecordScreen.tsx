@@ -52,6 +52,7 @@ export const EditRecordScreen = ({ route, navigation }: any) => {
         // FALLBACK: Hardcoded column names for this specific app's tables to ensure it works reliably.
         const columns: Record<string, string[]> = {
             items: ['name', 'description', 'created_at'],
+            day_exercises: ['target_sets', 'target_reps', 'rest_time_seconds', 'min_reps', 'max_reps'],
         };
 
         return columns[tableName] || [];
@@ -65,7 +66,7 @@ export const EditRecordScreen = ({ route, navigation }: any) => {
 
             // Basic type conversion
             columns.forEach(col => {
-                if (col.includes('_id') || col === 'order' || col === 'target_sets' || col === 'target_reps' || col === 'rest_time' || col === 'set_number' || col === 'reps' || col === 'rpe') {
+                if (col.includes('_id') || col === 'order' || col === 'target_sets' || col === 'target_reps' || col === 'rest_time' || col === 'set_number' || col === 'reps' || col === 'rpe' || col === 'min_reps' || col === 'max_reps') {
                     if (dataToSave[col]) dataToSave[col] = parseInt(dataToSave[col], 10);
                 }
                 if (col === 'target_weight' || col === 'weight') {

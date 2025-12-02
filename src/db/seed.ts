@@ -3,15 +3,14 @@ import * as schema from './schema';
 import { eq } from 'drizzle-orm';
 
 export const seedDatabase = async () => {
-    console.log('Seeding database...');
     try {
         // Check if exercises already exist
         const existingExercises = await db.select().from(schema.exercises).limit(1);
         if (existingExercises.length > 0) {
-            console.log('Database already seeded (exercises found).');
             return;
         }
 
+        console.log('Seeding database...');
         console.log('Inserting exercises...');
         const exercisesData = [
             { name: 'Bench Press', muscle_group: 'chest', equipment: 'barbell' },
@@ -49,21 +48,21 @@ export const seedDatabase = async () => {
 
             if (day.name === 'Push Day') {
                 await db.insert(schema.day_exercises).values([
-                    { day_id: day.id, exercise_id: exerciseMap.get('Bench Press')!, order_index: 0, target_sets: 3, target_reps: 8, rest_time_seconds: 60 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Overhead Press')!, order_index: 1, target_sets: 3, target_reps: 10, rest_time_seconds: 60 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Tricep Pushdown')!, order_index: 2, target_sets: 3, target_reps: 12, rest_time_seconds: 45 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Bench Press')!, order_index: 0, target_sets: 3, target_reps: 8, rest_time_seconds: 60, min_reps: 4, max_reps: 12 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Overhead Press')!, order_index: 1, target_sets: 3, target_reps: 10, rest_time_seconds: 60, min_reps: 6, max_reps: 15 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Tricep Pushdown')!, order_index: 2, target_sets: 3, target_reps: 12, rest_time_seconds: 45, min_reps: 8, max_reps: 15 },
                 ]);
             } else if (day.name === 'Pull Day') {
                 await db.insert(schema.day_exercises).values([
-                    { day_id: day.id, exercise_id: exerciseMap.get('Pull Ups')!, order_index: 0, target_sets: 3, target_reps: 5, rest_time_seconds: 90 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Barbell Row')!, order_index: 1, target_sets: 3, target_reps: 8, rest_time_seconds: 60 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Bicep Curls')!, order_index: 2, target_sets: 3, target_reps: 12, rest_time_seconds: 45 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Pull Ups')!, order_index: 0, target_sets: 3, target_reps: 5, rest_time_seconds: 90, min_reps: 3, max_reps: 8 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Barbell Row')!, order_index: 1, target_sets: 3, target_reps: 8, rest_time_seconds: 60, min_reps: 6, max_reps: 12 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Bicep Curls')!, order_index: 2, target_sets: 3, target_reps: 12, rest_time_seconds: 45, min_reps: 8, max_reps: 15 },
                 ]);
             } else if (day.name === 'Legs Day') {
                 await db.insert(schema.day_exercises).values([
-                    { day_id: day.id, exercise_id: exerciseMap.get('Squats')!, order_index: 0, target_sets: 5, target_reps: 5, rest_time_seconds: 90 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Lunges')!, order_index: 1, target_sets: 3, target_reps: 10, rest_time_seconds: 60 },
-                    { day_id: day.id, exercise_id: exerciseMap.get('Calf Raises')!, order_index: 2, target_sets: 3, target_reps: 15, rest_time_seconds: 45 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Squats')!, order_index: 0, target_sets: 5, target_reps: 5, rest_time_seconds: 90, min_reps: 3, max_reps: 8 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Lunges')!, order_index: 1, target_sets: 3, target_reps: 10, rest_time_seconds: 60, min_reps: 6, max_reps: 12 },
+                    { day_id: day.id, exercise_id: exerciseMap.get('Calf Raises')!, order_index: 2, target_sets: 3, target_reps: 15, rest_time_seconds: 45, min_reps: 10, max_reps: 20 },
                 ]);
             }
         }

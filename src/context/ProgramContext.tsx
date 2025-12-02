@@ -18,6 +18,7 @@ type ProgramContextType = {
     getCurrentDay: () => DayPlan | undefined;
     isLoading: boolean;
     setProgram: (programId: number) => Promise<void>;
+    currentProgramId: number | null;
 };
 
 const ProgramContext = createContext<ProgramContextType | undefined>(undefined);
@@ -60,6 +61,8 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     id: exercise.id.toString(),
                     name: exercise.name,
                     restTimeSeconds: dayExercise.rest_time_seconds || 60,
+                    minReps: dayExercise.min_reps || 4,
+                    maxReps: dayExercise.max_reps || 12,
                     sets: Array.from({ length: dayExercise.target_sets || 3 }).map((_, i) => ({
                         id: `${day.id}-${exercise.id}-${i}`,
                         targetReps: dayExercise.target_reps || 10,
@@ -210,6 +213,7 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 getCurrentDay,
                 isLoading,
                 setProgram,
+                currentProgramId,
             }}
         >
             {children}

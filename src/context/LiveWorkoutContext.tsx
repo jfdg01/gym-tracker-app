@@ -14,6 +14,8 @@ export type Exercise = {
     name: string;
     sets: Set[];
     restTimeSeconds: number;
+    minReps: number;
+    maxReps: number;
     nextSessionWeightAdjustment?: number; // +2.5, -5, 0
 };
 
@@ -64,6 +66,8 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 id: '1',
                 name: 'Squats',
                 restTimeSeconds: 5,
+                minReps: 4,
+                maxReps: 12,
                 sets: [
                     { id: 's1', targetReps: 10, targetWeight: 100, completed: false },
                     { id: 's2', targetReps: 10, targetWeight: 100, completed: false },
@@ -73,6 +77,8 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 id: '2',
                 name: 'Bench Press',
                 restTimeSeconds: 5,
+                minReps: 4,
+                maxReps: 12,
                 sets: [
                     { id: 'b1', targetReps: 8, targetWeight: 80, completed: false },
                     { id: 'b2', targetReps: 8, targetWeight: 80, completed: false },
@@ -82,6 +88,8 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 id: '3',
                 name: 'Deadlift',
                 restTimeSeconds: 5,
+                minReps: 4,
+                maxReps: 12,
                 sets: [
                     { id: 'd1', targetReps: 5, targetWeight: 120, completed: false },
                     { id: 'd2', targetReps: 5, targetWeight: 120, completed: false },
@@ -132,9 +140,9 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         if (isLastSetOfExercise) {
             // Progressive Overload Logic
-            if (reps > 12) {
+            if (reps > currentExercise.maxReps) {
                 currentExercise.nextSessionWeightAdjustment = 2.5; // Arbitrary increase
-            } else if (reps < 4) {
+            } else if (reps < currentExercise.minReps) {
                 currentExercise.nextSessionWeightAdjustment = -5;
             } else {
                 currentExercise.nextSessionWeightAdjustment = 0;

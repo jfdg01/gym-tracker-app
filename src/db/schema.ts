@@ -32,6 +32,8 @@ export const day_exercises = sqliteTable('day_exercises', {
     target_reps: integer('target_reps').default(10),
     target_rpe: integer('target_rpe'),
     rest_time_seconds: integer('rest_time_seconds').default(60),
+    min_reps: integer('min_reps').default(4),
+    max_reps: integer('max_reps').default(12),
 });
 
 export const user_settings = sqliteTable('user_settings', {

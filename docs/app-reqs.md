@@ -100,7 +100,6 @@ Cuando se completan todos los ejercicios (o se saltan):
 *   **Pantalla de Resumen (WorkoutSummaryScreen):**
     *   Listado de ejercicios completados.
     *   Visualización de "Badges" con los ajustes de peso recomendados para la próxima sesión.
-    *   **Mejora:** Eliminada la métrica de "Volumen" por solicitud del usuario.
 *   **Correcciones de Flujo:**
     *   Solucionado bug donde el último set del último ejercicio no disparaba la pantalla de resumen.
     *   Optimización de la lógica de transición en `LiveWorkoutContext`.

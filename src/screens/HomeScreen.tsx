@@ -52,7 +52,7 @@ export const HomeScreen = () => {
                     <Text className="text-3xl font-bold text-zinc-50">Hola, Usuario</Text>
                 </View>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('ProgramSelection' as never)}
+                    onPress={() => navigation.navigate('Programs' as never)}
                     className="bg-zinc-800 p-2 rounded-lg border border-zinc-700"
                 >
                     <Text className="text-zinc-400 font-bold text-xs">PROGRAMS</Text>

@@ -14,7 +14,7 @@ export const WorkoutSummaryScreen = () => {
 
     const handleFinish = () => {
         completeDay();
-        navigation.navigate('Home' as never);
+        (navigation as any).navigate('Tabs', { screen: 'Home' });
     };
 
     // Calculate total duration (mocked for now as we don't track start/end precisely in context yet)

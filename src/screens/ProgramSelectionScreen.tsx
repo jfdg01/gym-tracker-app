@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../db/client';
 import * as schema from '../db/schema';
 import { useProgram } from '../context/ProgramContext';
 import { eq } from 'drizzle-orm';
+import { ConfirmationModal } from '../components/ConfirmationModal';
 
 type Program = {
     id: number;
@@ -15,9 +16,11 @@ type Program = {
 
 export const ProgramSelectionScreen = () => {
     const navigation = useNavigation();
-    const { setProgram: setContextProgram } = useProgram();
+    const { setProgram: setContextProgram, currentProgramId } = useProgram();
     const [programs, setPrograms] = useState<Program[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         const loadPrograms = async () => {
@@ -26,7 +29,7 @@ export const ProgramSelectionScreen = () => {
                 setPrograms(allPrograms);
             } catch (error) {
                 console.error('Error loading programs:', error);
-                Alert.alert('Error', 'Failed to load programs');
+                console.error('Error loading programs:', error);
             } finally {
                 setLoading(false);
             }
@@ -34,45 +37,71 @@ export const ProgramSelectionScreen = () => {
         loadPrograms();
     }, []);
 
-    const handleSelectProgram = async (programId: number) => {
+    const handleProgramPress = (programId: number) => {
+        setSelectedProgramId(programId);
+        setModalVisible(true);
+    };
+
+    const confirmSelection = async () => {
+        if (selectedProgramId === null) return;
+
         try {
-            await setContextProgram(programId);
-            Alert.alert('Success', 'Program updated successfully', [
-                { text: 'OK', onPress: () => navigation.goBack() }
-            ]);
+            await setContextProgram(selectedProgramId);
+            setModalVisible(false);
+
+            // Optional: Navigate to Home or show success feedback
+            // navigation.navigate('Home' as never);
         } catch (error) {
             console.error('Error selecting program:', error);
-            Alert.alert('Error', 'Failed to update program');
         }
     };
 
     return (
         <SafeAreaView className="flex-1 bg-zinc-950">
-            <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center">
-                <TouchableOpacity onPress={() => navigation.goBack()} className="mr-4">
-                    <Text className="text-blue-500 font-bold text-lg">Back</Text>
-                </TouchableOpacity>
-                <Text className="text-zinc-50 text-xl font-bold">Select Program</Text>
+            <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center bg-zinc-950">
+                <Text className="text-zinc-50 text-3xl font-bold">Programas</Text>
             </View>
 
             <ScrollView className="flex-1 px-6 pt-6">
                 {loading ? (
                     <Text className="text-zinc-500 text-center">Loading programs...</Text>
                 ) : (
-                    programs.map((prog) => (
-                        <TouchableOpacity
-                            key={prog.id}
-                            onPress={() => handleSelectProgram(prog.id)}
-                            className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 mb-4 active:bg-zinc-800"
-                        >
-                            <Text className="text-zinc-50 text-lg font-bold mb-1">{prog.name}</Text>
-                            {prog.description && (
-                                <Text className="text-zinc-400 text-sm">{prog.description}</Text>
-                            )}
-                        </TouchableOpacity>
-                    ))
+                    programs.map((prog) => {
+                        const isActive = prog.id === currentProgramId;
+                        return (
+                            <TouchableOpacity
+                                key={prog.id}
+                                onPress={() => handleProgramPress(prog.id)}
+                                className={`p-6 rounded-2xl border mb-4 active:bg-zinc-800 ${isActive ? 'bg-zinc-800 border-blue-500' : 'bg-zinc-900 border-zinc-800'
+                                    }`}
+                            >
+                                <View className="flex-row justify-between items-center mb-2">
+                                    <Text className="text-zinc-50 text-xl font-bold">{prog.name}</Text>
+                                    {isActive ? (
+                                        <Text className="text-blue-500 font-bold text-sm">Activo</Text>
+                                    ) : (
+                                        <Text className="text-zinc-400 font-bold text-sm">Seleccionar</Text>
+                                    )}
+                                </View>
+                                {prog.description && (
+                                    <Text className="text-zinc-400 text-base leading-relaxed">{prog.description}</Text>
+                                )}
+                            </TouchableOpacity>
+                        );
+                    })
                 )}
             </ScrollView>
-        </SafeAreaView>
+
+            <ConfirmationModal
+                visible={modalVisible}
+                title="Cambiar Programa"
+                message="¿Estás seguro de que quieres cambiar tu programa de entrenamiento actual? Esto actualizará tu rutina diaria."
+                confirmText="Cambiar"
+                cancelText="Cancelar"
+                onConfirm={confirmSelection}
+                onCancel={() => setModalVisible(false)}
+                confirmButtonColor="blue"
+            />
+        </SafeAreaView >
     );
 };
