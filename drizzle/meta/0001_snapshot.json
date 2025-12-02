@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "2834a488-2d5c-42c9-9a9f-45195fbb6f1e",
-  "prevId": "7a151316-2768-4db2-a32e-d9258fc6108d",
+  "id": "353500ac-9080-433e-8cc7-ee2f16494cea",
+  "prevId": "0187f606-48e7-41b4-a59f-3ebf9d896292",
   "tables": {
     "day_exercises": {
       "name": "day_exercises",
@@ -34,37 +34,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "target_sets": {
-          "name": "target_sets",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 3
-        },
-        "target_reps": {
-          "name": "target_reps",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 10
-        },
-        "target_rpe": {
-          "name": "target_rpe",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "rest_time_seconds": {
-          "name": "rest_time_seconds",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 60
         }
       },
       "indexes": {},
@@ -184,26 +153,45 @@
           "notNull": false,
           "autoincrement": false
         },
-        "muscle_group": {
-          "name": "muscle_group",
-          "type": "text",
+        "sets": {
+          "name": "sets",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 3
         },
-        "equipment": {
-          "name": "equipment",
-          "type": "text",
+        "max_reps": {
+          "name": "max_reps",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 12
         },
-        "video_url": {
-          "name": "video_url",
-          "type": "text",
+        "min_reps": {
+          "name": "min_reps",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 4
+        },
+        "weight": {
+          "name": "weight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 20
+        },
+        "rest_time_seconds": {
+          "name": "rest_time_seconds",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 60
         }
       },
       "indexes": {},
@@ -242,6 +230,125 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
+    },
+    "user_settings": {
+      "name": "user_settings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "current_program_id": {
+          "name": "current_program_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "current_day_index": {
+          "name": "current_day_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_settings_current_program_id_programs_id_fk": {
+          "name": "user_settings_current_program_id_programs_id_fk",
+          "tableFrom": "user_settings",
+          "tableTo": "programs",
+          "columnsFrom": [
+            "current_program_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "workout_logs": {
+      "name": "workout_logs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "program_id": {
+          "name": "program_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "day_id": {
+          "name": "day_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'\"2025-12-02T13:48:33.889Z\"'"
+        },
+        "duration_seconds": {
+          "name": "duration_seconds",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "workout_logs_program_id_programs_id_fk": {
+          "name": "workout_logs_program_id_programs_id_fk",
+          "tableFrom": "workout_logs",
+          "tableTo": "programs",
+          "columnsFrom": [
+            "program_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "workout_logs_day_id_days_id_fk": {
+          "name": "workout_logs_day_id_days_id_fk",
+          "tableFrom": "workout_logs",
+          "tableTo": "days",
+          "columnsFrom": [
+            "day_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "views": {},
@@ -249,7 +356,9 @@
   "_meta": {
     "schemas": {},
     "tables": {},
-    "columns": {}
+    "columns": {
+      "\"exercises\".\"default_weight\"": "\"exercises\".\"weight\""
+    }
   },
   "internal": {
     "indexes": {}

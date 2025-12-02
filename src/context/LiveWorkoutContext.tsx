@@ -194,8 +194,17 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const finishWorkout = () => {
         if (!workout) return;
-        // We need to update the state to trigger the useEffect in ActiveExerciseScreen
-        // But since we are using a deep copy in startWorkout, we just need to set the completed flag on the current state
+
+        // Save progress via ProgramContext
+        // We need to access ProgramContext here. Since we can't use hooks inside a function,
+        // we should probably pass the completeDay function to LiveWorkoutProvider or use a callback.
+        // However, the cleanest way in this architecture without refactoring everything is to 
+        // expose the workout data and let the consumer (ActiveExerciseScreen) call completeDay.
+        // BUT, the user requirement is "when a workout ends".
+        // Let's modify the context to accept an onFinish callback or similar?
+        // Or better: The ActiveExerciseScreen calls finishWorkout. It can also call completeDay.
+        // Let's update this to just set state, and we'll handle the call in the Screen.
+
         setWorkout((prev) => {
             if (!prev) return null;
             return { ...prev, completed: true, endTime: new Date() };

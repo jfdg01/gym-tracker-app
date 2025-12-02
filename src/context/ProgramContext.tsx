@@ -14,7 +14,7 @@ export type DayPlan = {
 type ProgramContextType = {
     currentDayIndex: number;
     program: DayPlan[];
-    completeDay: () => Promise<void>;
+    completeDay: (completedExercises?: Exercise[]) => Promise<void>;
     getCurrentDay: () => DayPlan | undefined;
     isLoading: boolean;
     setProgram: (programId: number) => Promise<void>;
@@ -60,13 +60,13 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 const exercises: Exercise[] = dayExercises.map(({ dayExercise, exercise }) => ({
                     id: exercise.id.toString(),
                     name: exercise.name,
-                    restTimeSeconds: dayExercise.rest_time_seconds || 60,
-                    minReps: dayExercise.min_reps || 4,
-                    maxReps: dayExercise.max_reps || 12,
-                    sets: Array.from({ length: dayExercise.target_sets || 3 }).map((_, i) => ({
+                    restTimeSeconds: exercise.rest_time_seconds || 60,
+                    minReps: exercise.min_reps || 4,
+                    maxReps: exercise.max_reps || 12,
+                    sets: Array.from({ length: exercise.sets || 3 }).map((_, i) => ({
                         id: `${day.id}-${exercise.id}-${i}`,
-                        targetReps: dayExercise.target_reps || 10,
-                        targetWeight: 0, // Default weight, could be fetched from history
+                        targetReps: exercise.max_reps || 10,
+                        targetWeight: exercise.weight || 0,
                         completed: false,
                     })),
                 }));
@@ -140,7 +140,7 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
         init();
     }, [init]);
 
-    const completeDay = async () => {
+    const completeDay = async (completedExercises?: Exercise[]) => {
         if (program.length === 0 || currentProgramId === null) return;
 
         const nextDayIndex = (currentDayIndex + 1) % program.length;
@@ -155,9 +155,8 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     .where(eq(schema.user_settings.id, settings[0].id));
             }
 
-            // Log workout (optional, but good practice)
+            // Log workout
             const currentDay = program[currentDayIndex];
-            // We need the day_id from the DB, which we have in our loadedProgram structure as string, convert back to number
             const dayId = parseInt(currentDay.id);
 
             await db.insert(schema.workout_logs).values({
@@ -166,6 +165,50 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 completed_at: new Date(),
                 duration_seconds: 0, // Placeholder
             });
+
+            // Progressive Overload Logic
+            if (completedExercises) {
+                for (const exercise of completedExercises) {
+                    // Find the exercise in the DB to get current config
+                    const dbExercise = await db.select().from(schema.exercises).where(eq(schema.exercises.id, parseInt(exercise.id))).limit(1);
+
+                    if (dbExercise.length > 0) {
+                        const currentConfig = dbExercise[0];
+                        let newWeight = currentConfig.weight || 0;
+                        let weightChanged = false;
+
+                        // Check the last completed set (or average? usually last set performance drives overload)
+                        // The user said: "if the reps are below the min threshold... decreases... if above max... increases"
+                        // We'll look at the sets performed.
+                        // Simple logic: if ANY set was < min, decrease. If ALL sets were > max, increase? 
+                        // Or just check the last set?
+                        // "when an user performs a set they input the amount of reps they did."
+                        // Let's assume we check the sets.
+                        // Common logic: Check the last set.
+
+                        const lastSet = exercise.sets[exercise.sets.length - 1];
+                        if (lastSet && lastSet.completed && lastSet.actualReps !== undefined) {
+                            const minReps = currentConfig.min_reps || 4;
+                            const maxReps = currentConfig.max_reps || 12;
+
+                            if (lastSet.actualReps < minReps) {
+                                newWeight -= 2.5; // Default decrement
+                                if (newWeight < 0) newWeight = 0;
+                                weightChanged = true;
+                            } else if (lastSet.actualReps > maxReps) {
+                                newWeight += 2.5; // Default increment
+                                weightChanged = true;
+                            }
+                        }
+
+                        if (weightChanged) {
+                            await db.update(schema.exercises)
+                                .set({ weight: newWeight })
+                                .where(eq(schema.exercises.id, parseInt(exercise.id)));
+                        }
+                    }
+                }
+            }
 
         } catch (error) {
             console.error('Error saving progress:', error);

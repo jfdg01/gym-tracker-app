@@ -4,9 +4,11 @@ export const exercises = sqliteTable('exercises', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
     description: text('description'),
-    muscle_group: text('muscle_group'), // e.g., 'chest', 'back', 'legs'
-    equipment: text('equipment'), // e.g., 'barbell', 'dumbbell'
-    video_url: text('video_url'),
+    sets: integer('sets').default(3),
+    max_reps: integer('max_reps').default(12),
+    min_reps: integer('min_reps').default(4),
+    weight: integer('weight').default(20), // the weight will be modified by the system using the reps
+    rest_time_seconds: integer('rest_time_seconds').default(60),
 });
 
 export const programs = sqliteTable('programs', {
@@ -27,13 +29,7 @@ export const day_exercises = sqliteTable('day_exercises', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     day_id: integer('day_id').references(() => days.id),
     exercise_id: integer('exercise_id').references(() => exercises.id),
-    order_index: integer('order_index').notNull(),
-    target_sets: integer('target_sets').default(3),
-    target_reps: integer('target_reps').default(10),
-    target_rpe: integer('target_rpe'),
-    rest_time_seconds: integer('rest_time_seconds').default(60),
-    min_reps: integer('min_reps').default(4),
-    max_reps: integer('max_reps').default(12),
+    order_index: integer('order_index').notNull()
 });
 
 export const user_settings = sqliteTable('user_settings', {

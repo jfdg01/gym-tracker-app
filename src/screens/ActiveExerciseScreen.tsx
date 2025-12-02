@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { X, Check } from 'lucide-react-native';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
+import { useProgram } from '../context/ProgramContext';
 import { SetCompletionModal } from '../components/SetCompletionModal';
 import { SkipExerciseModal } from '../components/SkipExerciseModal';
 import { useNavigation } from '@react-navigation/native';
@@ -20,6 +21,8 @@ export const ActiveExerciseScreen = () => {
         cancelRest,
         finishWorkout,
     } = useLiveWorkout();
+
+    const { completeDay } = useProgram();
 
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
@@ -146,12 +149,11 @@ export const ActiveExerciseScreen = () => {
                     {/* Modal Footer */}
                     <View className="p-6 border-t border-zinc-900 bg-zinc-950 safe-bottom">
                         <TouchableOpacity
-                            onPress={() => {
+                            onPress={async () => {
                                 setListModalVisible(false);
-                                // finishWorkout triggers navigation to Summary via useEffect
-                                // Note: We can't call hook inside callback, so we use the one from scope
-                                // But wait, finishWorkout is already destructured at top level.
-                                // Just calling it directly.
+                                if (workout) {
+                                    await completeDay(workout.exercises);
+                                }
                                 finishWorkout();
                             }}
                             className="w-full bg-blue-600 py-4 rounded-2xl items-center shadow-lg shadow-blue-500/20 active:bg-blue-500"
@@ -193,7 +195,7 @@ export const ActiveExerciseScreen = () => {
 
                                 <View className="flex-1 items-center">
                                     <Text className={`text-base font-medium ${isCurrentSet ? 'text-zinc-50' : 'text-zinc-400'}`}>
-                                        {set.targetWeight}kg x {set.targetReps}
+                                        {set.targetWeight}kg x {currentExercise.minReps}-{currentExercise.maxReps}
                                     </Text>
                                 </View>
 

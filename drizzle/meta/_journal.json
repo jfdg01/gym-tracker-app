@@ -5,29 +5,15 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1764512093256,
-      "tag": "0000_chief_the_renegades",
+      "when": 1764683034066,
+      "tag": "0000_free_blue_marvel",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1764677494636,
-      "tag": "0001_motionless_maginty",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1764677892141,
-      "tag": "0002_nosy_nehzno",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1764681048907,
-      "tag": "0003_ambitious_living_lightning",
+      "when": 1764683727133,
+      "tag": "0001_slippery_wong",
       "breakpoints": true
     }
   ]
