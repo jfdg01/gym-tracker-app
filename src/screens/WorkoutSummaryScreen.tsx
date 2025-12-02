@@ -3,15 +3,18 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useProgram } from '../context/ProgramContext';
 
 export const WorkoutSummaryScreen = () => {
     const { workout } = useLiveWorkout();
+    const { completeDay } = useProgram();
     const navigation = useNavigation();
 
     if (!workout) return <View className="flex-1 bg-zinc-950 justify-center items-center"><Text className="text-zinc-50">No workout data</Text></View>;
 
     const handleFinish = () => {
-        navigation.navigate('DebugDashboard' as never);
+        completeDay();
+        navigation.navigate('Home' as never);
     };
 
     // Calculate total duration (mocked for now as we don't track start/end precisely in context yet)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { SetCompletionModal } from '../components/SetCompletionModal';
 import { useNavigation } from '@react-navigation/native';
@@ -12,20 +12,15 @@ export const ActiveExerciseScreen = () => {
         currentSetIndex,
         isResting,
         restTimer,
-        startWorkout,
         completeSet,
         skipExercise,
+        goToExercise,
         cancelRest,
     } = useLiveWorkout();
 
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
-
-    useEffect(() => {
-        if (!workout) {
-            startWorkout();
-        }
-    }, [workout]);
+    const [listModalVisible, setListModalVisible] = useState(false);
 
     useEffect(() => {
         if (workout?.completed) {
@@ -52,56 +47,111 @@ export const ActiveExerciseScreen = () => {
     return (
         <SafeAreaView className="flex-1 bg-zinc-950">
             {/* Header */}
-            <View className="px-6 py-4 flex-row justify-between items-center border-b border-zinc-900">
+            <View className="px-6 py-4 border-b border-zinc-900 flex-row justify-between items-center">
                 <View>
-                    <Text className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">Ejercicio {currentExerciseIndex + 1} de {workout.exercises.length}</Text>
-                    <Text className="text-2xl font-bold text-zinc-50 mt-1">{currentExercise.name}</Text>
+                    <Text className="text-zinc-400 text-xs uppercase tracking-widest font-bold mb-1">
+                        Ejercicio {currentExerciseIndex + 1} de {workout.exercises.length}
+                    </Text>
+                    <Text className="text-zinc-50 text-2xl font-bold">{currentExercise.name}</Text>
                 </View>
-                <TouchableOpacity className="w-10 h-10 bg-zinc-900 rounded-full items-center justify-center border border-zinc-800" onPress={() => alert('Edit feature coming soon!')}>
-                    <Text className="text-blue-500 font-bold text-xs">...</Text>
+                <TouchableOpacity
+                    onPress={() => setListModalVisible(true)}
+                    className="p-2 bg-zinc-900 rounded-lg border border-zinc-800"
+                >
+                    <Text className="text-zinc-400 font-bold text-xs">LISTA</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Main Content - Sets */}
-            <ScrollView className="flex-1 px-6 pt-6">
-                <View className="flex-row justify-between mb-4 px-2">
-                    <Text className="text-zinc-500 text-xs uppercase font-bold w-12 text-center">Set</Text>
-                    <Text className="text-zinc-500 text-xs uppercase font-bold flex-1 text-center">Objetivo</Text>
-                    <Text className="text-zinc-500 text-xs uppercase font-bold w-20 text-center">Hecho</Text>
+            {/* Exercise List Modal */}
+            <Modal visible={listModalVisible} animationType="slide" presentationStyle="pageSheet">
+                <View className="flex-1 bg-zinc-950">
+                    <View className="px-6 py-4 border-b border-zinc-900 flex-row justify-between items-center">
+                        <Text className="text-zinc-50 text-xl font-bold">Ejercicios</Text>
+                        <TouchableOpacity onPress={() => setListModalVisible(false)} className="p-2">
+                            <Text className="text-blue-500 font-bold">Cerrar</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <ScrollView className="flex-1 px-6 pt-4">
+                        {workout.exercises.map((ex, idx) => {
+                            const isCurrent = idx === currentExerciseIndex;
+                            const isCompleted = ex.sets.every(s => s.completed);
+
+                            return (
+                                <TouchableOpacity
+                                    key={ex.id}
+                                    onPress={() => {
+                                        goToExercise(idx);
+                                        setListModalVisible(false);
+                                    }}
+                                    className={`p-4 mb-3 rounded-xl border flex-row justify-between items-center ${isCurrent ? 'bg-blue-900/20 border-blue-500' : 'bg-zinc-900 border-zinc-800'
+                                        }`}
+                                >
+                                    <View>
+                                        <Text className={`font-bold text-lg ${isCurrent ? 'text-blue-400' : 'text-zinc-50'}`}>
+                                            {idx + 1}. {ex.name}
+                                        </Text>
+                                        <Text className="text-zinc-500 text-xs">
+                                            {ex.sets.length} sets • {ex.sets.filter(s => s.completed).length} completados
+                                        </Text>
+                                    </View>
+                                    {isCompleted && (
+                                        <View className="bg-emerald-500/20 px-2 py-1 rounded">
+                                            <Text className="text-emerald-500 text-xs font-bold">✓</Text>
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </ScrollView>
                 </View>
+            </Modal>
 
-                {currentExercise.sets.map((set, index) => {
-                    const isActive = index === currentSetIndex;
-                    const isCompleted = set.completed;
+            <ScrollView className="flex-1">
+                {/* Sets List */}
+                <View className="px-6 py-6">
+                    {/* Header Row */}
+                    <View className="flex-row mb-4 px-2">
+                        <Text className="text-zinc-500 text-xs uppercase font-bold w-12 text-center">Set</Text>
+                        <Text className="text-zinc-500 text-xs uppercase font-bold flex-1 text-center">Objetivo</Text>
+                        <Text className="text-zinc-500 text-xs uppercase font-bold w-16 text-center">Hecho</Text>
+                    </View>
 
-                    return (
-                        <View
-                            key={set.id}
-                            className={`flex-row justify-between items-center py-4 px-2 mb-3 rounded-xl border ${isActive && !isResting
-                                ? 'bg-zinc-900 border-blue-500/50'
-                                : 'border-transparent'
-                                } ${isCompleted ? 'opacity-50' : ''}`}
-                        >
-                            <View className={`w-12 h-8 rounded-lg justify-center items-center ${isCompleted ? 'bg-emerald-500/20' : isActive && !isResting ? 'bg-blue-500' : 'bg-zinc-800'}`}>
-                                <Text className={`${isCompleted ? 'text-emerald-500' : isActive && !isResting ? 'text-white' : 'text-zinc-400'} font-bold`}>
-                                    {index + 1}
-                                </Text>
+                    {currentExercise.sets.map((set, index) => {
+                        const isCurrentSet = index === currentSetIndex;
+                        const isCompleted = set.completed;
+
+                        return (
+                            <View
+                                key={set.id}
+                                className={`flex-row items-center py-4 mb-2 rounded-xl border ${isCurrentSet
+                                    ? 'bg-blue-900/10 border-blue-500/50'
+                                    : 'bg-zinc-900 border-zinc-800'
+                                    }`}
+                            >
+                                <View className="w-12 items-center justify-center">
+                                    <View className={`w-6 h-6 rounded-full items-center justify-center ${isCompleted ? 'bg-emerald-500' : isCurrentSet ? 'bg-blue-500' : 'bg-zinc-800'
+                                        }`}>
+                                        <Text className="text-white text-xs font-bold">{index + 1}</Text>
+                                    </View>
+                                </View>
+
+                                <View className="flex-1 items-center">
+                                    <Text className={`text-base font-medium ${isCurrentSet ? 'text-zinc-50' : 'text-zinc-400'}`}>
+                                        {set.targetWeight}kg x {set.targetReps}
+                                    </Text>
+                                </View>
+
+                                <View className="w-16 items-center">
+                                    {isCompleted ? (
+                                        <Text className="text-emerald-500 font-bold text-lg">{set.actualReps}</Text>
+                                    ) : (
+                                        <Text className="text-zinc-600 font-bold text-lg">-</Text>
+                                    )}
+                                </View>
                             </View>
-
-                            <Text className={`text-lg font-medium flex-1 text-center ${isActive && !isResting ? 'text-zinc-50' : 'text-zinc-400'}`}>
-                                {set.targetWeight}kg x {set.targetReps}
-                            </Text>
-
-                            <View className="w-20 items-center">
-                                {isCompleted ? (
-                                    <Text className="text-emerald-500 font-bold text-lg">{set.actualReps}</Text>
-                                ) : (
-                                    <Text className="text-zinc-700 text-lg">-</Text>
-                                )}
-                            </View>
-                        </View>
-                    );
-                })}
+                        );
+                    })}
+                </View>
             </ScrollView>
 
             {/* Rest Timer Area */}
@@ -123,20 +173,17 @@ export const ActiveExerciseScreen = () => {
             {/* Footer Actions */}
             <View className="px-6 py-6 pb-8 bg-zinc-950 border-t border-zinc-900">
                 <View className="flex-row space-x-4">
-                    {/* Skip Button */}
                     <TouchableOpacity
-                        className="flex-1 bg-zinc-900 py-4 rounded-2xl items-center justify-center border border-zinc-800 active:bg-zinc-800"
                         onPress={skipExercise}
+                        className="flex-1 bg-zinc-900 py-4 rounded-2xl items-center border border-zinc-800 active:bg-zinc-800"
                     >
-                        <Text className="text-zinc-400 font-bold text-base">Saltar</Text>
+                        <Text className="text-zinc-400 font-bold text-lg">Saltar</Text>
                     </TouchableOpacity>
 
-                    {/* Complete Button */}
                     <TouchableOpacity
-                        className={`flex-[2] py-4 rounded-2xl items-center justify-center shadow-lg shadow-blue-500/20 ${isResting ? 'bg-zinc-800' : 'bg-blue-600 active:bg-blue-500'
-                            }`}
-                        onPress={handleCompleteSet}
-                        disabled={isResting}
+                        onPress={() => setModalVisible(true)}
+                        className="flex-[2] bg-blue-600 py-4 rounded-2xl items-center shadow-lg shadow-blue-500/20 active:bg-blue-500"
+                        disabled={isResting} // Re-added disabled prop based on original logic
                     >
                         <Text className={`font-bold text-lg ${isResting ? 'text-zinc-500' : 'text-white'}`}>
                             {isResting ? 'Descansando...' : 'He completado mi set'}
@@ -147,9 +194,12 @@ export const ActiveExerciseScreen = () => {
 
             <SetCompletionModal
                 visible={modalVisible}
-                onConfirm={onConfirmSet}
+                onConfirm={(reps) => {
+                    completeSet(reps);
+                    setModalVisible(false);
+                }}
                 onCancel={() => setModalVisible(false)}
-                defaultReps={currentSet?.targetReps || 0}
+                defaultReps={currentExercise.sets[currentSetIndex]?.targetReps || 0}
             />
         </SafeAreaView>
     );

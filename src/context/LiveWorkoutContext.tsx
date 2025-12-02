@@ -30,9 +30,10 @@ type LiveWorkoutContextType = {
     currentSetIndex: number;
     isResting: boolean;
     restTimer: number;
-    startWorkout: () => void;
+    startWorkout: (exercises: Exercise[]) => void;
     completeSet: (reps: number) => void;
     skipExercise: () => void;
+    goToExercise: (index: number) => void;
     finishWorkout: () => void;
     cancelRest: () => void;
 };
@@ -89,8 +90,13 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
         ],
     };
 
-    const startWorkout = () => {
-        setWorkout(JSON.parse(JSON.stringify(mockWorkout))); // Deep copy to reset
+    const startWorkout = (exercises: Exercise[]) => {
+        const newWorkout: WorkoutSession = {
+            startTime: new Date(),
+            completed: false,
+            exercises: JSON.parse(JSON.stringify(exercises)), // Deep copy to reset
+        };
+        setWorkout(newWorkout);
         setCurrentExerciseIndex(0);
         setCurrentSetIndex(0);
         setIsResting(false);
@@ -126,7 +132,7 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         if (isLastSetOfExercise) {
             // Progressive Overload Logic
-            if (reps > 11) {
+            if (reps > 12) {
                 currentExercise.nextSessionWeightAdjustment = 2.5; // Arbitrary increase
             } else if (reps < 4) {
                 currentExercise.nextSessionWeightAdjustment = -5;
@@ -168,6 +174,16 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
     };
 
+    const goToExercise = (index: number) => {
+        if (!workout || index < 0 || index >= workout.exercises.length) return;
+        setCurrentExerciseIndex(index);
+        // Find first incomplete set or default to 0
+        const firstIncompleteSetIdx = workout.exercises[index].sets.findIndex(s => !s.completed);
+        setCurrentSetIndex(firstIncompleteSetIdx !== -1 ? firstIncompleteSetIdx : 0);
+        setIsResting(false);
+        setRestTimer(0);
+    };
+
     const finishWorkout = () => {
         if (!workout) return;
         // We need to update the state to trigger the useEffect in ActiveExerciseScreen
@@ -194,6 +210,7 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 startWorkout,
                 completeSet,
                 skipExercise,
+                goToExercise,
                 finishWorkout,
                 cancelRest,
             }}
