@@ -4,17 +4,24 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DebugDashboardScreen } from '../screens/DebugDashboardScreen';
 import { TableListScreen } from '../screens/TableListScreen';
 import { EditRecordScreen } from '../screens/EditRecordScreen';
+import { ActiveExerciseScreen } from '../screens/ActiveExerciseScreen';
+import { WorkoutSummaryScreen } from '../screens/WorkoutSummaryScreen';
+import { LiveWorkoutProvider } from '../context/LiveWorkoutContext';
 
 const Stack = createNativeStackNavigator();
 
 export const RootNavigator = () => {
     return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName="DebugDashboard" id="RootStack">
-                <Stack.Screen name="DebugDashboard" component={DebugDashboardScreen} options={{ title: 'Debug Dashboard' }} />
-                <Stack.Screen name="TableList" component={TableListScreen} options={({ route }: any) => ({ title: route.params.tableName })} />
-                <Stack.Screen name="EditRecord" component={EditRecordScreen} options={({ route }: any) => ({ title: route.params.recordId ? 'Edit Record' : 'Add Record' })} />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <LiveWorkoutProvider>
+            <NavigationContainer>
+                <Stack.Navigator initialRouteName="ActiveExercise" id="RootStack">
+                    <Stack.Screen name="DebugDashboard" component={DebugDashboardScreen} options={{ title: 'Debug Dashboard' }} />
+                    <Stack.Screen name="TableList" component={TableListScreen} options={({ route }: any) => ({ title: route.params.tableName })} />
+                    <Stack.Screen name="EditRecord" component={EditRecordScreen} options={({ route }: any) => ({ title: route.params.recordId ? 'Edit Record' : 'Add Record' })} />
+                    <Stack.Screen name="ActiveExercise" component={ActiveExerciseScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="WorkoutSummary" component={WorkoutSummaryScreen} options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </LiveWorkoutProvider>
     );
 };
