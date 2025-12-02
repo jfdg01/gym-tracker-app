@@ -54,7 +54,7 @@ export const ActiveExerciseScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
             {/* Header */}
             <View className="px-6 py-4 border-b border-zinc-900 flex-row justify-between items-center">
                 <View>

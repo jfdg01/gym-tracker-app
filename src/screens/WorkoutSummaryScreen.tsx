@@ -28,7 +28,7 @@ export const WorkoutSummaryScreen = () => {
     }, 0);
 
     return (
-        <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-zinc-950">
+        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} className="flex-1 bg-zinc-950">
             <ScrollView className="flex-1 px-6">
                 <Text className="text-3xl font-bold text-zinc-50 mt-8 mb-1">{t('workoutSummary.summary')}</Text>
                 <Text className="text-zinc-400 text-base mb-8">{t('workoutSummary.goodJob')}</Text>

@@ -35,7 +35,7 @@ export const HomeScreen = () => {
 
     if (isLoading) {
         return (
-            <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-zinc-950 px-6 justify-center items-center">
+            <SafeAreaView edges={['top', 'left', 'right', 'bottom']} className="flex-1 bg-zinc-950 px-6 justify-center items-center">
                 <Text className="text-zinc-50">{t('common.loading')}</Text>
             </SafeAreaView>
         );
@@ -45,7 +45,7 @@ export const HomeScreen = () => {
 
     if (!currentDay || program.length === 0) {
         return (
-            <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-zinc-950 px-6 justify-center items-center">
+            <SafeAreaView edges={['top', 'left', 'right', 'bottom']} className="flex-1 bg-zinc-950 px-6 justify-center items-center">
                 <Text className="text-zinc-50">{t('common.noProgram')}</Text>
             </SafeAreaView>
         );
@@ -73,7 +73,7 @@ export const HomeScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950 px-6" edges={['top', 'left', 'right']}>
+        <SafeAreaView className="flex-1 bg-zinc-950 px-6" edges={['top', 'left', 'right', 'bottom']}>
             <View className="mt-8 mb-8 flex-row justify-between items-center">
                 <View>
                     <Text className="text-zinc-400 text-sm uppercase tracking-wider font-bold mb-1">{t('common.appName')}</Text>

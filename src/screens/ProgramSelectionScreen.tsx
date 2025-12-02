@@ -87,7 +87,7 @@ export const ProgramSelectionScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
             <View className="px-6 py-4 border-b border-zinc-900 flex-row items-center justify-between bg-zinc-950">
                 <Text className="text-zinc-50 text-3xl font-bold">{t('common.programs')}</Text>
                 <TouchableOpacity onPress={handleCreateProgram} className="bg-blue-500 px-5 py-3 rounded-xl">

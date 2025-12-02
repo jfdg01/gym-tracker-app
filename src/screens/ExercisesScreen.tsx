@@ -81,7 +81,7 @@ export const ExercisesScreen = () => {
     );
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
             <View className="px-6 flex-1">
                 {/* titulo Ejercicios */}
                 <View className="flex-row justify-between items-center my-6">

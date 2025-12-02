@@ -36,7 +36,7 @@ export const ExercisePickerScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right']}>
+        <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
             <View className="px-4 py-2 border-b border-zinc-900 flex-row items-center">
                 <TouchableOpacity onPress={() => navigation.goBack()} className="mr-4">
                     <Text className="text-blue-500 text-lg">{t('common.cancel')}</Text>
