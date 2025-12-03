@@ -19,7 +19,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
     const [minReps, setMinReps] = useState('4');
     const [maxReps, setMaxReps] = useState('12');
     const [weight, setWeight] = useState('');
-    const [restTimeSeconds, setRestTimeSeconds] = useState('60');
+    const [restTimeSeconds, setRestTimeSeconds] = useState('180');
 
     useEffect(() => {
         if (initialData) {
@@ -28,7 +28,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
             setMinReps(initialData.min_reps?.toString() || '4');
             setMaxReps(initialData.max_reps?.toString() || '12');
             setWeight(initialData.weight?.toString() || '');
-            setRestTimeSeconds(initialData.rest_time_seconds?.toString() || '60');
+            setRestTimeSeconds(initialData.rest_time_seconds?.toString() || '180');
         } else {
             resetForm();
         }
@@ -40,7 +40,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
         setMinReps('4');
         setMaxReps('12');
         setWeight('');
-        setRestTimeSeconds('60');
+        setRestTimeSeconds('180');
     };
 
     const handleSave = async () => {
@@ -52,7 +52,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
             min_reps: parseInt(minReps) || 4,
             max_reps: parseInt(maxReps) || 12,
             weight: weight ? parseFloat(weight) : null,
-            rest_time_seconds: parseInt(restTimeSeconds) || 60,
+            rest_time_seconds: parseInt(restTimeSeconds) || 180,
         };
 
         await onSave(exerciseData);

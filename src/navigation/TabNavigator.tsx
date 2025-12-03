@@ -4,11 +4,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ProgramManagementScreen } from '../screens/ProgramManagementScreen';
 import { ExercisesScreen } from '../screens/ExercisesScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
 import { Text, View } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
-import { Home, ClipboardList, Dumbbell } from 'lucide-react-native';
+import { Home, ClipboardList, Dumbbell, Settings } from 'lucide-react-native';
 
 const TabIcon = ({ name, focused, color }: { name: string; focused: boolean; color: string }) => {
     switch (name) {
@@ -18,6 +19,8 @@ const TabIcon = ({ name, focused, color }: { name: string; focused: boolean; col
             return <ClipboardList size={24} color={color} />;
         case 'Exercises':
             return <Dumbbell size={24} color={color} />;
+        case 'Settings':
+            return <Settings size={24} color={color} />;
         default:
             return null;
     }
@@ -63,6 +66,11 @@ export const TabNavigator = () => {
                 name="Exercises"
                 component={ExercisesScreen}
                 options={{ title: t('navigation.exercises') }}
+            />
+            <Tab.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={{ title: t('navigation.settings') }}
             />
         </Tab.Navigator>
     );

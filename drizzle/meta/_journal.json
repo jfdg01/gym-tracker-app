@@ -15,6 +15,13 @@
       "when": 1764718410395,
       "tag": "0001_futuristic_rockslide",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1764720910004,
+      "tag": "0002_outgoing_amazoness",
+      "breakpoints": true
     }
   ]
 }

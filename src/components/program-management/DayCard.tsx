@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Switch, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { DayItem, DayExerciseItem } from '../../types/program-management';
-import { updateDay, removeExerciseFromDay, reorderExercisesInDay } from '../../db/plans';
+import { removeExerciseFromDay, reorderExercisesInDay } from '../../db/plans';
 import { Trash2, ChevronUp, ChevronDown, Plus } from 'lucide-react-native';
 import { DayExerciseCard } from './DayExerciseCard';
 
@@ -17,6 +17,8 @@ type DayCardProps = {
     onAddExercise: () => void;
     onRefresh: () => void;
     onEditExercise: (exerciseId: number) => void;
+    onUpdate: (updates: Partial<DayItem>) => void;
+    onSave: (overrides?: Partial<DayItem>) => void;
 };
 
 export const DayCard = ({
@@ -29,18 +31,13 @@ export const DayCard = ({
     isLast,
     onAddExercise,
     onRefresh,
-    onEditExercise
+    onEditExercise,
+    onUpdate,
+    onSave
 }: DayCardProps) => {
     const { t } = useTranslation();
-    const [dayName, setDayName] = useState(day.name);
-    const [isRestDay, setIsRestDay] = useState(day.is_rest_day || false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isExerciseListCollapsed, setIsExerciseListCollapsed] = useState(false);
-
-    const handleSaveDaySettings = async () => {
-        await updateDay(day.id, { name: dayName, is_rest_day: isRestDay });
-        onRefresh();
-    };
 
     const handleRemoveExercise = async (id: number) => {
         await removeExerciseFromDay(id);
@@ -63,58 +60,71 @@ export const DayCard = ({
     return (
         <View className="bg-zinc-900 rounded-xl border border-zinc-800 mb-4 overflow-hidden">
             {/* Header */}
-            <View className="p-4 bg-zinc-800/50 border-b border-zinc-800">
-                <View className="flex-row justify-between items-center mb-3">
-                    <View className="flex-1 flex-row items-center mr-2">
+            <View className="p-4 border-b border-zinc-800">
+                <View className="mb-3">
+                    <View className="flex-row justify-between items-start mb-3">
                         <TouchableOpacity
                             onPress={() => setIsCollapsed(!isCollapsed)}
-                            className="mr-3 p-1 bg-zinc-800 rounded border border-zinc-700"
+                            className="p-2 bg-zinc-800 rounded-lg border border-zinc-700 items-center justify-center min-w-[44px] min-h-[44px]"
                         >
                             {isCollapsed ? (
-                                <ChevronDown size={16} color="#a1a1aa" />
+                                <>
+                                    <ChevronDown size={20} color="#a1a1aa" />
+                                    <Text className="text-zinc-400 text-[10px] mt-1">{t('common.expand')}</Text>
+                                </>
                             ) : (
-                                <ChevronUp size={16} color="#a1a1aa" />
+                                <>
+                                    <ChevronUp size={20} color="#a1a1aa" />
+                                    <Text className="text-zinc-400 text-[10px] mt-1">{t('common.collapse')}</Text>
+                                </>
                             )}
                         </TouchableOpacity>
-                        <TextInput
-                            className="flex-1 text-zinc-50 font-bold text-lg bg-zinc-900/50 p-2 rounded border border-zinc-700"
-                            value={dayName}
-                            onChangeText={setDayName}
-                            onEndEditing={handleSaveDaySettings}
-                            placeholder={t('dayEditor.dayName')}
-                            placeholderTextColor="#71717a"
-                        />
+
+                        <View className="flex-row items-center">
+                            <TouchableOpacity
+                                onPress={onMoveUp}
+                                disabled={isFirst}
+                                className={`p-2 rounded-lg mr-1 min-w-[44px] min-h-[44px] items-center justify-center flex-col ${isFirst ? 'opacity-30' : 'bg-zinc-700'}`}
+                            >
+                                <ChevronUp size={20} color="white" />
+                                <Text className="text-white text-[10px] mt-1">{t('common.up')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={onMoveDown}
+                                disabled={isLast}
+                                className={`p-2 rounded-lg mr-2 min-w-[44px] min-h-[44px] items-center justify-center flex-col ${isLast ? 'opacity-30' : 'bg-zinc-700'}`}
+                            >
+                                <ChevronDown size={20} color="white" />
+                                <Text className="text-white text-[10px] mt-1">{t('common.down')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={onDelete}
+                                className="bg-red-900/30 p-2 rounded-lg min-w-[44px] min-h-[44px] items-center justify-center flex-col"
+                            >
+                                <Trash2 size={20} color="#f87171" />
+                                <Text className="text-red-400 text-[10px] mt-1">{t('common.delete')}</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <View className="flex-row items-center">
-                        <TouchableOpacity
-                            onPress={onMoveUp}
-                            disabled={isFirst}
-                            className={`p-2 rounded mr-1 ${isFirst ? 'opacity-30' : 'bg-zinc-700'}`}
-                        >
-                            <ChevronUp size={16} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={onMoveDown}
-                            disabled={isLast}
-                            className={`p-2 rounded mr-2 ${isLast ? 'opacity-30' : 'bg-zinc-700'}`}
-                        >
-                            <ChevronDown size={16} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={onDelete} className="bg-red-900/30 p-2 rounded">
-                            <Trash2 size={16} color="#f87171" />
-                        </TouchableOpacity>
-                    </View>
+
+                    <TextInput
+                        className="text-zinc-50 font-bold text-lg bg-zinc-950 p-3 rounded-lg border border-zinc-800 w-full"
+                        value={day.name}
+                        onChangeText={(text) => onUpdate({ name: text })}
+                        onEndEditing={() => onSave({ name: day.name })}
+                        placeholder={t('dayEditor.dayName')}
+                        placeholderTextColor="#71717a"
+                    />
                 </View>
 
                 {!isCollapsed && (
                     <View className="flex-row items-center justify-between">
                         <Text className="text-zinc-400 text-sm">{t('common.restDay')}</Text>
                         <Switch
-                            value={isRestDay}
-                            onValueChange={async (val) => {
-                                setIsRestDay(val);
-                                await updateDay(day.id, { is_rest_day: val });
-                                onRefresh();
+                            value={day.is_rest_day || false}
+                            onValueChange={(val) => {
+                                onUpdate({ is_rest_day: val });
+                                onSave({ is_rest_day: val });
                             }}
                             trackColor={{ false: '#3f3f46', true: '#2563eb' }}
                         />
@@ -124,14 +134,17 @@ export const DayCard = ({
 
             {/* Content */}
             {!isCollapsed && (
-                !isRestDay ? (
+                !day.is_rest_day ? (
                     <View className="p-4">
                         <TouchableOpacity
                             className="flex-row items-center justify-between mb-2"
                             onPress={() => setIsExerciseListCollapsed(!isExerciseListCollapsed)}
                         >
                             <Text className="text-zinc-500 text-xs uppercase font-bold">{t('dayEditor.exercises')}</Text>
-                            <View className="bg-zinc-900 p-1 rounded border border-zinc-800">
+                            <View className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800 flex-row items-center">
+                                <Text className="text-zinc-500 text-[10px] mr-1 font-medium">
+                                    {isExerciseListCollapsed ? t('common.expand') : t('common.collapse')}
+                                </Text>
                                 {isExerciseListCollapsed ? (
                                     <ChevronDown size={14} color="#71717a" />
                                 ) : (

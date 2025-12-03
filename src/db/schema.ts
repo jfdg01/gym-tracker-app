@@ -8,7 +8,7 @@ export const exercises = sqliteTable('exercises', {
     max_reps: integer('max_reps').default(12),
     min_reps: integer('min_reps').default(4),
     weight: integer('weight').default(20), // the weight will be modified by the system using the reps
-    rest_time_seconds: integer('rest_time_seconds').default(60),
+    rest_time_seconds: integer('rest_time_seconds').default(180),
 });
 
 export const programs = sqliteTable('programs', {
@@ -37,6 +37,7 @@ export const user_settings = sqliteTable('user_settings', {
     current_program_id: integer('current_program_id').references(() => programs.id),
     current_day_index: integer('current_day_index').default(0),
     language: text('language').default('en'),
+    name: text('name').default('User'),
 });
 
 export const workout_logs = sqliteTable('workout_logs', {

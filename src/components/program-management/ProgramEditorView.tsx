@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus, ChevronUp, ChevronDown } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../db/client';
 import { programs, days, day_exercises, exercises } from '../../db/schema';
 import { eq, asc } from 'drizzle-orm';
-import { updatePlan, addDayToPlan, deleteDay, reorderDays, deletePlan, addExerciseToDay } from '../../db/plans';
+import { updatePlan, addDayToPlan, deleteDay, reorderDays, deletePlan, addExerciseToDay, updateDay } from '../../db/plans';
 import { useProgram } from '../../context/ProgramContext';
 import { DayItem, DayExerciseItem } from '../../types/program-management';
 import { ScreenHeader } from '../ScreenHeader';
@@ -37,6 +37,11 @@ export const ProgramEditorView = ({
     const [daysExercises, setDaysExercises] = useState<Record<number, DayExerciseItem[]>>({});
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [isDaysListCollapsed, setIsDaysListCollapsed] = useState(false);
+
+    // Delete Day State
+    const [deleteDayModalVisible, setDeleteDayModalVisible] = useState(false);
+    const [dayToDeleteId, setDayToDeleteId] = useState<number | null>(null);
+    const [dayToDeleteName, setDayToDeleteName] = useState<string>('');
 
     // Picker State
     const [pickerVisible, setPickerVisible] = useState(false);
@@ -94,23 +99,20 @@ export const ProgramEditorView = ({
         loadProgramDetails();
     };
 
-    const handleDeleteDay = async (dayId: number) => {
-        Alert.alert(
-            t('programEditor.deleteDayTitle'),
-            t('common.areYouSure'),
-            [
-                { text: t('common.cancel'), style: "cancel" },
-                {
-                    text: t('common.delete'),
-                    style: "destructive",
-                    onPress: async () => {
-                        await deleteDay(dayId);
-                        loadProgramDetails();
-                        if (programId === currentProgramId) refreshProgram();
-                    }
-                }
-            ]
-        );
+    const handleDeleteDay = (dayId: number, dayName: string) => {
+        setDayToDeleteId(dayId);
+        setDayToDeleteName(dayName);
+        setDeleteDayModalVisible(true);
+    };
+
+    const confirmDeleteDay = async () => {
+        if (dayToDeleteId) {
+            await deleteDay(dayToDeleteId);
+            loadProgramDetails();
+            if (programId === currentProgramId) refreshProgram();
+            setDeleteDayModalVisible(false);
+            setDayToDeleteId(null);
+        }
     };
 
     const handleMoveUp = async (index: number) => {
@@ -192,6 +194,40 @@ export const ProgramEditorView = ({
 
     // const [isDaysListCollapsed, setIsDaysListCollapsed] = useState(false); // Removed duplicate
 
+
+
+    const handleDayChange = (dayId: number, updates: Partial<DayItem>) => {
+        setDaysList(prev => prev.map(d => d.id === dayId ? { ...d, ...updates } : d));
+    };
+
+    const handleDaySave = async (dayId: number, overrides?: Partial<DayItem>) => {
+        const day = daysList.find(d => d.id === dayId);
+        if (day) {
+            await updateDay(day.id, {
+                name: day.name,
+                is_rest_day: day.is_rest_day,
+                ...overrides
+            });
+        }
+    };
+
+    const handleRefresh = async () => {
+        // Save local changes before reloading to prevent overwriting with old DB data
+        await Promise.all(daysList.map(d =>
+            updateDay(d.id, { name: d.name, is_rest_day: d.is_rest_day })
+        ));
+        await loadProgramDetails();
+    };
+
+    const handleSaveAndExit = async () => {
+        await handleSaveMeta();
+        // Save all days to ensure consistency
+        await Promise.all(daysList.map(d =>
+            updateDay(d.id, { name: d.name, is_rest_day: d.is_rest_day })
+        ));
+        onBack();
+    };
+
     // ... existing code ...
 
     return (
@@ -202,7 +238,7 @@ export const ProgramEditorView = ({
                 leftAction={
                     <HeaderAction
                         label={t('common.done')}
-                        onPress={onBack}
+                        onPress={handleSaveAndExit}
                         variant="link"
                     />
                 }
@@ -211,7 +247,7 @@ export const ProgramEditorView = ({
             <FlatList
                 data={isDaysListCollapsed ? [] : daysList}
                 keyExtractor={(item) => `day-${item.id}`}
-                contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 100 }}
+                contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 100 }}
                 ListHeaderComponent={
                     <View className="mb-6">
                         <Text className="text-zinc-500 text-xs uppercase font-bold mb-2">{t('programEditor.programName')}</Text>
@@ -235,7 +271,10 @@ export const ProgramEditorView = ({
                             onPress={() => setIsDaysListCollapsed(!isDaysListCollapsed)}
                         >
                             <Text className="text-zinc-500 text-xs uppercase font-bold">{t('programEditor.days')}</Text>
-                            <View className="bg-zinc-900 p-1 rounded border border-zinc-800">
+                            <View className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800 flex-row items-center">
+                                <Text className="text-zinc-500 text-[10px] mr-1 font-medium">
+                                    {isDaysListCollapsed ? t('common.expand') : t('common.collapse')}
+                                </Text>
                                 {isDaysListCollapsed ? (
                                     <ChevronDown size={14} color="#71717a" />
                                 ) : (
@@ -249,14 +288,16 @@ export const ProgramEditorView = ({
                     <DayCard
                         day={item}
                         exercises={daysExercises[item.id] || []}
-                        onDelete={() => handleDeleteDay(item.id)}
+                        onDelete={() => handleDeleteDay(item.id, item.name)}
                         onMoveUp={() => handleMoveUp(index)}
                         onMoveDown={() => handleMoveDown(index)}
                         isFirst={index === 0}
                         isLast={index === daysList.length - 1}
                         onAddExercise={() => handleAddExercise(item.id)}
-                        onRefresh={loadProgramDetails}
+                        onRefresh={handleRefresh}
                         onEditExercise={handleEditExercise}
+                        onUpdate={(updates) => handleDayChange(item.id, updates)}
+                        onSave={() => handleDaySave(item.id)}
                     />
                 )}
                 ListFooterComponent={
@@ -274,7 +315,7 @@ export const ProgramEditorView = ({
                         <View className="mt-8">
                             <TouchableOpacity
                                 className="bg-blue-600 p-4 rounded-xl items-center mb-3"
-                                onPress={onBack}
+                                onPress={handleSaveAndExit}
                             >
                                 <Text className="text-white font-bold">{t('common.save')}</Text>
                             </TouchableOpacity>
@@ -297,6 +338,17 @@ export const ProgramEditorView = ({
                 cancelText={t('common.cancel')}
                 onConfirm={confirmDeleteProgram}
                 onCancel={() => setDeleteModalVisible(false)}
+                confirmButtonColor="red"
+            />
+
+            <ConfirmationModal
+                visible={deleteDayModalVisible}
+                title={t('programEditor.deleteDayTitle')}
+                message={t('programEditor.deleteDayMessage', { name: dayToDeleteName })}
+                confirmText={t('common.delete')}
+                cancelText={t('common.cancel')}
+                onConfirm={confirmDeleteDay}
+                onCancel={() => setDeleteDayModalVisible(false)}
                 confirmButtonColor="red"
             />
 

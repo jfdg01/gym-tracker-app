@@ -49,6 +49,17 @@ We use a customized Zinc-based dark palette with a vibrant Electric Blue accent.
 
 ## 4. Components & Styling
 
+### Visual Hierarchy & Nesting
+*   **Level 1 (Background)**: `bg-zinc-950` - The main canvas.
+*   **Level 2 (Primary Card)**: `bg-zinc-900` - Main content containers (e.g., Day Card).
+    *   Border: `border border-zinc-800`
+    *   Shadow: `shadow-sm`
+    *   Title: `text-lg font-bold text-zinc-50`
+*   **Level 3 (Nested/Secondary Card)**: `bg-zinc-800/50` - Items inside a primary card (e.g., Exercise Item).
+    *   Border: `border border-zinc-700/50`
+    *   Title: `text-base font-semibold text-zinc-100`
+    *   Metadata: `text-xs font-medium text-zinc-400`
+
 ### Cards
 *   **Background**: `bg-zinc-900`
 *   **Border**: `border border-zinc-800` (Subtle definition)

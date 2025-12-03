@@ -23,26 +23,31 @@
 		"areYouSure": "¿Estás seguro?",
 		"cancel": "Cancelar",
 		"close": "Cerrar",
+		"collapse": "Colapsar",
 		"completed": "Completado",
 		"confirm": "Confirmar",
 		"createdAt": "Creado el",
 		"delete": "Eliminar",
 		"description": "Descripción",
 		"done": "Listo",
+		"down": "Bajar",
 		"edit": "Editar",
 		"error": "Error",
 		"exercises": "Ejercicios",
 		"exercisesCount": "{{count}} ejercicios planificados",
-		"greeting": "Hola, Usuario",
+		"expand": "Expandir",
+		"greeting": "Hola, {{name}}",
 		"language": "Idioma",
 		"lastWorkout": "Último Entrenamiento",
 		"loading": "Cargando programa...",
 		"markComplete": "Marcar como Completado",
 		"maxReps": "Reps Máx",
 		"minReps": "Reps Mín",
+		"moveDown": "Mover Abajo",
+		"moveUp": "Mover Arriba",
 		"name": "Nombre",
 		"nextDays": "Próximos Días",
-		"noProgram": "No has definido ningún programa. Crea uno nuevo.",
+		"noProgram": "No has definido ningún programa. Crea uno nuevo o selecciona uno existente.",
 		"programs": "Programas",
 		"remove": "Eliminar",
 		"rest": "Descanso",
@@ -57,15 +62,17 @@
 		"startWorkout": "Comenzar Sesión",
 		"targetReps": "Reps Objetivo",
 		"targetSets": "Series Objetivo",
-		"today": "Te toca hoy"
+		"today": "Te toca hoy",
+		"up": "Subir"
 	},
 	"dayEditor": {
 		"addExercise": "Añadir Ejercicio",
 		"dayName": "Nombre del Día",
-		"exercises": "Ejercicios",
 		"editDay": "Editar Día",
+		"exercises": "Ejercicios",
 		"isRestDay": "Este es un día de descanso.",
 		"noExercises": "No se pueden añadir ejercicios.",
+		"restDayDescription": "Día de descanso activo. Estira, camina o simplemente descansa.",
 		"searchPlaceholder": "Buscar ejercicios...",
 		"selectExercise": "Seleccionar Ejercicio",
 		"setsReps": "{{sets}} series x {{reps}} reps"
@@ -89,22 +96,27 @@
 		"weightLabel": "Peso (kg)"
 	},
 	"exercises": {
+		"createNew": "Crear nuevo ejercicio",
 		"createPrompt": "Pulsa el botón de abajo para crear uno.",
-		"exerciseDetails": "{{sets}} series • {{min}}-{{max}} reps • {{weight}}kg",
+		"exerciseDetails": "{{sets}} series • {{min}}-{{max}} reps • {{weight}}",
 		"freeWeight": "Peso libre",
-		"noExercises": "No hay ejercicios aún."
+		"noExercises": "No hay ejercicios aún.",
+		"noExercisesFound": "No se encontraron ejercicios"
 	},
 	"home": {
+		"noProgramMessage": "Comienza creando un nuevo programa de entrenamiento o seleccionando uno existente de tu biblioteca.",
 		"restDayAlert": "¡Es día de descanso! Disfruta tu recuperación."
 	},
 	"navigation": {
 		"exercises": "Ejercicios",
 		"home": "Inicio",
-		"programs": "Programas"
+		"programs": "Programas",
+		"settings": "Ajustes"
 	},
 	"programEditor": {
 		"addDay": "Añadir Día",
 		"days": "Días",
+		"deleteDayMessage": "Esto eliminará el día \"{{name}}\"",
 		"deleteDayTitle": "Eliminar Día",
 		"editProgram": "Editar Programa",
 		"programName": "Nombre del Programa",
@@ -114,14 +126,25 @@
 		"active": "Activo",
 		"changeProgramMessage": "¿Estás seguro de que quieres cambiar tu programa activo?",
 		"changeProgramTitle": "Cambiar Programa",
+		"createPrompt": "Crea tu primer programa para comenzar a registrar tus entrenamientos.",
 		"deleteProgramMessage": "¿Estás seguro? Esto eliminará todos los días e historial asociados con este programa.",
 		"deleteProgramTitle": "Eliminar Programa",
 		"new": "+ Nuevo",
+		"noPrograms": "No se encontraron programas",
 		"switch": "Cambiar"
 	},
 	"setCompletion": {
 		"repsLabel": "Reps",
 		"title": "Registrar Serie"
+	},
+	"settings": {
+		"language": "Idioma",
+		"nameLabel": "Tu Nombre",
+		"namePlaceholder": "Introduce tu nombre",
+		"profile": "Perfil",
+		"saveError": "Error al guardar los ajustes",
+		"saved": "Ajustes guardados correctamente",
+		"title": "Ajustes"
 	},
 	"skipExercise": {
 		"message": "¿Estás seguro de que quieres omitir este ejercicio? El progreso actual no se guardará.",

@@ -8,6 +8,7 @@ import { ExerciseFormModal } from '../components/ExerciseFormModal';
 import { useFocusEffect } from '@react-navigation/native';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { HeaderAction } from '../components/HeaderAction';
+import { EmptyState } from '../components/EmptyState';
 
 export const ExercisesScreen = () => {
     const { t } = useTranslation();
@@ -76,7 +77,7 @@ export const ExercisesScreen = () => {
             <View className="flex-1">
                 <Text className="text-zinc-50 font-bold text-lg">{item.name}</Text>
                 <Text className="text-zinc-400 text-sm">
-                    {t('exercises.exerciseDetails', { sets: item.sets, min: item.min_reps, max: item.max_reps, weight: item.weight ? item.weight : t('exercises.freeWeight') })}
+                    {t('exercises.exerciseDetails', { sets: item.sets, min: item.min_reps, max: item.max_reps, weight: item.weight ? `${item.weight}kg` : t('exercises.freeWeight') })}
                 </Text>
             </View>
         </TouchableOpacity>
@@ -117,21 +118,32 @@ export const ExercisesScreen = () => {
                     contentContainerStyle={{ paddingBottom: 100 }}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
-                        <View className="items-center justify-center py-20">
-                            <Text className="text-zinc-500 text-lg">{t('exercises.noExercises')}</Text>
-                            <Text className="text-zinc-600 text-sm mt-2">{t('exercises.createPrompt')}</Text>
-                        </View>
+                        exercises.length === 0 ? (
+                            <EmptyState
+                                icon={Dumbbell}
+                                title={t('exercises.noExercises')}
+                                message={t('exercises.createPrompt')}
+                                actionLabel={t('common.add')}
+                                onAction={openCreateModal}
+                            />
+                        ) : (
+                            <View className="items-center justify-center py-20">
+                                <Text className="text-zinc-500 text-lg">{t('tableList.noRecords')}</Text>
+                            </View>
+                        )
                     }
                     // add button
                     ListFooterComponent={
-                        <View className="items-center mt-4">
-                            <TouchableOpacity
-                                onPress={openCreateModal}
-                                className="bg-blue-500 p-3 rounded-full"
-                            >
-                                <Plus size={24} color="white" />
-                            </TouchableOpacity>
-                        </View>
+                        exercises.length > 0 ? (
+                            <View className="items-center mt-4">
+                                <TouchableOpacity
+                                    onPress={openCreateModal}
+                                    className="bg-blue-500 p-3 rounded-full"
+                                >
+                                    <Plus size={24} color="white" />
+                                </TouchableOpacity>
+                            </View>
+                        ) : null
                     }
                 />
             </View>

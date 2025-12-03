@@ -6,7 +6,7 @@
 		"doneHeader": "Done",
 		"exerciseProgress": "Exercise {{current}} of {{total}}",
 		"finishWorkout": "Finish Workout",
-		"list": "LIST",
+		"list": "List",
 		"noExercise": "No exercise",
 		"rest": "Rest",
 		"resting": "Resting...",
@@ -23,23 +23,28 @@
 		"areYouSure": "Are you sure?",
 		"cancel": "Cancel",
 		"close": "Close",
+		"collapse": "Collapse",
 		"completed": "Completed",
 		"confirm": "Confirm",
 		"createdAt": "Created At",
 		"delete": "Delete",
 		"description": "Description",
 		"done": "Done",
+		"down": "Down",
 		"edit": "Edit",
 		"error": "Error",
 		"exercises": "Exercises",
 		"exercisesCount": "{{count}} exercises planned",
-		"greeting": "Hello, User",
+		"expand": "Expand",
+		"greeting": "Hello, {{name}}",
 		"language": "Language",
 		"lastWorkout": "Last Workout",
 		"loading": "Loading program...",
 		"markComplete": "Mark as Complete",
 		"maxReps": "Max Reps",
 		"minReps": "Min Reps",
+		"moveDown": "Move Down",
+		"moveUp": "Move Up",
 		"name": "Name",
 		"nextDays": "Upcoming Days",
 		"noProgram": "No active program found. Create or select one.",
@@ -57,15 +62,17 @@
 		"startWorkout": "Start Session",
 		"targetReps": "Target Reps",
 		"targetSets": "Target Sets",
-		"today": "Today's Workout"
+		"today": "Today's Workout",
+		"up": "Up"
 	},
 	"dayEditor": {
 		"addExercise": "Add Exercise",
 		"dayName": "Day Name",
-		"exercises": "Exercises",
 		"editDay": "Edit Day",
+		"exercises": "Exercises",
 		"isRestDay": "This is a Rest Day.",
 		"noExercises": "No exercises can be added.",
+		"restDayDescription": "Can't add exercises to rest days.",
 		"searchPlaceholder": "Search exercises...",
 		"selectExercise": "Select Exercise",
 		"setsReps": "{{sets}} sets x {{reps}} reps"
@@ -89,22 +96,27 @@
 		"weightLabel": "Weight (kg)"
 	},
 	"exercises": {
+		"createNew": "Create new exercise",
 		"createPrompt": "Tap the button below to create one.",
-		"exerciseDetails": "{{sets}} sets • {{min}}-{{max}} reps • {{weight}}kg",
+		"exerciseDetails": "{{sets}} sets • {{min}}-{{max}} reps • {{weight}}",
 		"freeWeight": "Free Weight",
-		"noExercises": "No exercises yet."
+		"noExercises": "No exercises yet.",
+		"noExercisesFound": "No exercises found"
 	},
 	"home": {
+		"noProgramMessage": "Get started by creating a new workout program or selecting an existing one from your library.",
 		"restDayAlert": "It's a rest day! Enjoy your recovery."
 	},
 	"navigation": {
 		"exercises": "Exercises",
 		"home": "Home",
-		"programs": "Programs"
+		"programs": "Programs",
+		"settings": "Settings"
 	},
 	"programEditor": {
 		"addDay": "Add Day",
 		"days": "Days",
+		"deleteDayMessage": "This will delete the day \"{{name}}\"",
 		"deleteDayTitle": "Delete Day",
 		"editProgram": "Edit Program",
 		"programName": "Program Name",
@@ -114,14 +126,25 @@
 		"active": "Active",
 		"changeProgramMessage": "Are you sure you want to switch your active program?",
 		"changeProgramTitle": "Change Program",
+		"createPrompt": "Create your first program to start tracking your workouts.",
 		"deleteProgramMessage": "Are you sure? This will delete all days and history associated with this program.",
 		"deleteProgramTitle": "Delete Program",
 		"new": "+ New",
+		"noPrograms": "No programs found",
 		"switch": "Switch"
 	},
 	"setCompletion": {
 		"repsLabel": "Reps",
 		"title": "Log Set"
+	},
+	"settings": {
+		"language": "Language",
+		"nameLabel": "Your Name",
+		"namePlaceholder": "Enter your name",
+		"profile": "Profile",
+		"saveError": "Failed to save settings",
+		"saved": "Settings saved successfully",
+		"title": "Settings"
 	},
 	"skipExercise": {
 		"message": "Are you sure you want to skip this exercise? Current progress will not be saved.",

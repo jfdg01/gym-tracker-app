@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { ClipboardList } from 'lucide-react-native';
+import { EmptyState } from '../EmptyState';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../db/client';
 import * as schema from '../../db/schema';
@@ -68,9 +70,20 @@ export const ProgramListView = ({
                 }
             />
 
-            <ScrollView className="flex-1 px-6 pt-6">
+            <ScrollView
+                className="flex-1 px-6 pt-6"
+                contentContainerStyle={{ flexGrow: 1 }}
+            >
                 {loading ? (
                     <Text className="text-zinc-500 text-center">{t('common.loading')}</Text>
+                ) : programList.length === 0 ? (
+                    <EmptyState
+                        icon={ClipboardList}
+                        title={t('programSelection.noPrograms')}
+                        message={t('programSelection.createPrompt')}
+                        actionLabel={t('programSelection.new')}
+                        onAction={onCreate}
+                    />
                 ) : (
                     programList.map((prog) => {
                         const isActive = prog.id === currentProgramId;
@@ -111,7 +124,7 @@ export const ProgramListView = ({
                         );
                     })
                 )}
-                <View className="h-20" />
+                {programList.length > 0 && <View className="h-20" />}
             </ScrollView>
 
             <ConfirmationModal

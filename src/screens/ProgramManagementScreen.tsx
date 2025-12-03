@@ -13,7 +13,7 @@ export const ProgramManagementScreen = () => {
     const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null);
 
     const handleCreateProgram = async () => {
-        const newId = await createPlan("New Program", "Description");
+        const newId = await createPlan("New Program", "");
         setSelectedProgramId(newId);
         setView('PROGRAM_EDIT');
     };
