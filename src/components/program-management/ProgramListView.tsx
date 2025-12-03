@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { ClipboardList } from 'lucide-react-native';
 import { EmptyState } from '../EmptyState';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 import { db } from '../../db/client';
 import * as schema from '../../db/schema';
 import { useProgram } from '../../context/ProgramContext';
@@ -29,9 +30,11 @@ export const ProgramListView = ({
     const [modalVisible, setModalVisible] = useState(false);
     const [pendingSelectionId, setPendingSelectionId] = useState<number | null>(null);
 
-    useEffect(() => {
-        loadPrograms();
-    }, [currentProgramId]); // Reload if active program changes
+    useFocusEffect(
+        useCallback(() => {
+            loadPrograms();
+        }, []) // Empty deps - reload every time screen is focused
+    );
 
     const loadPrograms = async () => {
         try {
