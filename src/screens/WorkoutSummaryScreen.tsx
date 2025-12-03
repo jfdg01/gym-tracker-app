@@ -59,11 +59,11 @@ export const WorkoutSummaryScreen = () => {
                             </View>
 
                             {exercise.nextSessionWeightAdjustment !== 0 && exercise.nextSessionWeightAdjustment !== undefined && (
-                                <View className={`px-2 py-1 rounded-lg ${exercise.nextSessionWeightAdjustment > 0 ? 'bg-emerald-500/20' : 'bg-red-500/20'
+                                <View className={`px-2 py-1 rounded-lg ${exercise.nextSessionWeightAdjustment > 0 ? 'bg-emerald-500/20' : 'bg-zinc-800'
                                     }`}>
-                                    <Text className={`${exercise.nextSessionWeightAdjustment > 0 ? 'text-emerald-500' : 'text-red-500'
-                                        } font-bold text-xs`}>
-                                        {exercise.nextSessionWeightAdjustment > 0 ? t('workoutSummary.increaseWeight') : t('workoutSummary.decreaseWeight')}
+                                    <Text className={`${exercise.nextSessionWeightAdjustment > 0 ? 'text-emerald-500' : 'text-zinc-400'
+                                        } text-xs font-medium`}>
+                                        {exercise.nextSessionWeightAdjustment > 0 ? t('workoutSummary.increaseWeight') : ''}
                                     </Text>
                                 </View>
                             )}
@@ -85,7 +85,7 @@ export const WorkoutSummaryScreen = () => {
                                 <Text className="text-zinc-400 text-xs mr-2">{t('workoutSummary.nextSession')}</Text>
                                 <Text className="text-zinc-50 font-bold text-sm">
                                     {exercise.sets[0].targetWeight + exercise.nextSessionWeightAdjustment}kg
-                                    <Text className={exercise.nextSessionWeightAdjustment > 0 ? 'text-emerald-500' : 'text-red-500'}>
+                                    <Text className={exercise.nextSessionWeightAdjustment > 0 ? 'text-emerald-500' : 'text-zinc-400'}>
                                         {' '}({exercise.nextSessionWeightAdjustment > 0 ? '+' : ''}{exercise.nextSessionWeightAdjustment}kg)
                                     </Text>
                                 </Text>

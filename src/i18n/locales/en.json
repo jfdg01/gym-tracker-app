@@ -49,6 +49,7 @@
 		"nextDays": "Upcoming Days",
 		"noProgram": "No active program found. Create or select one.",
 		"programs": "Programs",
+		"none": "None",
 		"remove": "Remove",
 		"rest": "Rest",
 		"restDay": "Rest Day",
@@ -117,7 +118,9 @@
 	"exercises": {
 		"createNew": "Create new exercise",
 		"createPrompt": "Tap the button below to create one.",
-		"exerciseDetails": "{{sets}} sets • {{min}}-{{max}} reps • {{weight}}",
+		"exerciseDetails": "{{sets}} sets • {{max}} reps • {{weight}}",
+		"detailsTime": "{{sets}} sets • {{duration}}s",
+		"detailsText": "{{sets}} sets • {{value}}",
 		"freeWeight": "Free Weight",
 		"noExercises": "No exercises yet.",
 		"noExercisesFound": "No exercises found"

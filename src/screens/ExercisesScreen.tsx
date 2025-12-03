@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+
 import { View, Text, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +10,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { HeaderAction } from '../components/HeaderAction';
 import { EmptyState } from '../components/EmptyState';
+import { SearchBar } from '../components/SearchBar';
+import { searchFilter } from '../utils/textUtils';
 
 export const ExercisesScreen = () => {
     const { t } = useTranslation();
@@ -31,15 +34,7 @@ export const ExercisesScreen = () => {
     );
 
     useEffect(() => {
-        if (searchQuery) {
-            const lower = searchQuery.toLowerCase();
-            const filtered = exercises.filter(ex =>
-                ex.name.toLowerCase().includes(lower)
-            );
-            setFilteredExercises(filtered);
-        } else {
-            setFilteredExercises(exercises);
-        }
+        setFilteredExercises(searchFilter(exercises, searchQuery));
     }, [searchQuery, exercises]);
 
     const handleSave = async (data: NewExercise) => {
@@ -68,19 +63,26 @@ export const ExercisesScreen = () => {
 
     const renderItem = ({ item }: { item: Exercise }) => {
         let details = '';
-        const trackType = item.track_type || 'reps';
-        const resistanceType = item.resistance_type || 'weight';
+        const type = item.type || 'reps';
+        const trackType = type === 'time' ? 'time' : 'reps';
+        const resistanceType = type === 'text' ? 'text' : 'weight';
 
         if (trackType === 'time') {
-            details = `${item.sets} sets • ${item.time_duration || 0}s`;
+            details = t('exercises.detailsTime', {
+                sets: item.sets,
+                duration: item.time_duration || 0
+            });
         } else if (resistanceType === 'text') {
-            details = `${item.sets} sets • ${item.current_val_text || '-'}`;
+            details = t('exercises.detailsText', {
+                sets: item.sets,
+                value: item.current_val_text || t('common.none')
+            });
         } else {
             details = t('exercises.exerciseDetails', {
                 sets: item.sets,
-                min: item.min_reps,
                 max: item.max_reps,
-                weight: item.weight ? `${item.weight}kg` : t('exercises.freeWeight')
+                weight: item.weight ? `${item.weight}kg` : t('exercises.freeWeight'),
+                increaseRate: item.increase_rate,
             });
         }
 
@@ -117,16 +119,10 @@ export const ExercisesScreen = () => {
                 />
 
                 {/* buscador */}
-                <View className="bg-zinc-900 p-3 rounded-xl flex-row items-center mb-6 border border-zinc-800">
-                    <Search size={20} color="#71717a" className="mr-3" />
-                    <TextInput
-                        className="flex-1 text-zinc-50 text-base"
-                        placeholder={t('dayEditor.searchPlaceholder')}
-                        placeholderTextColor="#71717a"
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                    />
-                </View>
+                <SearchBar
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
 
                 <FlatList
                     data={filteredExercises}

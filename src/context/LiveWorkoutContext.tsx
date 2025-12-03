@@ -16,18 +16,17 @@ export type Exercise = {
     description?: string | null;
     track_type?: 'reps' | 'time';
     resistance_type?: 'weight' | 'text';
+    type?: 'reps' | 'time' | 'text';
     sets: Set[];
     restTimeSeconds: number;
-    minReps: number;
     maxReps: number;
     weight?: number | null;
     timeDuration?: number;
     currentValText?: string;
     increaseRate?: number;
-    decreaseRate?: number;
     timeIncreaseStep?: number;
     maxTimeCap?: number;
-    nextSessionWeightAdjustment?: number; // dynamic based on increaseRate/decreaseRate
+    nextSessionWeightAdjustment?: number; // dynamic based on increaseRate
     nextSessionTimeAdjustment?: number; // dynamic based on timeIncreaseStep
 };
 
@@ -117,64 +116,6 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
         const isLastSetOfExercise = currentSetIndex === currentExercise.sets.length - 1;
 
         if (isLastSetOfExercise) {
-            // Progressive Overload Logic
-            const trackType = currentExercise.track_type || 'reps';
-            const resistanceType = currentExercise.resistance_type || 'weight';
-
-            // 1. Check if progression criteria met (Trigger)
-            let criteriaMet = false;
-
-            if (trackType === 'time') {
-                // Check if all sets met the target time
-                criteriaMet = currentExercise.sets.every(s => {
-                    const val = parseFloat(s.actualValue || '0');
-                    return val >= (currentExercise.timeDuration || 0);
-                });
-            } else {
-                // Reps based
-                const valNum = typeof val === 'number' ? val : parseFloat(val);
-                criteriaMet = valNum >= currentExercise.maxReps;
-            }
-
-            // 2. Apply Progression (Resistance Increase)
-            if (criteriaMet) {
-                if (trackType === 'time') {
-                    // For time tracking, we might increase time OR weight/text depending on resistance type?
-                    // Actually, if resistance is weight, we increase weight. If resistance is text, we do nothing (manual).
-                    // But wait, for Planks (Time + Text), we usually increase Time until a cap, then change Text (Form).
-                    // For Weighted Planks (Time + Weight), we increase Time until cap, then Weight? Or just Weight?
-                    // The user said: "for planks we need time and text, since we stay for as long as possible and when we reach a certain amount of s we change the form"
-                    // So for Time-based, we primarily increase TIME.
-
-                    const step = currentExercise.timeIncreaseStep || 5;
-                    const cap = currentExercise.maxTimeCap || 120;
-                    const currentDuration = currentExercise.timeDuration || 0;
-
-                    if (currentDuration < cap) {
-                        let nextDuration = currentDuration + step;
-                        if (nextDuration > cap) nextDuration = cap;
-                        currentExercise.nextSessionTimeAdjustment = nextDuration - currentDuration;
-                    } else {
-                        // Reached cap. If resistance is weight, maybe increase weight?
-                        // For now, let's keep it simple: Time exercises increase Time.
-                        currentExercise.nextSessionTimeAdjustment = 0;
-                    }
-                } else {
-                    // Reps based
-                    if (resistanceType === 'weight') {
-                        currentExercise.nextSessionWeightAdjustment = currentExercise.increaseRate ?? 2.5;
-                    }
-                }
-            } else {
-                // Criteria NOT met (Deload logic?)
-                if (trackType === 'reps' && resistanceType === 'weight') {
-                    const valNum = typeof val === 'number' ? val : parseFloat(val);
-                    if (valNum < currentExercise.minReps) {
-                        currentExercise.nextSessionWeightAdjustment = -(currentExercise.decreaseRate ?? 5.0);
-                    }
-                }
-            }
-
             // Move to next exercise or finish
             if (currentExerciseIndex < updatedExercises.length - 1) {
                 setCurrentExerciseIndex((prev) => prev + 1);

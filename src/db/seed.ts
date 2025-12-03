@@ -13,15 +13,15 @@ export const seedDatabase = async () => {
         console.log('Seeding database...');
         console.log('Inserting exercises...');
         const exercisesData = [
-            { name: 'Bench Press', sets: 3, min_reps: 4, max_reps: 12, weight: 60, rest_time_seconds: 60 },
-            { name: 'Overhead Press', sets: 3, min_reps: 6, max_reps: 15, weight: 40, rest_time_seconds: 60 },
-            { name: 'Tricep Pushdown', sets: 3, min_reps: 8, max_reps: 15, weight: 20, rest_time_seconds: 45 },
-            { name: 'Pull Ups', sets: 3, min_reps: 3, max_reps: 8, weight: 0, rest_time_seconds: 90 },
-            { name: 'Barbell Row', sets: 3, min_reps: 6, max_reps: 12, weight: 50, rest_time_seconds: 60 },
-            { name: 'Bicep Curls', sets: 3, min_reps: 8, max_reps: 15, weight: 15, rest_time_seconds: 45 },
-            { name: 'Squats', sets: 5, min_reps: 3, max_reps: 8, weight: 80, rest_time_seconds: 90 },
-            { name: 'Lunges', sets: 3, min_reps: 6, max_reps: 12, weight: 20, rest_time_seconds: 60 },
-            { name: 'Calf Raises', sets: 3, min_reps: 10, max_reps: 20, weight: 40, rest_time_seconds: 45 },
+            { name: 'Bench Press', sets: 3, max_reps: 12, weight: 60, rest_time_seconds: 60 },
+            { name: 'Overhead Press', sets: 3, max_reps: 15, weight: 40, rest_time_seconds: 60 },
+            { name: 'Tricep Pushdown', sets: 3, max_reps: 15, weight: 20, rest_time_seconds: 45 },
+            { name: 'Pull Ups', sets: 3, max_reps: 8, weight: 0, rest_time_seconds: 90 },
+            { name: 'Barbell Row', sets: 3, max_reps: 12, weight: 50, rest_time_seconds: 60 },
+            { name: 'Bicep Curls', sets: 3, max_reps: 15, weight: 15, rest_time_seconds: 45 },
+            { name: 'Squats', sets: 5, max_reps: 8, weight: 80, rest_time_seconds: 90 },
+            { name: 'Lunges', sets: 3, max_reps: 12, weight: 20, rest_time_seconds: 60 },
+            { name: 'Calf Raises', sets: 3, max_reps: 20, weight: 40, rest_time_seconds: 45 },
         ];
 
         const insertedExercises = await db.insert(schema.exercises).values(exercisesData).returning();

@@ -7,13 +7,11 @@ export const exercises = sqliteTable('exercises', {
     type: text('type').default('reps'), // 'reps' | 'time' | 'text'
     sets: integer('sets').default(3),
     max_reps: integer('max_reps').default(12),
-    min_reps: integer('min_reps').default(4),
     weight: integer('weight').default(20), // the weight will be modified by the system using the reps
     time_duration: integer('time_duration'), // target time in seconds for time-based exercises
     current_val_text: text('current_val_text'), // current value for text-based exercises
     rest_time_seconds: integer('rest_time_seconds').default(180),
     increase_rate: real('increase_rate').default(2.5),
-    decrease_rate: real('decrease_rate').default(5.0),
     time_increase_step: integer('time_increase_step').default(5),
     max_time_cap: integer('max_time_cap').default(120),
 });

@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, TextInput, FlatList, Modal } from 'react-
 import { useTranslation } from 'react-i18next';
 import { db } from '../../db/client';
 import { exercises } from '../../db/schema';
-import { like } from 'drizzle-orm';
 import { Plus } from 'lucide-react-native';
+import { SearchBar } from '../SearchBar';
+import { searchFilter } from '../../utils/textUtils';
 
 type ExercisePickerModalProps = {
     visible: boolean;
@@ -22,20 +23,20 @@ export const ExercisePickerModal = ({
     const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const [allExercises, setAllExercises] = useState<typeof exercises.$inferSelect[]>([]);
+    const [filteredExercises, setFilteredExercises] = useState<typeof exercises.$inferSelect[]>([]);
 
     useEffect(() => {
         if (visible) {
             loadAllExercises();
         }
-    }, [visible, search]);
+    }, [visible]);
+
+    useEffect(() => {
+        setFilteredExercises(searchFilter(allExercises, search));
+    }, [search, allExercises]);
 
     const loadAllExercises = async () => {
-        let query = db.select().from(exercises);
-        if (search) {
-            // @ts-ignore - simple like search
-            query = query.where(like(exercises.name, `%${search}%`));
-        }
-        const results = await query;
+        const results = await db.select().from(exercises);
         setAllExercises(results);
     };
 
@@ -55,18 +56,14 @@ export const ExercisePickerModal = ({
                 </View>
 
                 <View className="p-4">
-                    <TextInput
-                        className="bg-zinc-900 text-zinc-50 p-4 rounded-xl border border-zinc-800"
-                        placeholder={t('dayEditor.searchPlaceholder')}
-                        placeholderTextColor="#71717a"
+                    <SearchBar
                         value={search}
                         onChangeText={setSearch}
-                        autoFocus
                     />
                 </View>
 
                 <FlatList
-                    data={allExercises}
+                    data={filteredExercises}
                     keyExtractor={(item) => `exercise-${item.id}`}
                     ListEmptyComponent={
                         <View className="items-center justify-center py-10">

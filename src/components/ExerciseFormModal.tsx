@@ -64,13 +64,11 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
     const [trackType, setTrackType] = useState<'reps' | 'time'>('reps');
     const [resistanceType, setResistanceType] = useState<'weight' | 'text'>('weight');
     const [sets, setSets] = useState('3');
-    const [minReps, setMinReps] = useState('4');
     const [maxReps, setMaxReps] = useState('12');
     const [weight, setWeight] = useState('');
     const [timeDuration, setTimeDuration] = useState('60');
     const [restTimeSeconds, setRestTimeSeconds] = useState('180');
     const [increaseRate, setIncreaseRate] = useState('2.5');
-    const [decreaseRate, setDecreaseRate] = useState('5.0');
     const [timeIncreaseStep, setTimeIncreaseStep] = useState('5');
     const [maxTimeCap, setMaxTimeCap] = useState('120');
     const [currentValText, setCurrentValText] = useState('');
@@ -80,16 +78,25 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
         if (initialData) {
             setName(initialData.name);
             setDescription(initialData.description || '');
-            setTrackType((initialData.track_type as 'reps' | 'time') || 'reps');
-            setResistanceType((initialData.resistance_type as 'weight' | 'text') || 'weight');
+
+            // Map DB type to UI state
+            if (initialData.type === 'time') {
+                setTrackType('time');
+                setResistanceType('weight'); // Default
+            } else if (initialData.type === 'text') {
+                setTrackType('reps'); // Default
+                setResistanceType('text');
+            } else {
+                setTrackType('reps');
+                setResistanceType('weight');
+            }
+
             setSets(initialData.sets?.toString() || '3');
-            setMinReps(initialData.min_reps?.toString() || '4');
             setMaxReps(initialData.max_reps?.toString() || '12');
             setWeight(initialData.weight?.toString() || '');
             setTimeDuration(initialData.time_duration?.toString() || '60');
             setRestTimeSeconds(initialData.rest_time_seconds?.toString() || '180');
             setIncreaseRate(initialData.increase_rate?.toString() || '2.5');
-            setDecreaseRate(initialData.decrease_rate?.toString() || '5.0');
             setTimeIncreaseStep(initialData.time_increase_step?.toString() || '5');
             setMaxTimeCap(initialData.max_time_cap?.toString() || '120');
             setCurrentValText(initialData.current_val_text || '');
@@ -104,13 +111,11 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
         setTrackType('reps');
         setResistanceType('weight');
         setSets('3');
-        setMinReps('4');
         setMaxReps('12');
         setWeight('');
         setTimeDuration('60');
         setRestTimeSeconds('180');
         setIncreaseRate('2.5');
-        setDecreaseRate('5.0');
         setTimeIncreaseStep('5');
         setMaxTimeCap('120');
         setCurrentValText('');
@@ -119,19 +124,23 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
     const handleSave = async () => {
         if (!name.trim()) return;
 
+        let type = 'reps';
+        if (trackType === 'time') {
+            type = 'time';
+        } else if (resistanceType === 'text') {
+            type = 'text';
+        }
+
         const exerciseData: NewExercise = {
             name,
             description,
-            track_type: trackType,
-            resistance_type: resistanceType,
+            type,
             sets: parseInt(sets) || 3,
-            min_reps: parseInt(minReps) || 4,
             max_reps: parseInt(maxReps) || 12,
             weight: weight ? parseFloat(weight) : null,
             time_duration: parseInt(timeDuration) || 60,
             rest_time_seconds: parseInt(restTimeSeconds) || 180,
             increase_rate: parseFloat(increaseRate) || 2.5,
-            decrease_rate: parseFloat(decreaseRate) || 5.0,
             time_increase_step: parseInt(timeIncreaseStep) || 5,
             max_time_cap: parseInt(maxTimeCap) || 120,
             current_val_text: currentValText,
@@ -249,23 +258,13 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                             </View>
 
                             {trackType === 'reps' && (
-                                <View className="flex-row space-x-4">
-                                    <View className="flex-1 mr-2">
-                                        <Text className="text-zinc-400 my-2 text-sm">{t('common.minReps')}</Text>
-                                        <NumberInput
-                                            value={minReps}
-                                            onChange={setMinReps}
-                                            step={1}
-                                        />
-                                    </View>
-                                    <View className="flex-1 ml-2">
-                                        <Text className="text-zinc-400 my-2 text-sm">{t('common.maxReps')}</Text>
-                                        <NumberInput
-                                            value={maxReps}
-                                            onChange={setMaxReps}
-                                            step={1}
-                                        />
-                                    </View>
+                                <View>
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('common.maxReps')}</Text>
+                                    <NumberInput
+                                        value={maxReps}
+                                        onChange={setMaxReps}
+                                        step={1}
+                                    />
                                 </View>
                             )}
 
@@ -290,23 +289,14 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                             </View>
 
                             {resistanceType === 'weight' && (
-                                <View className="flex-row space-x-4">
-                                    <View className="flex-1 mr-2">
-                                        <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.increaseRate')}</Text>
+                                <View className="flex-1">
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.increaseRate')}</Text>
+                                    <View className="flex-row items-center">
                                         <NumberInput
                                             value={increaseRate}
                                             onChange={setIncreaseRate}
                                             step={0.5}
                                             placeholder="2.5"
-                                        />
-                                    </View>
-                                    <View className="flex-1 ml-2">
-                                        <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.decreaseRate')}</Text>
-                                        <NumberInput
-                                            value={decreaseRate}
-                                            onChange={setDecreaseRate}
-                                            step={0.5}
-                                            placeholder="5.0"
                                         />
                                     </View>
                                 </View>

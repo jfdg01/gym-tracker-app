@@ -65,13 +65,11 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     description: exercise.description,
                     type: (exercise.type as 'reps' | 'time' | 'text') || 'reps',
                     restTimeSeconds: exercise.rest_time_seconds || 60,
-                    minReps: exercise.min_reps || 4,
                     maxReps: exercise.max_reps || 12,
                     weight: exercise.weight,
                     timeDuration: exercise.time_duration,
                     currentValText: exercise.current_val_text,
                     increaseRate: exercise.increase_rate,
-                    decreaseRate: exercise.decrease_rate,
                     timeIncreaseStep: exercise.time_increase_step,
                     maxTimeCap: exercise.max_time_cap,
                     sets: Array.from({ length: exercise.sets || 3 }).map((_, i) => ({
@@ -221,8 +219,9 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                                     .where(eq(schema.exercises.id, exerciseId));
                             };
 
-                            const trackType = exercise.track_type || 'reps';
-                            const resistanceType = exercise.resistance_type || 'weight';
+                            const type = exercise.type || 'reps';
+                            const trackType = exercise.track_type || (type === 'time' ? 'time' : 'reps');
+                            const resistanceType = exercise.resistance_type || (type === 'text' ? 'text' : 'weight');
 
                             if (lastSet.completed) {
                                 // 1. Check if progression criteria met
@@ -261,9 +260,9 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                                 } else {
                                     // Deload logic (only for Reps + Weight for now)
                                     if (trackType === 'reps' && resistanceType === 'weight') {
-                                        if (lastSet.actualReps !== undefined && lastSet.actualReps <= exercise.minReps) {
+                                        if (lastSet.actualReps !== undefined && lastSet.actualReps >= exercise.maxReps) {
                                             await updateExercise(id, {
-                                                weight: (exercise.weight || 0) - (exercise.decreaseRate ?? 5.0),
+                                                weight: (exercise.weight || 0) + (exercise.increaseRate || 2.5)
                                             });
                                         }
                                     }
