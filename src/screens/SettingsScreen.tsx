@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -23,6 +23,11 @@ export const SettingsScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [settingsId, setSettingsId] = useState<number | null>(null);
     const [showImportConfirm, setShowImportConfirm] = useState(false);
+    const [alertModal, setAlertModal] = useState<{ visible: boolean; title: string; message: string; color?: string }>({
+        visible: false,
+        title: '',
+        message: ''
+    });
 
     useEffect(() => {
         loadSettings();
@@ -99,7 +104,12 @@ export const SettingsScreen = () => {
             // Success message is handled by the share dialog usually, but we can show one if needed.
             // However, on Android/iOS, share sheet opening is the "success" of the generation.
         } catch (error) {
-            Alert.alert(t('common.error'), t('settings.exportError'));
+            setAlertModal({
+                visible: true,
+                title: t('common.error'),
+                message: t('settings.exportError'),
+                color: 'red'
+            });
         }
     };
 
@@ -113,11 +123,21 @@ export const SettingsScreen = () => {
             const success = await BackupService.importData();
             if (success) {
                 await reloadContext();
-                Alert.alert(t('common.done'), t('settings.importSuccess'));
+                setAlertModal({
+                    visible: true,
+                    title: t('common.done'),
+                    message: t('settings.importSuccess'),
+                    color: 'emerald'
+                });
                 loadSettings();
             }
         } catch (error) {
-            Alert.alert(t('common.error'), t('settings.importError'));
+            setAlertModal({
+                visible: true,
+                title: t('common.error'),
+                message: t('settings.importError'),
+                color: 'red'
+            });
         }
     };
 
@@ -212,13 +232,22 @@ export const SettingsScreen = () => {
 
             <ConfirmationModal
                 visible={showImportConfirm}
-                title={t('common.areYouSure')}
-                message={t('settings.confirmImport')}
+                title={t('settings.confirmImportTitle')}
+                message={t('settings.confirmImportMessage')}
                 confirmText={t('common.confirm')}
                 cancelText={t('common.cancel')}
-                confirmButtonColor="red"
+                confirmButtonColor="blue"
                 onConfirm={confirmImport}
                 onCancel={() => setShowImportConfirm(false)}
+            />
+
+            <ConfirmationModal
+                visible={alertModal.visible}
+                title={alertModal.title}
+                message={alertModal.message}
+                confirmText="OK"
+                confirmButtonColor={alertModal.color || 'blue'}
+                onConfirm={() => setAlertModal({ visible: false, title: '', message: '' })}
             />
         </SafeAreaView>
     );

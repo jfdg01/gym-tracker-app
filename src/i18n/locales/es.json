@@ -154,7 +154,8 @@
 		"importSuccess": "Datos importados correctamente",
 		"importError": "Error al importar datos",
 		"exportError": "Error al exportar datos",
-		"confirmImport": "¿Estás seguro de que quieres importar datos? Esto sobrescribirá tus datos actuales."
+		"confirmImportTitle": "Importar Copia de Seguridad",
+		"confirmImportMessage": "Esto fusionará los datos de la copia de seguridad con tus datos actuales. Los programas se añadirán y los ejercicios se crearán si no existen."
 	},
 	"skipExercise": {
 		"message": "¿Estás seguro de que quieres omitir este ejercicio? El progreso actual no se guardará.",

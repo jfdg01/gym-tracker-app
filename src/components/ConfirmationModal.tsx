@@ -9,7 +9,7 @@ interface ConfirmationModalProps {
     confirmText?: string;
     cancelText?: string;
     onConfirm: () => void;
-    onCancel: () => void;
+    onCancel?: () => void; // Optional - if not provided, shows only confirm button (alert mode)
     confirmButtonColor?: string; // 'blue' | 'red' | 'emerald' etc. (tailwind class prefix)
     children?: React.ReactNode;
 }
@@ -51,21 +51,32 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
                     {children}
 
-                    <View className="flex-row justify-between w-full space-x-4">
-                        <TouchableOpacity
-                            className="flex-1 py-4 rounded-2xl items-center active:bg-zinc-800"
-                            onPress={onCancel}
-                        >
-                            <Text className="text-zinc-400 font-bold text-base">{cancelText || defaultCancelText}</Text>
-                        </TouchableOpacity>
+                    {onCancel ? (
+                        // Confirmation mode: Show both buttons
+                        <View className="flex-row justify-between w-full space-x-4">
+                            <TouchableOpacity
+                                className="flex-1 py-4 rounded-2xl items-center active:bg-zinc-800"
+                                onPress={onCancel}
+                            >
+                                <Text className="text-zinc-400 font-bold text-base">{cancelText || defaultCancelText}</Text>
+                            </TouchableOpacity>
 
+                            <TouchableOpacity
+                                className={`flex-[2] py-4 rounded-2xl items-center shadow-lg ${buttonStyle}`}
+                                onPress={onConfirm}
+                            >
+                                <Text className="text-white font-bold text-lg">{confirmText || defaultConfirmText}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                        // Alert mode: Show only confirm button
                         <TouchableOpacity
-                            className={`flex-[2] py-4 rounded-2xl items-center shadow-lg ${buttonStyle}`}
+                            className={`w-full py-4 rounded-2xl items-center shadow-lg ${buttonStyle}`}
                             onPress={onConfirm}
                         >
-                            <Text className="text-white font-bold text-lg">{confirmText || defaultConfirmText}</Text>
+                            <Text className="text-white font-bold text-lg">{confirmText || 'OK'}</Text>
                         </TouchableOpacity>
-                    </View>
+                    )}
                 </View>
             </View>
         </Modal>

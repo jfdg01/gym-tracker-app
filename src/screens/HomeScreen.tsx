@@ -57,11 +57,7 @@ export const HomeScreen = () => {
 
     const handleStartWorkout = () => {
         if (!currentDay) return;
-
-        if (currentDay.isRestDay) {
-            alert(t('home.restDayAlert'));
-            return;
-        }
+        if (currentDay.isRestDay) return; // UI prevents this, but check anyway
 
         startWorkout(currentDay.exercises);
         navigation.navigate('ActiveExercise' as never);
