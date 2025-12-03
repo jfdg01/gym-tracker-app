@@ -1,7 +1,10 @@
 {
-    "title": "Rastreador de Gimnasio SQLite",
-    "placeholder": "Introduce el nombre del ítem",
-    "add": "Añadir",
+    "title": "Gym Tracker",
     "language": "Idioma",
-    "change_language": "Cambiar Idioma"
+    "change_language": "Cambiar Idioma",
+    "welcome": {
+        "title": "Bienvenido a Gym Tracker",
+        "subtitle": "Tu compañero definitivo para seguir entrenamientos y progreso.",
+        "get_started": "Comenzar"
+    }
 }

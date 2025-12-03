@@ -1,7 +1,10 @@
 {
     "title": "SQLite Gym Tracker",
-    "placeholder": "Enter item name",
-    "add": "Add",
     "language": "Language",
-    "change_language": "Change Language"
+    "change_language": "Change Language",
+    "welcome": {
+        "title": "Welcome to Gym Tracker",
+        "subtitle": "Your ultimate companion for tracking workouts and progress.",
+        "get_started": "Get Started"
+    }
 }
