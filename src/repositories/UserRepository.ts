@@ -2,7 +2,7 @@ import { BaseRepository } from "./BaseRepository";
 import { user_settings } from "../db/schema";
 import { InferInsertModel, eq } from "drizzle-orm";
 
-type NewUserSettings = InferInsertModel<typeof user_settings>;
+export type NewUserSettings = InferInsertModel<typeof user_settings>;
 
 export class UserRepository extends BaseRepository<typeof user_settings> {
     constructor() {

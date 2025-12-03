@@ -1,9 +1,4 @@
-import { WorkoutRepository } from "../repositories/WorkoutRepository";
-import { workout_logs, workout_exercise_sets } from "../db/schema";
-import { InferInsertModel } from "drizzle-orm";
-
-type NewWorkoutLog = InferInsertModel<typeof workout_logs>;
-type NewWorkoutSet = InferInsertModel<typeof workout_exercise_sets>;
+import { WorkoutRepository, NewWorkoutLog, NewWorkoutSet } from "../repositories/WorkoutRepository";
 
 export class WorkoutService {
     constructor(private workoutRepository: WorkoutRepository) { }

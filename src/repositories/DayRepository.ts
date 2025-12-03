@@ -2,7 +2,7 @@ import { BaseRepository } from "./BaseRepository";
 import { days } from "../db/schema";
 import { InferInsertModel, eq } from "drizzle-orm";
 
-type NewDay = InferInsertModel<typeof days>;
+export type NewDay = InferInsertModel<typeof days>;
 
 export class DayRepository extends BaseRepository<typeof days> {
     constructor() {

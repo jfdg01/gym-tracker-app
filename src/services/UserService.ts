@@ -1,8 +1,4 @@
-import { UserRepository } from "../repositories/UserRepository";
-import { user_settings } from "../db/schema";
-import { InferInsertModel } from "drizzle-orm";
-
-type NewUserSettings = InferInsertModel<typeof user_settings>;
+import { UserRepository, NewUserSettings } from "../repositories/UserRepository";
 
 export class UserService {
     constructor(private userRepository: UserRepository) { }

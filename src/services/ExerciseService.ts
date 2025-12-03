@@ -1,8 +1,4 @@
-import { ExerciseRepository } from "../repositories/ExerciseRepository";
-import { exercises } from "../db/schema";
-import { InferInsertModel } from "drizzle-orm";
-
-type NewExercise = InferInsertModel<typeof exercises>;
+import { ExerciseRepository, NewExercise } from "../repositories/ExerciseRepository";
 
 export class ExerciseService {
     constructor(private exerciseRepository: ExerciseRepository) { }

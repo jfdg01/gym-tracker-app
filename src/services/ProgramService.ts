@@ -1,10 +1,5 @@
-import { ProgramRepository } from "../repositories/ProgramRepository";
-import { DayRepository } from "../repositories/DayRepository";
-import { programs, days } from "../db/schema";
-import { InferInsertModel } from "drizzle-orm";
-
-type NewProgram = InferInsertModel<typeof programs>;
-type NewDay = InferInsertModel<typeof days>;
+import { ProgramRepository, NewProgram } from "../repositories/ProgramRepository";
+import { DayRepository, NewDay } from "../repositories/DayRepository";
 
 export class ProgramService {
     constructor(

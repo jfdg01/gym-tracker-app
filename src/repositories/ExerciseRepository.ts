@@ -2,7 +2,7 @@ import { BaseRepository } from "./BaseRepository";
 import { exercises } from "../db/schema";
 import { InferInsertModel, eq } from "drizzle-orm";
 
-type NewExercise = InferInsertModel<typeof exercises>;
+export type NewExercise = InferInsertModel<typeof exercises>;
 
 export class ExerciseRepository extends BaseRepository<typeof exercises> {
     constructor() {

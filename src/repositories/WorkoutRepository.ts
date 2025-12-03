@@ -2,8 +2,8 @@ import { BaseRepository } from "./BaseRepository";
 import { workout_logs, workout_exercise_sets } from "../db/schema";
 import { InferInsertModel, eq } from "drizzle-orm";
 
-type NewWorkoutLog = InferInsertModel<typeof workout_logs>;
-type NewWorkoutSet = InferInsertModel<typeof workout_exercise_sets>;
+export type NewWorkoutLog = InferInsertModel<typeof workout_logs>;
+export type NewWorkoutSet = InferInsertModel<typeof workout_exercise_sets>;
 
 export class WorkoutRepository extends BaseRepository<typeof workout_logs> {
     constructor() {
