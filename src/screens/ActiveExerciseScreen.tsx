@@ -71,6 +71,12 @@ export const ActiveExerciseScreen = () => {
                 }
             />
 
+            {currentExercise.description && (
+                <View className="px-6 py-2 bg-zinc-900/50 border-b border-zinc-900">
+                    <Text className="text-zinc-400 text-sm italic">{currentExercise.description}</Text>
+                </View>
+            )}
+
             {/* Exercise List Modal */}
             <Modal visible={listModalVisible} animationType="slide" presentationStyle="pageSheet">
                 <View className="flex-1 bg-zinc-950">

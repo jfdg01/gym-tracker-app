@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b766646b-17d4-4295-8ed9-283466a15f56",
+  "id": "4724996a-1faa-4698-9b89-95f8f8cfd39d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "day_exercises": {
@@ -191,7 +191,23 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": 60
+          "default": 180
+        },
+        "increase_rate": {
+          "name": "increase_rate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 2.5
+        },
+        "decrease_rate": {
+          "name": "decrease_rate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 5
         }
       },
       "indexes": {},
@@ -255,6 +271,22 @@
           "notNull": false,
           "autoincrement": false,
           "default": 0
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'en'"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'User'"
         }
       },
       "indexes": {},
@@ -307,7 +339,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "'\"2025-12-02T14:05:34.476Z\"'"
+          "default": "'\"2025-12-03T09:50:44.409Z\"'"
         },
         "duration_seconds": {
           "name": "duration_seconds",

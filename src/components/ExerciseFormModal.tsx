@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { NewExercise, Exercise } from '../db/exercises';
-import { X } from 'lucide-react-native';
+import { X, Minus, Plus } from 'lucide-react-native';
 import { ConfirmationModal } from './ConfirmationModal';
 
 interface ExerciseFormModalProps {
@@ -13,24 +13,74 @@ interface ExerciseFormModalProps {
     initialData?: Exercise | null;
 }
 
+interface NumberInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    step?: number;
+    placeholder?: string;
+    min?: number;
+}
+
+const NumberInput: React.FC<NumberInputProps> = ({ value, onChange, step = 1, placeholder, min = 0 }) => {
+    const handleIncrement = () => {
+        const current = parseFloat(value) || 0;
+        const next = current + step;
+        const formatted = Number.isInteger(step) ? next.toString() : next.toFixed(1);
+        onChange(formatted);
+    };
+
+    const handleDecrement = () => {
+        const current = parseFloat(value) || 0;
+        const next = current - step;
+        if (next < min) return;
+        const formatted = Number.isInteger(step) ? next.toString() : next.toFixed(1);
+        onChange(formatted);
+    };
+
+    return (
+        <View className="flex-row items-center bg-zinc-800 rounded-xl border border-zinc-800">
+            <TouchableOpacity onPress={handleDecrement} className="p-4 active:bg-zinc-700 rounded-l-xl">
+                <Minus size={20} color="#a1a1aa" />
+            </TouchableOpacity>
+            <TextInput
+                className="flex-1 text-zinc-50 text-center font-bold text-lg py-4"
+                value={value}
+                onChangeText={onChange}
+                keyboardType="numeric"
+                placeholder={placeholder}
+                placeholderTextColor="#52525b"
+            />
+            <TouchableOpacity onPress={handleIncrement} className="p-4 active:bg-zinc-700 rounded-r-xl">
+                <Plus size={20} color="#3b82f6" />
+            </TouchableOpacity>
+        </View>
+    );
+};
+
 export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, onClose, onSave, onDelete, initialData }) => {
     const { t } = useTranslation();
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
     const [sets, setSets] = useState('3');
     const [minReps, setMinReps] = useState('4');
     const [maxReps, setMaxReps] = useState('12');
     const [weight, setWeight] = useState('');
     const [restTimeSeconds, setRestTimeSeconds] = useState('180');
+    const [increaseRate, setIncreaseRate] = useState('2.5');
+    const [decreaseRate, setDecreaseRate] = useState('5.0');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     useEffect(() => {
         if (initialData) {
             setName(initialData.name);
+            setDescription(initialData.description || '');
             setSets(initialData.sets?.toString() || '3');
             setMinReps(initialData.min_reps?.toString() || '4');
             setMaxReps(initialData.max_reps?.toString() || '12');
             setWeight(initialData.weight?.toString() || '');
             setRestTimeSeconds(initialData.rest_time_seconds?.toString() || '180');
+            setIncreaseRate(initialData.increase_rate?.toString() || '2.5');
+            setDecreaseRate(initialData.decrease_rate?.toString() || '5.0');
         } else {
             resetForm();
         }
@@ -38,11 +88,14 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
 
     const resetForm = () => {
         setName('');
+        setDescription('');
         setSets('3');
         setMinReps('4');
         setMaxReps('12');
         setWeight('');
         setRestTimeSeconds('180');
+        setIncreaseRate('2.5');
+        setDecreaseRate('5.0');
     };
 
     const handleSave = async () => {
@@ -50,11 +103,14 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
 
         const exerciseData: NewExercise = {
             name,
+            description,
             sets: parseInt(sets) || 3,
             min_reps: parseInt(minReps) || 4,
             max_reps: parseInt(maxReps) || 12,
             weight: weight ? parseFloat(weight) : null,
             rest_time_seconds: parseInt(restTimeSeconds) || 180,
+            increase_rate: parseFloat(increaseRate) || 2.5,
+            decrease_rate: parseFloat(decreaseRate) || 5.0,
         };
 
         await onSave(exerciseData);
@@ -96,28 +152,38 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                                 />
                             </View>
 
+                            <View>
+                                <Text className="text-zinc-400 my-3 text-sm">{t('exerciseForm.descriptionLabel')}</Text>
+                                <TextInput
+                                    className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800 min-h-[100px]"
+                                    placeholder={t('exerciseForm.descriptionPlaceholder')}
+                                    placeholderTextColor="#52525b"
+                                    value={description}
+                                    onChangeText={setDescription}
+                                    multiline
+                                    textAlignVertical="top"
+                                />
+                            </View>
+
                             <View className="h-px bg-zinc-800 my-4" />
                             <Text className="text-zinc-50 font-semibold text-lg">{t('exerciseForm.configuration')}</Text>
 
                             <View className="flex-row space-x-4">
                                 <View className="flex-1 mr-2">
                                     <Text className="text-zinc-400 my-2 text-sm">{t('common.sets')}</Text>
-                                    <TextInput
-                                        className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
+                                    <NumberInput
                                         value={sets}
-                                        onChangeText={setSets}
-                                        keyboardType="numeric"
+                                        onChange={setSets}
+                                        step={1}
                                     />
                                 </View>
                                 <View className="flex-1 ml-2">
                                     <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.weightLabel')}</Text>
-                                    <TextInput
-                                        className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
-                                        placeholder="0"
-                                        placeholderTextColor="#52525b"
+                                    <NumberInput
                                         value={weight}
-                                        onChangeText={setWeight}
-                                        keyboardType="numeric"
+                                        onChange={setWeight}
+                                        step={2.5}
+                                        placeholder="0"
                                     />
                                 </View>
                             </View>
@@ -125,32 +191,50 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                             <View className="flex-row space-x-4">
                                 <View className="flex-1 mr-2">
                                     <Text className="text-zinc-400 my-2 text-sm">{t('common.minReps')}</Text>
-                                    <TextInput
-                                        className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
+                                    <NumberInput
                                         value={minReps}
-                                        onChangeText={setMinReps}
-                                        keyboardType="numeric"
+                                        onChange={setMinReps}
+                                        step={1}
                                     />
                                 </View>
                                 <View className="flex-1 ml-2">
                                     <Text className="text-zinc-400 my-2 text-sm">{t('common.maxReps')}</Text>
-                                    <TextInput
-                                        className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
+                                    <NumberInput
                                         value={maxReps}
-                                        onChangeText={setMaxReps}
-                                        keyboardType="numeric"
+                                        onChange={setMaxReps}
+                                        step={1}
                                     />
                                 </View>
                             </View>
 
                             <View>
                                 <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.restTimeLabel')}</Text>
-                                <TextInput
-                                    className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
+                                <NumberInput
                                     value={restTimeSeconds}
-                                    onChangeText={setRestTimeSeconds}
-                                    keyboardType="numeric"
+                                    onChange={setRestTimeSeconds}
+                                    step={5}
                                 />
+                            </View>
+
+                            <View className="flex-row space-x-4">
+                                <View className="flex-1 mr-2">
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.increaseRate')}</Text>
+                                    <NumberInput
+                                        value={increaseRate}
+                                        onChange={setIncreaseRate}
+                                        step={0.5}
+                                        placeholder="2.5"
+                                    />
+                                </View>
+                                <View className="flex-1 ml-2">
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.decreaseRate')}</Text>
+                                    <NumberInput
+                                        value={decreaseRate}
+                                        onChange={setDecreaseRate}
+                                        step={0.5}
+                                        placeholder="5.0"
+                                    />
+                                </View>
                             </View>
                         </View>
                     </ScrollView>

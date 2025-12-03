@@ -12,11 +12,14 @@ export type Set = {
 export type Exercise = {
     id: string;
     name: string;
+    description?: string | null;
     sets: Set[];
     restTimeSeconds: number;
     minReps: number;
     maxReps: number;
-    nextSessionWeightAdjustment?: number; // +2.5, -5, 0
+    increaseRate?: number;
+    decreaseRate?: number;
+    nextSessionWeightAdjustment?: number; // dynamic based on increaseRate/decreaseRate
 };
 
 export type WorkoutSession = {
@@ -141,9 +144,9 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (isLastSetOfExercise) {
             // Progressive Overload Logic
             if (reps > currentExercise.maxReps) {
-                currentExercise.nextSessionWeightAdjustment = 2.5; // Arbitrary increase
+                currentExercise.nextSessionWeightAdjustment = currentExercise.increaseRate ?? 2.5;
             } else if (reps < currentExercise.minReps) {
-                currentExercise.nextSessionWeightAdjustment = -5;
+                currentExercise.nextSessionWeightAdjustment = -(currentExercise.decreaseRate ?? 5.0);
             } else {
                 currentExercise.nextSessionWeightAdjustment = 0;
             }

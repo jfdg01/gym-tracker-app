@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
 
 export const exercises = sqliteTable('exercises', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -9,6 +9,8 @@ export const exercises = sqliteTable('exercises', {
     min_reps: integer('min_reps').default(4),
     weight: integer('weight').default(20), // the weight will be modified by the system using the reps
     rest_time_seconds: integer('rest_time_seconds').default(180),
+    increase_rate: real('increase_rate').default(2.5),
+    decrease_rate: real('decrease_rate').default(5.0),
 });
 
 export const programs = sqliteTable('programs', {

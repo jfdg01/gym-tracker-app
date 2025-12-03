@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1764684334484,
-      "tag": "0000_goofy_cardiac",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1764718410395,
-      "tag": "0001_futuristic_rockslide",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1764720910004,
-      "tag": "0002_outgoing_amazoness",
+      "when": 1764755444415,
+      "tag": "0000_futuristic_mongu",
       "breakpoints": true
     }
   ]
