@@ -36,6 +36,20 @@ describe("DayRepository", () => {
             expect(mockValues).toHaveBeenCalledWith(newDay);
             expect(result).toEqual(mockResult[0]);
         });
+
+        it("should create a rest day", async () => {
+            const newDay = { name: "Rest", program_id: 1, order_index: 1, is_rest_day: true };
+            const mockResult = [{ id: 2, ...newDay }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockInsert = jest.fn().mockReturnValue({ values: mockValues });
+            mockDb.insert.mockImplementation(mockInsert);
+
+            const result = await repository.create(newDay);
+
+            expect(mockValues).toHaveBeenCalledWith(newDay);
+            expect(result).toEqual(mockResult[0]);
+        });
     });
 
     describe("update", () => {

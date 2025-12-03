@@ -22,7 +22,7 @@ describe("ExerciseRepository", () => {
     });
 
     describe("create", () => {
-        it("should create a new exercise", async () => {
+        it("should create a new exercise with minimal required fields", async () => {
             const newExercise = { name: "Squat", track_type: "reps" as const, resistance_type: "weight" as const };
             const mockResult = [{ id: 1, ...newExercise }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
@@ -36,10 +36,29 @@ describe("ExerciseRepository", () => {
             expect(mockValues).toHaveBeenCalledWith(newExercise);
             expect(result).toEqual(mockResult[0]);
         });
+
+        it("should create an exercise with all optional fields", async () => {
+            const newExercise = {
+                name: "Plank",
+                description: "Hold position",
+                track_type: "time" as const,
+                resistance_type: "text" as const
+            };
+            const mockResult = [{ id: 2, ...newExercise }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockInsert = jest.fn().mockReturnValue({ values: mockValues });
+            mockDb.insert.mockImplementation(mockInsert);
+
+            const result = await repository.create(newExercise);
+
+            expect(mockValues).toHaveBeenCalledWith(newExercise);
+            expect(result).toEqual(mockResult[0]);
+        });
     });
 
     describe("update", () => {
-        it("should update an exercise", async () => {
+        it("should update an exercise name", async () => {
             const updateData = { name: "Updated Squat" };
             const mockResult = [{ id: 1, ...updateData }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
@@ -53,6 +72,21 @@ describe("ExerciseRepository", () => {
             expect(mockDb.update).toHaveBeenCalledWith(exercises);
             expect(mockSet).toHaveBeenCalledWith(updateData);
             expect(mockWhere).toHaveBeenCalledWith(eq(exercises.id, 1));
+            expect(result).toEqual(mockResult[0]);
+        });
+
+        it("should update exercise type fields", async () => {
+            const updateData = { track_type: "time" as const, resistance_type: "text" as const };
+            const mockResult = [{ id: 1, ...updateData }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockWhere = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockSet = jest.fn().mockReturnValue({ where: mockWhere });
+            const mockUpdate = jest.fn().mockReturnValue({ set: mockSet });
+            mockDb.update.mockImplementation(mockUpdate);
+
+            const result = await repository.update(1, updateData);
+
+            expect(mockSet).toHaveBeenCalledWith(updateData);
             expect(result).toEqual(mockResult[0]);
         });
     });

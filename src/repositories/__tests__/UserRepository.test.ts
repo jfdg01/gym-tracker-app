@@ -54,6 +54,35 @@ describe("UserRepository", () => {
             expect(mockWhere).toHaveBeenCalledWith(eq(user_settings.id, 1));
             expect(result).toEqual(mockResult[0]);
         });
+
+        it("should update nullable fields to null", async () => {
+            const mockResult = [{ id: 1, current_program_id: null }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockWhere = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockSet = jest.fn().mockReturnValue({ where: mockWhere });
+            const mockUpdate = jest.fn().mockReturnValue({ set: mockSet });
+            mockDb.update.mockImplementation(mockUpdate);
+
+            const result = await repository.updateSettings({ current_program_id: null });
+
+            expect(mockSet).toHaveBeenCalledWith({ current_program_id: null });
+            expect(result).toEqual(mockResult[0]);
+        });
+
+        it("should update multiple fields at once", async () => {
+            const updateData = { language: "fr", name: "Pierre" };
+            const mockResult = [{ id: 1, ...updateData }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockWhere = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockSet = jest.fn().mockReturnValue({ where: mockWhere });
+            const mockUpdate = jest.fn().mockReturnValue({ set: mockSet });
+            mockDb.update.mockImplementation(mockUpdate);
+
+            const result = await repository.updateSettings(updateData);
+
+            expect(mockSet).toHaveBeenCalledWith(updateData);
+            expect(result).toEqual(mockResult[0]);
+        });
     });
 
     describe("ensureSettingsExist", () => {

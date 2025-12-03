@@ -22,7 +22,7 @@ describe("WorkoutRepository", () => {
     });
 
     describe("createLog", () => {
-        it("should create a workout log", async () => {
+        it("should create a workout log for scheduled program", async () => {
             const newLog = { program_id: 1, day_id: 1 };
             const mockResult = [{ id: 1, ...newLog }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
@@ -33,6 +33,20 @@ describe("WorkoutRepository", () => {
             const result = await repository.createLog(newLog);
 
             expect(mockDb.insert).toHaveBeenCalledWith(workout_logs);
+            expect(mockValues).toHaveBeenCalledWith(newLog);
+            expect(result).toEqual(mockResult[0]);
+        });
+
+        it("should create an ad-hoc workout log (no program/day)", async () => {
+            const newLog = { duration_seconds: 0 };
+            const mockResult = [{ id: 2, ...newLog }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockInsert = jest.fn().mockReturnValue({ values: mockValues });
+            mockDb.insert.mockImplementation(mockInsert);
+
+            const result = await repository.createLog(newLog);
+
             expect(mockValues).toHaveBeenCalledWith(newLog);
             expect(result).toEqual(mockResult[0]);
         });
@@ -58,7 +72,7 @@ describe("WorkoutRepository", () => {
     });
 
     describe("createSet", () => {
-        it("should create a workout set", async () => {
+        it("should create a workout set with minimal data", async () => {
             const newSet = { workout_log_id: 1, exercise_id: 1, set_number: 1 };
             const mockResult = [{ id: 1, ...newSet }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
@@ -69,6 +83,41 @@ describe("WorkoutRepository", () => {
             const result = await repository.createSet(newSet);
 
             expect(mockDb.insert).toHaveBeenCalledWith(workout_exercise_sets);
+            expect(mockValues).toHaveBeenCalledWith(newSet);
+            expect(result).toEqual(mockResult[0]);
+        });
+
+        it("should create a skipped set", async () => {
+            const newSet = { workout_log_id: 1, exercise_id: 1, set_number: 2, skipped: true };
+            const mockResult = [{ id: 2, ...newSet }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockInsert = jest.fn().mockReturnValue({ values: mockValues });
+            mockDb.insert.mockImplementation(mockInsert);
+
+            const result = await repository.createSet(newSet);
+
+            expect(mockValues).toHaveBeenCalledWith(newSet);
+            expect(result).toEqual(mockResult[0]);
+        });
+
+        it("should create a completed set with performance data", async () => {
+            const newSet = {
+                workout_log_id: 1,
+                exercise_id: 1,
+                set_number: 3,
+                actual_reps: 12,
+                actual_weight: 50,
+                actual_time_seconds: 60
+            };
+            const mockResult = [{ id: 3, ...newSet }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockInsert = jest.fn().mockReturnValue({ values: mockValues });
+            mockDb.insert.mockImplementation(mockInsert);
+
+            const result = await repository.createSet(newSet);
+
             expect(mockValues).toHaveBeenCalledWith(newSet);
             expect(result).toEqual(mockResult[0]);
         });

@@ -22,7 +22,7 @@ describe("ProgramRepository", () => {
     });
 
     describe("create", () => {
-        it("should create a new program", async () => {
+        it("should create a new program with name only", async () => {
             const newProgram = { name: "PPL" };
             const mockResult = [{ id: 1, ...newProgram }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
@@ -33,6 +33,34 @@ describe("ProgramRepository", () => {
             const result = await repository.create(newProgram);
 
             expect(mockDb.insert).toHaveBeenCalledWith(programs);
+            expect(mockValues).toHaveBeenCalledWith(newProgram);
+            expect(result).toEqual(mockResult[0]);
+        });
+
+        it("should create a program with description", async () => {
+            const newProgram = { name: "Full Body", description: "3 days a week" };
+            const mockResult = [{ id: 2, ...newProgram }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockInsert = jest.fn().mockReturnValue({ values: mockValues });
+            mockDb.insert.mockImplementation(mockInsert);
+
+            const result = await repository.create(newProgram);
+
+            expect(mockValues).toHaveBeenCalledWith(newProgram);
+            expect(result).toEqual(mockResult[0]);
+        });
+
+        it("should handle special characters in name", async () => {
+            const newProgram = { name: "Gara's Prográm! @#$%" };
+            const mockResult = [{ id: 3, ...newProgram }];
+            const mockReturning = jest.fn().mockResolvedValue(mockResult);
+            const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
+            const mockInsert = jest.fn().mockReturnValue({ values: mockValues });
+            mockDb.insert.mockImplementation(mockInsert);
+
+            const result = await repository.create(newProgram);
+
             expect(mockValues).toHaveBeenCalledWith(newProgram);
             expect(result).toEqual(mockResult[0]);
         });
