@@ -87,6 +87,8 @@
 	"exerciseForm": {
 		"configuration": "Configuración",
 		"delete": "Eliminar Ejercicio",
+		"deleteConfirmTitle": "Eliminar Ejercicio",
+		"deleteConfirmMessage": "¿Estás seguro de que quieres eliminar este ejercicio? Esta acción no se puede deshacer.",
 		"editTitle": "Editar Ejercicio",
 		"nameLabel": "Nombre *",
 		"namePlaceholder": "Ej. Press de Banca",
@@ -144,7 +146,15 @@
 		"profile": "Perfil",
 		"saveError": "Error al guardar los ajustes",
 		"saved": "Ajustes guardados correctamente",
-		"title": "Ajustes"
+		"title": "Ajustes",
+		"dataManagement": "Gestión de Datos",
+		"exportData": "Exportar Datos",
+		"importData": "Importar Datos",
+		"exportSuccess": "Datos exportados correctamente",
+		"importSuccess": "Datos importados correctamente",
+		"importError": "Error al importar datos",
+		"exportError": "Error al exportar datos",
+		"confirmImport": "¿Estás seguro de que quieres importar datos? Esto sobrescribirá tus datos actuales."
 	},
 	"skipExercise": {
 		"message": "¿Estás seguro de que quieres omitir este ejercicio? El progreso actual no se guardará.",

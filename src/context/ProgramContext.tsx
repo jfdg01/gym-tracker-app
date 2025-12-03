@@ -20,6 +20,7 @@ type ProgramContextType = {
     setProgram: (programId: number) => Promise<void>;
     currentProgramId: number | null;
     refreshProgram: () => Promise<void>;
+    reloadContext: () => Promise<void>;
 };
 
 const ProgramContext = createContext<ProgramContextType | undefined>(undefined);
@@ -265,6 +266,7 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 setProgram,
                 currentProgramId,
                 refreshProgram,
+                reloadContext: init,
             }}
         >
             {children}

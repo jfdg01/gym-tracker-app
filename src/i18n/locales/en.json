@@ -87,6 +87,8 @@
 	"exerciseForm": {
 		"configuration": "Configuration",
 		"delete": "Delete Exercise",
+		"deleteConfirmTitle": "Delete Exercise",
+		"deleteConfirmMessage": "Are you sure you want to delete this exercise? This action cannot be undone.",
 		"editTitle": "Edit Exercise",
 		"nameLabel": "Name *",
 		"namePlaceholder": "E.g. Bench Press",
@@ -144,7 +146,16 @@
 		"profile": "Profile",
 		"saveError": "Failed to save settings",
 		"saved": "Settings saved successfully",
-		"title": "Settings"
+		"title": "Settings",
+		"dataManagement": "Data Management",
+		"exportData": "Export Data",
+		"importData": "Import Data",
+		"exportSuccess": "Data exported successfully",
+		"importSuccess": "Data imported successfully",
+		"importError": "Failed to import data",
+		"exportError": "Failed to export data",
+		"confirmImportTitle": "Import Backup",
+		"confirmImportMessage": "This will merge the backup data with your current data. Programs will be added, and exercises will be created if they don't already exist."
 	},
 	"skipExercise": {
 		"message": "Are you sure you want to skip this exercise? Current progress will not be saved.",

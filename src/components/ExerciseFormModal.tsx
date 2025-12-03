@@ -3,6 +3,7 @@ import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView } from 'reac
 import { useTranslation } from 'react-i18next';
 import { NewExercise, Exercise } from '../db/exercises';
 import { X } from 'lucide-react-native';
+import { ConfirmationModal } from './ConfirmationModal';
 
 interface ExerciseFormModalProps {
     visible: boolean;
@@ -20,6 +21,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
     const [maxReps, setMaxReps] = useState('12');
     const [weight, setWeight] = useState('');
     const [restTimeSeconds, setRestTimeSeconds] = useState('180');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -163,7 +165,7 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
 
                         {initialData && (
                             <TouchableOpacity
-                                onPress={handleDelete}
+                                onPress={() => setShowDeleteConfirm(true)}
                                 className="bg-red-500/10 p-4 rounded-xl items-center border border-red-500/20"
                             >
                                 <Text className="text-red-500 font-bold text-lg">{t('exerciseForm.delete')}</Text>
@@ -172,6 +174,17 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                     </View>
                 </View>
             </View>
+
+            <ConfirmationModal
+                visible={showDeleteConfirm}
+                title={t('exerciseForm.deleteConfirmTitle')}
+                message={t('exerciseForm.deleteConfirmMessage')}
+                confirmText={t('common.delete')}
+                cancelText={t('common.cancel')}
+                confirmButtonColor="red"
+                onConfirm={handleDelete}
+                onCancel={() => setShowDeleteConfirm(false)}
+            />
         </Modal>
     );
 };
