@@ -2,37 +2,46 @@ import './global.css';
 import { StatusBar } from 'expo-status-bar';
 import { Text, View, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { useEffect, useState } from 'react';
-import { initDatabase, addItem, getItems } from './database';
+import './src/i18n';
+import { useTranslation } from 'react-i18next';
 
 export default function App() {
-  const [items, setItems] = useState([]);
   const [text, setText] = useState('');
-
-  useEffect(() => {
-    initDatabase();
-    refreshItems();
-  }, []);
-
-  const refreshItems = async () => {
-    const data = await getItems();
-    setItems(data);
-  };
+  const { t, i18n } = useTranslation();
 
   const handleAddItem = async () => {
     if (!text) return;
-    await addItem(text);
     setText('');
-    refreshItems();
+  };
+
+  const changeLanguage = (lang) => {
+    i18n.changeLanguage(lang);
   };
 
   return (
-    <View className="flex-1 bg-white pt-12 px-4">
-      <Text className="text-2xl font-bold text-center mb-4">SQLite Gym Tracker</Text>
+    <View className="flex-1 bg-zinc-800 pt-12 px-4">
+      <View className="flex-row justify-between items-center mb-4">
+        <Text className="text-2xl font-bold">{t('title')}</Text>
+        <View className="flex-row">
+          <TouchableOpacity
+            onPress={() => changeLanguage('en')}
+            className={`px-2 py-1 rounded mr-2 ${i18n.language === 'en' ? 'bg-blue-500' : 'bg-gray-200'}`}
+          >
+            <Text className={`${i18n.language === 'en' ? 'text-white' : 'text-black'}`}>EN</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => changeLanguage('es')}
+            className={`px-2 py-1 rounded ${i18n.language === 'es' ? 'bg-blue-500' : 'bg-gray-200'}`}
+          >
+            <Text className={`${i18n.language === 'es' ? 'text-white' : 'text-black'}`}>ES</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <View className="flex-row mb-4">
         <TextInput
           className="flex-1 border border-gray-300 rounded p-2 mr-2"
-          placeholder="Enter item name"
+          placeholder={t('placeholder')}
           value={text}
           onChangeText={setText}
         />
@@ -40,19 +49,9 @@ export default function App() {
           className="bg-blue-500 justify-center px-4 rounded"
           onPress={handleAddItem}
         >
-          <Text className="text-white font-bold">Add</Text>
+          <Text className="text-white font-bold">{t('add')}</Text>
         </TouchableOpacity>
       </View>
-
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View className="bg-gray-100 p-3 mb-2 rounded">
-            <Text>{item.name}</Text>
-          </View>
-        )}
-      />
 
       <StatusBar style="auto" />
     </View>
