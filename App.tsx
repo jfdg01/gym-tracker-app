@@ -1,14 +1,13 @@
 import './global.css';
-import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
-import './src/i18n';
-import { WelcomeScreen } from './src/screens';
+import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import './src/i18n'; // Initialize i18n
+import WelcomeScreen from './src/screens/WelcomeScreen';
 
 export default function App() {
-  return (
-    <View className="flex-1 bg-zinc-950">
-      <WelcomeScreen />
-      <StatusBar style="light" />
-    </View>
-  );
+    return (
+        <SafeAreaProvider>
+            <WelcomeScreen />
+        </SafeAreaProvider>
+    );
 }

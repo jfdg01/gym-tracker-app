@@ -1,34 +1,40 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export const WelcomeScreen = () => {
-    const { t } = useTranslation();
+export default function WelcomeScreen() {
+    const { t, i18n } = useTranslation();
+
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'en' ? 'es' : 'en';
+        i18n.changeLanguage(newLang);
+    };
 
     return (
-        <View className="flex-1 bg-zinc-950 px-6 justify-center items-center">
-            <StatusBar style="light" />
-
-            <View className="w-full items-center mb-12">
-                <Text className="text-3xl font-bold text-zinc-50 text-center mb-4">
+        <SafeAreaView className="flex-1 bg-white items-center justify-center px-4">
+            <View className="w-full max-w-md items-center space-y-8">
+                <Text className="text-3xl font-bold text-center text-gray-900">
                     {t('welcome.title')}
                 </Text>
-                <Text className="text-zinc-400 text-center text-base px-4">
+
+                <Text className="text-lg text-center text-gray-600 mt-4">
                     {t('welcome.subtitle')}
                 </Text>
-            </View>
 
-            <TouchableOpacity
-                className="w-full bg-blue-500 py-4 rounded-xl items-center active:opacity-90 shadow-sm"
-                onPress={() => {
-                    console.log('Get Started pressed');
-                }}
-            >
-                <Text className="text-white font-bold text-lg">
-                    {t('welcome.get_started')}
+                <TouchableOpacity
+                    onPress={toggleLanguage}
+                    className="mt-8 bg-blue-600 px-6 py-3 rounded-lg active:bg-blue-700"
+                >
+                    <Text className="text-white font-semibold text-lg">
+                        {t('change_language')} ({i18n.language.toUpperCase()})
+                    </Text>
+                </TouchableOpacity>
+
+                <Text className="mt-4 text-sm text-gray-400">
+                    {t('language')}: {i18n.language}
                 </Text>
-            </TouchableOpacity>
-        </View>
+            </View>
+        </SafeAreaView>
     );
-};
+}
