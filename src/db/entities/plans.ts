@@ -33,9 +33,15 @@ export const getPlanDetails = async (planId: number) => {
             day_exercise_id: day_exercises.id,
             exercise_id: exercises.id,
             name: exercises.name,
-            sets: exercises.sets,
-            reps: exercises.max_reps, // displaying max_reps as default reps
-            weight: exercises.weight,
+            track_type: exercises.track_type,
+            resistance_type: exercises.resistance_type,
+            target_sets: day_exercises.target_sets,
+            target_reps: day_exercises.target_reps,
+            target_weight: day_exercises.target_weight,
+            target_resistance_text: day_exercises.target_resistance_text,
+            target_time_seconds: day_exercises.target_time_seconds,
+            rest_time_seconds: day_exercises.rest_time_seconds,
+            increase_rate: day_exercises.increase_rate,
             order_index: day_exercises.order_index
         })
             .from(day_exercises)
@@ -55,32 +61,13 @@ export const getPlanDetails = async (planId: number) => {
     };
 };
 
-export const updatePlan = async (id: number, data: Partial<NewPlan>): Promise<void> => {
-    await db.update(programs).set(data).where(eq(programs.id, id));
+export const updatePlan = async (id: number, data: Partial<Omit<NewPlan, 'id' | 'created_at' | 'updated_at'>>): Promise<void> => {
+    await db.update(programs).set({ ...data, updated_at: new Date() }).where(eq(programs.id, id));
 };
 
 export const deletePlan = async (id: number): Promise<void> => {
-    // Transactional delete to ensure cleanup
-    await db.transaction(async (tx) => {
-        // 1. Get all days for the program
-        const planDays = await tx.select({ id: days.id }).from(days).where(eq(days.program_id, id));
-        const dayIds = planDays.map(d => d.id);
-
-        if (dayIds.length > 0) {
-            // 2. Delete all day_exercises for these days
-            // Note: Drizzle doesn't support 'inArray' easily in all drivers, iterating is safer for now or use raw query if needed.
-            // But expo-sqlite should support it. Let's try to do it efficiently.
-            for (const dayId of dayIds) {
-                await tx.delete(day_exercises).where(eq(day_exercises.day_id, dayId));
-            }
-
-            // 3. Delete days
-            await tx.delete(days).where(eq(days.program_id, id));
-        }
-
-        // 4. Delete program
-        await tx.delete(programs).where(eq(programs.id, id));
-    });
+    // Cascade deletes are now handled automatically by the database
+    await db.delete(programs).where(eq(programs.id, id));
 };
 
 // --- Day Management ---
@@ -106,8 +93,8 @@ export const addDayToPlan = async (planId: number, name: string): Promise<number
     return result[0].insertedId;
 };
 
-export const updateDay = async (dayId: number, data: Partial<NewDay>): Promise<void> => {
-    await db.update(days).set(data).where(eq(days.id, dayId));
+export const updateDay = async (dayId: number, data: Partial<Omit<NewDay, 'id' | 'created_at' | 'updated_at'>>): Promise<void> => {
+    await db.update(days).set({ ...data, updated_at: new Date() }).where(eq(days.id, dayId));
 };
 
 export const deleteDay = async (dayId: number): Promise<void> => {
@@ -115,13 +102,11 @@ export const deleteDay = async (dayId: number): Promise<void> => {
         const day = await tx.select().from(days).where(eq(days.id, dayId)).get();
         if (!day) return;
 
-        // 1. Delete day exercises
-        await tx.delete(day_exercises).where(eq(day_exercises.day_id, dayId));
-
-        // 2. Delete day
+        // Cascade delete of day_exercises is handled automatically
+        // Delete day
         await tx.delete(days).where(eq(days.id, dayId));
 
-        // 3. Reorder remaining days
+        // Reorder remaining days
         const remainingDays = await tx.select().from(days)
             .where(eq(days.program_id, day.program_id!))
             .orderBy(asc(days.order_index));
@@ -129,7 +114,7 @@ export const deleteDay = async (dayId: number): Promise<void> => {
         for (let i = 0; i < remainingDays.length; i++) {
             if (remainingDays[i].order_index !== i) {
                 await tx.update(days)
-                    .set({ order_index: i })
+                    .set({ order_index: i, updated_at: new Date() })
                     .where(eq(days.id, remainingDays[i].id));
             }
         }
@@ -172,10 +157,10 @@ export const removeExerciseFromDay = async (dayExerciseId: number): Promise<void
         const target = await tx.select().from(day_exercises).where(eq(day_exercises.id, dayExerciseId)).get();
         if (!target) return;
 
-        // 1. Delete
+        // Delete (cascade to workout_exercise_sets handled automatically)
         await tx.delete(day_exercises).where(eq(day_exercises.id, dayExerciseId));
 
-        // 2. Reorder remaining
+        // Reorder remaining
         const remaining = await tx.select().from(day_exercises)
             .where(eq(day_exercises.day_id, target.day_id!))
             .orderBy(asc(day_exercises.order_index));

@@ -10,18 +10,18 @@ export type NewUserSettings = typeof schema.user_settings.$inferInsert;
  * Creates default settings if none exist.
  */
 export const getUserSettings = async (): Promise<UserSettings> => {
-    const settings = await db.select().from(schema.user_settings).limit(1);
+    const settings = await db.select().from(schema.user_settings).where(eq(schema.user_settings.id, 1));
 
     if (settings.length > 0) {
         return settings[0];
     }
 
-    // Create default settings if none exist
+    // Create default settings if none exist (enforced singleton with id=1)
     const result = await db.insert(schema.user_settings)
         .values({
-            language: 'en',
-            name: 'User',
-            current_day_index: 0
+            id: 1,
+            language: 'es',
+            name: 'User'
         })
         .returning();
 
@@ -39,23 +39,23 @@ export const ensureUserSettings = getUserSettings;
  * @param data Partial user settings data to update
  * @returns Updated user settings
  */
-export const updateUserSettings = async (data: Partial<NewUserSettings>): Promise<UserSettings> => {
-    const settings = await db.select().from(schema.user_settings).limit(1);
+export const updateUserSettings = async (data: Partial<Omit<NewUserSettings, 'id'>>): Promise<UserSettings> => {
+    const settings = await db.select().from(schema.user_settings).where(eq(schema.user_settings.id, 1));
 
     if (settings.length > 0) {
         const result = await db.update(schema.user_settings)
             .set(data)
-            .where(eq(schema.user_settings.id, settings[0].id))
+            .where(eq(schema.user_settings.id, 1))
             .returning();
         return result[0];
     }
 
-    // Create with provided data if settings don't exist
+    // Create with provided data if settings don't exist (enforced singleton with id=1)
     const result = await db.insert(schema.user_settings)
         .values({
-            language: 'en',
+            id: 1,
+            language: 'es',
             name: 'User',
-            current_day_index: 0,
             ...data
         })
         .returning();
@@ -71,10 +71,10 @@ export const updateCurrentProgram = async (programId: number | null): Promise<vo
 };
 
 /**
- * Update the current day index
+ * Update the last completed day ID
  */
-export const updateCurrentDayIndex = async (dayIndex: number): Promise<void> => {
-    await updateUserSettings({ current_day_index: dayIndex });
+export const updateLastDayId = async (dayId: number | null): Promise<void> => {
+    await updateUserSettings({ last_day_id: dayId });
 };
 
 /**

@@ -14,13 +14,16 @@ export const getExerciseById = async (id: number) => {
     return result[0];
 };
 
-export const createExercise = async (data: NewExercise) => {
+export const createExercise = async (data: Omit<NewExercise, 'id' | 'created_at' | 'updated_at'>) => {
     const result = await db.insert(schema.exercises).values(data).returning();
     return result[0];
 };
 
-export const updateExercise = async (id: number, data: Partial<NewExercise>) => {
-    const result = await db.update(schema.exercises).set(data).where(eq(schema.exercises.id, id)).returning();
+export const updateExercise = async (id: number, data: Partial<Omit<NewExercise, 'id' | 'created_at' | 'updated_at'>>) => {
+    const result = await db.update(schema.exercises)
+        .set({ ...data, updated_at: new Date() })
+        .where(eq(schema.exercises.id, id))
+        .returning();
     return result[0];
 };
 
