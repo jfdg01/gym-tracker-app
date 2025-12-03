@@ -61,26 +61,38 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
     const { t } = useTranslation();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [trackType, setTrackType] = useState<'reps' | 'time'>('reps');
+    const [resistanceType, setResistanceType] = useState<'weight' | 'text'>('weight');
     const [sets, setSets] = useState('3');
     const [minReps, setMinReps] = useState('4');
     const [maxReps, setMaxReps] = useState('12');
     const [weight, setWeight] = useState('');
+    const [timeDuration, setTimeDuration] = useState('60');
     const [restTimeSeconds, setRestTimeSeconds] = useState('180');
     const [increaseRate, setIncreaseRate] = useState('2.5');
     const [decreaseRate, setDecreaseRate] = useState('5.0');
+    const [timeIncreaseStep, setTimeIncreaseStep] = useState('5');
+    const [maxTimeCap, setMaxTimeCap] = useState('120');
+    const [currentValText, setCurrentValText] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     useEffect(() => {
         if (initialData) {
             setName(initialData.name);
             setDescription(initialData.description || '');
+            setTrackType((initialData.track_type as 'reps' | 'time') || 'reps');
+            setResistanceType((initialData.resistance_type as 'weight' | 'text') || 'weight');
             setSets(initialData.sets?.toString() || '3');
             setMinReps(initialData.min_reps?.toString() || '4');
             setMaxReps(initialData.max_reps?.toString() || '12');
             setWeight(initialData.weight?.toString() || '');
+            setTimeDuration(initialData.time_duration?.toString() || '60');
             setRestTimeSeconds(initialData.rest_time_seconds?.toString() || '180');
             setIncreaseRate(initialData.increase_rate?.toString() || '2.5');
             setDecreaseRate(initialData.decrease_rate?.toString() || '5.0');
+            setTimeIncreaseStep(initialData.time_increase_step?.toString() || '5');
+            setMaxTimeCap(initialData.max_time_cap?.toString() || '120');
+            setCurrentValText(initialData.current_val_text || '');
         } else {
             resetForm();
         }
@@ -89,13 +101,19 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
     const resetForm = () => {
         setName('');
         setDescription('');
+        setTrackType('reps');
+        setResistanceType('weight');
         setSets('3');
         setMinReps('4');
         setMaxReps('12');
         setWeight('');
+        setTimeDuration('60');
         setRestTimeSeconds('180');
         setIncreaseRate('2.5');
         setDecreaseRate('5.0');
+        setTimeIncreaseStep('5');
+        setMaxTimeCap('120');
+        setCurrentValText('');
     };
 
     const handleSave = async () => {
@@ -104,13 +122,19 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
         const exerciseData: NewExercise = {
             name,
             description,
+            track_type: trackType,
+            resistance_type: resistanceType,
             sets: parseInt(sets) || 3,
             min_reps: parseInt(minReps) || 4,
             max_reps: parseInt(maxReps) || 12,
             weight: weight ? parseFloat(weight) : null,
+            time_duration: parseInt(timeDuration) || 60,
             rest_time_seconds: parseInt(restTimeSeconds) || 180,
             increase_rate: parseFloat(increaseRate) || 2.5,
             decrease_rate: parseFloat(decreaseRate) || 5.0,
+            time_increase_step: parseInt(timeIncreaseStep) || 5,
+            max_time_cap: parseInt(maxTimeCap) || 120,
+            current_val_text: currentValText,
         };
 
         await onSave(exerciseData);
@@ -168,6 +192,40 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                             <View className="h-px bg-zinc-800 my-4" />
                             <Text className="text-zinc-50 font-semibold text-lg">{t('exerciseForm.configuration')}</Text>
 
+                            {/* Tracking Type Selector */}
+                            <Text className="text-zinc-400 mb-2 text-sm">{t('exerciseForm.trackTypeLabel')}</Text>
+                            <View className="bg-zinc-800 rounded-full p-1 flex-row mb-4">
+                                <TouchableOpacity
+                                    onPress={() => setTrackType('reps')}
+                                    className={`flex-1 py-3 rounded-full items-center ${trackType === 'reps' ? 'bg-blue-600' : 'bg-transparent'}`}
+                                >
+                                    <Text className={`font-bold ${trackType === 'reps' ? 'text-white' : 'text-zinc-400'}`}>{t('exerciseForm.typeReps')}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => setTrackType('time')}
+                                    className={`flex-1 py-3 rounded-full items-center ${trackType === 'time' ? 'bg-blue-600' : 'bg-transparent'}`}
+                                >
+                                    <Text className={`font-bold ${trackType === 'time' ? 'text-white' : 'text-zinc-400'}`}>{t('exerciseForm.typeTime')}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Resistance Type Selector */}
+                            <Text className="text-zinc-400 mb-2 text-sm">{t('exerciseForm.resistanceTypeLabel')}</Text>
+                            <View className="bg-zinc-800 rounded-full p-1 flex-row mb-6">
+                                <TouchableOpacity
+                                    onPress={() => setResistanceType('weight')}
+                                    className={`flex-1 py-3 rounded-full items-center ${resistanceType === 'weight' ? 'bg-blue-600' : 'bg-transparent'}`}
+                                >
+                                    <Text className={`font-bold ${resistanceType === 'weight' ? 'text-white' : 'text-zinc-400'}`}>{t('exerciseForm.resistanceWeight')}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => setResistanceType('text')}
+                                    className={`flex-1 py-3 rounded-full items-center ${resistanceType === 'text' ? 'bg-blue-600' : 'bg-transparent'}`}
+                                >
+                                    <Text className={`font-bold ${resistanceType === 'text' ? 'text-white' : 'text-zinc-400'}`}>{t('exerciseForm.resistanceText')}</Text>
+                                </TouchableOpacity>
+                            </View>
+
                             <View className="flex-row space-x-4">
                                 <View className="flex-1 mr-2">
                                     <Text className="text-zinc-400 my-2 text-sm">{t('common.sets')}</Text>
@@ -177,35 +235,50 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                                         step={1}
                                     />
                                 </View>
-                                <View className="flex-1 ml-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.weightLabel')}</Text>
-                                    <NumberInput
-                                        value={weight}
-                                        onChange={setWeight}
-                                        step={2.5}
-                                        placeholder="0"
-                                    />
-                                </View>
+                                {resistanceType === 'weight' && (
+                                    <View className="flex-1 ml-2">
+                                        <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.weightLabel')}</Text>
+                                        <NumberInput
+                                            value={weight}
+                                            onChange={setWeight}
+                                            step={2.5}
+                                            placeholder="0"
+                                        />
+                                    </View>
+                                )}
                             </View>
 
-                            <View className="flex-row space-x-4">
-                                <View className="flex-1 mr-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">{t('common.minReps')}</Text>
+                            {trackType === 'reps' && (
+                                <View className="flex-row space-x-4">
+                                    <View className="flex-1 mr-2">
+                                        <Text className="text-zinc-400 my-2 text-sm">{t('common.minReps')}</Text>
+                                        <NumberInput
+                                            value={minReps}
+                                            onChange={setMinReps}
+                                            step={1}
+                                        />
+                                    </View>
+                                    <View className="flex-1 ml-2">
+                                        <Text className="text-zinc-400 my-2 text-sm">{t('common.maxReps')}</Text>
+                                        <NumberInput
+                                            value={maxReps}
+                                            onChange={setMaxReps}
+                                            step={1}
+                                        />
+                                    </View>
+                                </View>
+                            )}
+
+                            {trackType === 'time' && (
+                                <View>
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.targetTime')}</Text>
                                     <NumberInput
-                                        value={minReps}
-                                        onChange={setMinReps}
-                                        step={1}
+                                        value={timeDuration}
+                                        onChange={setTimeDuration}
+                                        step={5}
                                     />
                                 </View>
-                                <View className="flex-1 ml-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">{t('common.maxReps')}</Text>
-                                    <NumberInput
-                                        value={maxReps}
-                                        onChange={setMaxReps}
-                                        step={1}
-                                    />
-                                </View>
-                            </View>
+                            )}
 
                             <View>
                                 <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.restTimeLabel')}</Text>
@@ -216,26 +289,64 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({ visible, o
                                 />
                             </View>
 
-                            <View className="flex-row space-x-4">
-                                <View className="flex-1 mr-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.increaseRate')}</Text>
-                                    <NumberInput
-                                        value={increaseRate}
-                                        onChange={setIncreaseRate}
-                                        step={0.5}
-                                        placeholder="2.5"
+                            {resistanceType === 'weight' && (
+                                <View className="flex-row space-x-4">
+                                    <View className="flex-1 mr-2">
+                                        <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.increaseRate')}</Text>
+                                        <NumberInput
+                                            value={increaseRate}
+                                            onChange={setIncreaseRate}
+                                            step={0.5}
+                                            placeholder="2.5"
+                                        />
+                                    </View>
+                                    <View className="flex-1 ml-2">
+                                        <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.decreaseRate')}</Text>
+                                        <NumberInput
+                                            value={decreaseRate}
+                                            onChange={setDecreaseRate}
+                                            step={0.5}
+                                            placeholder="5.0"
+                                        />
+                                    </View>
+                                </View>
+                            )}
+
+                            {resistanceType === 'text' && (
+                                <View>
+                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.currentValText')}</Text>
+                                    <TextInput
+                                        className="bg-zinc-800 text-zinc-50 p-4 rounded-xl border border-zinc-800"
+                                        placeholder={t('exerciseForm.currentValTextPlaceholder')}
+                                        placeholderTextColor="#52525b"
+                                        value={currentValText}
+                                        onChangeText={setCurrentValText}
                                     />
                                 </View>
-                                <View className="flex-1 ml-2">
-                                    <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.decreaseRate')}</Text>
-                                    <NumberInput
-                                        value={decreaseRate}
-                                        onChange={setDecreaseRate}
-                                        step={0.5}
-                                        placeholder="5.0"
-                                    />
+                            )}
+
+                            {trackType === 'time' && (
+                                <View className="flex-row space-x-4">
+                                    <View className="flex-1 mr-2">
+                                        <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.timeIncreaseStep')}</Text>
+                                        <NumberInput
+                                            value={timeIncreaseStep}
+                                            onChange={setTimeIncreaseStep}
+                                            step={5}
+                                            placeholder="5"
+                                        />
+                                    </View>
+                                    <View className="flex-1 ml-2">
+                                        <Text className="text-zinc-400 my-2 text-sm">{t('exerciseForm.maxTimeCap')}</Text>
+                                        <NumberInput
+                                            value={maxTimeCap}
+                                            onChange={setMaxTimeCap}
+                                            step={5}
+                                            placeholder="120"
+                                        />
+                                    </View>
                                 </View>
-                            </View>
+                            )}
                         </View>
                     </ScrollView>
 

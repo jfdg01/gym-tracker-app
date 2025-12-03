@@ -89,17 +89,30 @@
 		"delete": "Eliminar Ejercicio",
 		"deleteConfirmTitle": "Eliminar Ejercicio",
 		"deleteConfirmMessage": "¿Estás seguro de que quieres eliminar este ejercicio? Esta acción no se puede deshacer.",
-		"descriptionLabel": "Descripción",
-		"descriptionPlaceholder": "Añade una descripción o notas...",
+		"descriptionLabel": "Descripción (Opcional)",
+		"descriptionPlaceholder": "Añade notas sobre la forma, configuración, etc...",
 		"editTitle": "Editar Ejercicio",
-		"increaseRate": "Tasa de Aumento",
-		"decreaseRate": "Tasa de Disminución",
-		"nameLabel": "Nombre *",
+		"nameLabel": "Nombre",
 		"namePlaceholder": "Ej. Press de Banca",
 		"newTitle": "Nuevo Ejercicio",
 		"restTimeLabel": "Descanso (seg)",
 		"save": "Guardar Ejercicio",
-		"weightLabel": "Peso (kg)"
+		"weightLabel": "Peso (kg)",
+		"type": "Tipo",
+		"typeReps": "Reps",
+		"typeTime": "Tiempo",
+		"typeText": "Texto",
+		"targetTime": "Tiempo Objetivo (s)",
+		"timeIncreaseStep": "Paso de Aumento (s)",
+		"maxTimeCap": "Límite de Tiempo (s)",
+		"increaseRate": "Tasa de Aumento (kg)",
+		"decreaseRate": "Tasa de Disminución (kg)",
+		"currentValText": "Progreso Actual / Nivel",
+		"currentValTextPlaceholder": "Ej. Nivel 5, Banda Azul, etc.",
+		"trackTypeLabel": "Seguimiento (Lo que cuentas)",
+		"resistanceTypeLabel": "Resistencia (Lo que cuesta)",
+		"resistanceWeight": "Peso",
+		"resistanceText": "Texto / Nivel"
 	},
 	"exercises": {
 		"createNew": "Crear nuevo ejercicio",
@@ -140,8 +153,10 @@
 		"switch": "Cambiar"
 	},
 	"setCompletion": {
-		"repsLabel": "Reps",
-		"title": "Registrar Serie"
+		"title": "Completar Serie",
+		"repsLabel": "Reps Realizadas",
+		"timeLabel": "Tiempo (segundos)",
+		"textLabel": "Resultado"
 	},
 	"settings": {
 		"language": "Idioma",

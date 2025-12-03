@@ -62,9 +62,18 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 const exercises: Exercise[] = dayExercises.map(({ dayExercise, exercise }) => ({
                     id: exercise.id.toString(),
                     name: exercise.name,
+                    description: exercise.description,
+                    type: (exercise.type as 'reps' | 'time' | 'text') || 'reps',
                     restTimeSeconds: exercise.rest_time_seconds || 60,
                     minReps: exercise.min_reps || 4,
                     maxReps: exercise.max_reps || 12,
+                    weight: exercise.weight,
+                    timeDuration: exercise.time_duration,
+                    currentValText: exercise.current_val_text,
+                    increaseRate: exercise.increase_rate,
+                    decreaseRate: exercise.decrease_rate,
+                    timeIncreaseStep: exercise.time_increase_step,
+                    maxTimeCap: exercise.max_time_cap,
                     sets: Array.from({ length: exercise.sets || 3 }).map((_, i) => ({
                         id: `${day.id}-${exercise.id}-${i}`,
                         targetReps: exercise.max_reps || 10,
@@ -176,37 +185,90 @@ export const ProgramProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
                     if (dbExercise.length > 0) {
                         const currentConfig = dbExercise[0];
-                        let newWeight = currentConfig.weight || 0;
-                        let weightChanged = false;
+                        const type = currentConfig.type || 'reps';
 
-                        // Use the adjustment calculated during the workout if available
-                        if (exercise.nextSessionWeightAdjustment !== undefined && exercise.nextSessionWeightAdjustment !== 0) {
-                            newWeight += exercise.nextSessionWeightAdjustment;
-                            if (newWeight < 0) newWeight = 0;
-                            weightChanged = true;
-                        } else {
-                            // Fallback logic if no adjustment was calculated (e.g. legacy or error)
-                            // We'll stick to the simple logic: check last set
+                        if (type === 'time') {
+                            // Time-based progression
+                            if (exercise.nextSessionTimeAdjustment !== undefined && exercise.nextSessionTimeAdjustment > 0) {
+                                const currentDuration = currentConfig.time_duration || 0;
+                                const newDuration = currentDuration + exercise.nextSessionTimeAdjustment;
+
+                                await db.update(schema.exercises)
+                                    .set({ time_duration: newDuration })
+                                    .where(eq(schema.exercises.id, parseInt(exercise.id)));
+                            }
+                        } else if (type === 'text') {
+                            // Text-based update
+                            // Get the last set's value
                             const lastSet = exercise.sets[exercise.sets.length - 1];
-                            if (lastSet && lastSet.completed && lastSet.actualReps !== undefined) {
-                                const minReps = currentConfig.min_reps || 4;
-                                const maxReps = currentConfig.max_reps || 12;
+                            if (lastSet && lastSet.completed && lastSet.actualValue) {
+                                await db.update(schema.exercises)
+                                    .set({ current_val_text: lastSet.actualValue })
+                                    .where(eq(schema.exercises.id, parseInt(exercise.id)));
+                            }
+                        } else {
+                            // Reps-based progression
+                            let newWeight = currentConfig.weight || 0;
+                            let weightChanged = false;
 
-                                if (lastSet.actualReps < minReps) {
-                                    newWeight -= 2.5; // Default decrement
-                                    if (newWeight < 0) newWeight = 0;
-                                    weightChanged = true;
-                                } else if (lastSet.actualReps > maxReps) {
-                                    newWeight += 2.5; // Default increment
-                                    weightChanged = true;
+                            const id = parseInt(exercise.id);
+                            const sets = exercise.sets;
+                            const lastSet = sets[sets.length - 1];
+
+                            const updateExercise = async (exerciseId: number, data: Partial<typeof schema.exercises.$inferInsert>) => {
+                                await db.update(schema.exercises)
+                                    .set(data)
+                                    .where(eq(schema.exercises.id, exerciseId));
+                            };
+
+                            const trackType = exercise.track_type || 'reps';
+                            const resistanceType = exercise.resistance_type || 'weight';
+
+                            if (lastSet.completed) {
+                                // 1. Check if progression criteria met
+                                let criteriaMet = false;
+
+                                if (trackType === 'time') {
+                                    criteriaMet = sets.every(
+                                        set => set.actualValue && parseFloat(set.actualValue) >= (exercise.timeDuration || 0)
+                                    );
+                                } else {
+                                    // Reps based
+                                    criteriaMet = lastSet.actualReps !== undefined && lastSet.actualReps >= exercise.maxReps;
+                                }
+
+                                // 2. Apply Progression
+                                if (criteriaMet) {
+                                    if (trackType === 'time') {
+                                        // Increase Time Duration
+                                        let newDuration = (exercise.timeDuration || 0) + (exercise.timeIncreaseStep ?? 5);
+                                        if (exercise.maxTimeCap && newDuration > exercise.maxTimeCap) {
+                                            newDuration = exercise.maxTimeCap;
+                                        }
+
+                                        // Only update if it changed
+                                        if (newDuration !== exercise.timeDuration) {
+                                            await updateExercise(id, { time_duration: newDuration });
+                                        }
+                                    } else {
+                                        // Reps based
+                                        if (resistanceType === 'weight') {
+                                            await updateExercise(id, {
+                                                weight: (exercise.weight || 0) + (exercise.increaseRate ?? 2.5),
+                                            });
+                                        }
+                                    }
+                                } else {
+                                    // Deload logic (only for Reps + Weight for now)
+                                    if (trackType === 'reps' && resistanceType === 'weight') {
+                                        if (lastSet.actualReps !== undefined && lastSet.actualReps <= exercise.minReps) {
+                                            await updateExercise(id, {
+                                                weight: (exercise.weight || 0) - (exercise.decreaseRate ?? 5.0),
+                                            });
+                                        }
+                                    }
                                 }
                             }
-                        }
-
-                        if (weightChanged) {
-                            await db.update(schema.exercises)
-                                .set({ weight: newWeight })
-                                .where(eq(schema.exercises.id, parseInt(exercise.id)));
                         }
                     }
                 }

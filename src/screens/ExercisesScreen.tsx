@@ -66,22 +66,39 @@ export const ExercisesScreen = () => {
         setIsModalVisible(true);
     };
 
-    const renderItem = ({ item }: { item: Exercise }) => (
-        <TouchableOpacity
-            onPress={() => openEditModal(item)}
-            className="bg-zinc-900 p-4 rounded-xl mb-3 border border-zinc-800 flex-row items-center"
-        >
-            <View className="bg-zinc-800 p-3 rounded-full mr-4">
-                <Dumbbell size={24} color="#3b82f6" />
-            </View>
-            <View className="flex-1">
-                <Text className="text-zinc-50 font-bold text-lg">{item.name}</Text>
-                <Text className="text-zinc-400 text-sm">
-                    {t('exercises.exerciseDetails', { sets: item.sets, min: item.min_reps, max: item.max_reps, weight: item.weight ? `${item.weight}kg` : t('exercises.freeWeight') })}
-                </Text>
-            </View>
-        </TouchableOpacity>
-    );
+    const renderItem = ({ item }: { item: Exercise }) => {
+        let details = '';
+        const trackType = item.track_type || 'reps';
+        const resistanceType = item.resistance_type || 'weight';
+
+        if (trackType === 'time') {
+            details = `${item.sets} sets • ${item.time_duration || 0}s`;
+        } else if (resistanceType === 'text') {
+            details = `${item.sets} sets • ${item.current_val_text || '-'}`;
+        } else {
+            details = t('exercises.exerciseDetails', {
+                sets: item.sets,
+                min: item.min_reps,
+                max: item.max_reps,
+                weight: item.weight ? `${item.weight}kg` : t('exercises.freeWeight')
+            });
+        }
+
+        return (
+            <TouchableOpacity
+                onPress={() => openEditModal(item)}
+                className="bg-zinc-900 p-4 rounded-xl mb-3 border border-zinc-800 flex-row items-center"
+            >
+                <View className="bg-zinc-800 p-3 rounded-full mr-4">
+                    <Dumbbell size={24} color="#3b82f6" />
+                </View>
+                <View className="flex-1">
+                    <Text className="text-zinc-50 font-bold text-lg">{item.name}</Text>
+                    <Text className="text-zinc-400 text-sm">{details}</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>

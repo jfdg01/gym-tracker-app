@@ -6,6 +6,7 @@ export type Set = {
     targetReps: number;
     targetWeight: number;
     actualReps?: number;
+    actualValue?: string; // For text/time based exercises
     completed: boolean;
 };
 
@@ -13,13 +14,21 @@ export type Exercise = {
     id: string;
     name: string;
     description?: string | null;
+    track_type?: 'reps' | 'time';
+    resistance_type?: 'weight' | 'text';
     sets: Set[];
     restTimeSeconds: number;
     minReps: number;
     maxReps: number;
+    weight?: number | null;
+    timeDuration?: number;
+    currentValText?: string;
     increaseRate?: number;
     decreaseRate?: number;
+    timeIncreaseStep?: number;
+    maxTimeCap?: number;
     nextSessionWeightAdjustment?: number; // dynamic based on increaseRate/decreaseRate
+    nextSessionTimeAdjustment?: number; // dynamic based on timeIncreaseStep
 };
 
 export type WorkoutSession = {
@@ -36,7 +45,7 @@ type LiveWorkoutContextType = {
     isResting: boolean;
     restTimer: number;
     startWorkout: (exercises: Exercise[]) => void;
-    completeSet: (reps: number) => void;
+    completeSet: (val: number | string) => void;
     skipExercise: () => void;
     goToExercise: (index: number) => void;
     finishWorkout: () => void;
@@ -59,47 +68,6 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [currentSetIndex, setCurrentSetIndex] = useState(0);
     const [isResting, setIsResting] = useState(false);
     const [restTimer, setRestTimer] = useState(0);
-
-    // Mock Data
-    const mockWorkout: WorkoutSession = {
-        startTime: new Date(),
-        completed: false,
-        exercises: [
-            {
-                id: '1',
-                name: 'Squats',
-                restTimeSeconds: 5,
-                minReps: 4,
-                maxReps: 12,
-                sets: [
-                    { id: 's1', targetReps: 10, targetWeight: 100, completed: false },
-                    { id: 's2', targetReps: 10, targetWeight: 100, completed: false },
-                ],
-            },
-            {
-                id: '2',
-                name: 'Bench Press',
-                restTimeSeconds: 5,
-                minReps: 4,
-                maxReps: 12,
-                sets: [
-                    { id: 'b1', targetReps: 8, targetWeight: 80, completed: false },
-                    { id: 'b2', targetReps: 8, targetWeight: 80, completed: false },
-                ],
-            },
-            {
-                id: '3',
-                name: 'Deadlift',
-                restTimeSeconds: 5,
-                minReps: 4,
-                maxReps: 12,
-                sets: [
-                    { id: 'd1', targetReps: 5, targetWeight: 120, completed: false },
-                    { id: 'd2', targetReps: 5, targetWeight: 120, completed: false },
-                ],
-            },
-        ],
-    };
 
     const startWorkout = (exercises: Exercise[]) => {
         const newWorkout: WorkoutSession = {
@@ -127,7 +95,7 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
         return () => clearInterval(interval);
     }, [isResting, restTimer]);
 
-    const completeSet = (reps: number) => {
+    const completeSet = (val: number | string) => {
         if (!workout) return;
 
         const updatedWorkout = { ...workout };
@@ -135,7 +103,14 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
         const currentExercise = updatedExercises[currentExerciseIndex];
         const currentSet = currentExercise.sets[currentSetIndex];
 
-        currentSet.actualReps = reps;
+        if (typeof val === 'number') {
+            currentSet.actualReps = val;
+            currentSet.actualValue = val.toString();
+        } else {
+            currentSet.actualValue = val;
+            // For text based, actualReps might be undefined or 0
+        }
+
         currentSet.completed = true;
 
         // Check if it was the last set of the exercise
@@ -143,12 +118,61 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         if (isLastSetOfExercise) {
             // Progressive Overload Logic
-            if (reps > currentExercise.maxReps) {
-                currentExercise.nextSessionWeightAdjustment = currentExercise.increaseRate ?? 2.5;
-            } else if (reps < currentExercise.minReps) {
-                currentExercise.nextSessionWeightAdjustment = -(currentExercise.decreaseRate ?? 5.0);
+            const trackType = currentExercise.track_type || 'reps';
+            const resistanceType = currentExercise.resistance_type || 'weight';
+
+            // 1. Check if progression criteria met (Trigger)
+            let criteriaMet = false;
+
+            if (trackType === 'time') {
+                // Check if all sets met the target time
+                criteriaMet = currentExercise.sets.every(s => {
+                    const val = parseFloat(s.actualValue || '0');
+                    return val >= (currentExercise.timeDuration || 0);
+                });
             } else {
-                currentExercise.nextSessionWeightAdjustment = 0;
+                // Reps based
+                const valNum = typeof val === 'number' ? val : parseFloat(val);
+                criteriaMet = valNum >= currentExercise.maxReps;
+            }
+
+            // 2. Apply Progression (Resistance Increase)
+            if (criteriaMet) {
+                if (trackType === 'time') {
+                    // For time tracking, we might increase time OR weight/text depending on resistance type?
+                    // Actually, if resistance is weight, we increase weight. If resistance is text, we do nothing (manual).
+                    // But wait, for Planks (Time + Text), we usually increase Time until a cap, then change Text (Form).
+                    // For Weighted Planks (Time + Weight), we increase Time until cap, then Weight? Or just Weight?
+                    // The user said: "for planks we need time and text, since we stay for as long as possible and when we reach a certain amount of s we change the form"
+                    // So for Time-based, we primarily increase TIME.
+
+                    const step = currentExercise.timeIncreaseStep || 5;
+                    const cap = currentExercise.maxTimeCap || 120;
+                    const currentDuration = currentExercise.timeDuration || 0;
+
+                    if (currentDuration < cap) {
+                        let nextDuration = currentDuration + step;
+                        if (nextDuration > cap) nextDuration = cap;
+                        currentExercise.nextSessionTimeAdjustment = nextDuration - currentDuration;
+                    } else {
+                        // Reached cap. If resistance is weight, maybe increase weight?
+                        // For now, let's keep it simple: Time exercises increase Time.
+                        currentExercise.nextSessionTimeAdjustment = 0;
+                    }
+                } else {
+                    // Reps based
+                    if (resistanceType === 'weight') {
+                        currentExercise.nextSessionWeightAdjustment = currentExercise.increaseRate ?? 2.5;
+                    }
+                }
+            } else {
+                // Criteria NOT met (Deload logic?)
+                if (trackType === 'reps' && resistanceType === 'weight') {
+                    const valNum = typeof val === 'number' ? val : parseFloat(val);
+                    if (valNum < currentExercise.minReps) {
+                        currentExercise.nextSessionWeightAdjustment = -(currentExercise.decreaseRate ?? 5.0);
+                    }
+                }
             }
 
             // Move to next exercise or finish
@@ -159,9 +183,6 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 setRestTimer(currentExercise.restTimeSeconds);
                 setWorkout(updatedWorkout);
             } else {
-                // IMPORTANT: If it's the last exercise, we must mark it as completed immediately
-                // and NOT set the intermediate state, otherwise the component might re-render
-                // with the old state before finishWorkout takes effect.
                 const finalWorkout = { ...updatedWorkout, completed: true, endTime: new Date() };
                 setWorkout(finalWorkout);
             }
@@ -197,16 +218,6 @@ export const LiveWorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const finishWorkout = () => {
         if (!workout) return;
-
-        // Save progress via ProgramContext
-        // We need to access ProgramContext here. Since we can't use hooks inside a function,
-        // we should probably pass the completeDay function to LiveWorkoutProvider or use a callback.
-        // However, the cleanest way in this architecture without refactoring everything is to 
-        // expose the workout data and let the consumer (ActiveExerciseScreen) call completeDay.
-        // BUT, the user requirement is "when a workout ends".
-        // Let's modify the context to accept an onFinish callback or similar?
-        // Or better: The ActiveExerciseScreen calls finishWorkout. It can also call completeDay.
-        // Let's update this to just set state, and we'll handle the call in the Screen.
 
         setWorkout((prev) => {
             if (!prev) return null;

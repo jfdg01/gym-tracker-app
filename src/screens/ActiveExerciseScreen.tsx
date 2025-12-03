@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { X, Check } from 'lucide-react-native';
+import { X, Check, SkipForward } from 'lucide-react-native';
 import { useLiveWorkout } from '../context/LiveWorkoutContext';
 import { useProgram } from '../context/ProgramContext';
 import { SetCompletionModal } from '../components/SetCompletionModal';
@@ -50,14 +50,27 @@ export const ActiveExerciseScreen = () => {
         setModalVisible(true);
     };
 
-    const onConfirmSet = (reps: number) => {
+    const onConfirmSet = (val: number | string) => {
         setModalVisible(false);
-        completeSet(reps);
+        completeSet(val);
+    };
+
+    const getTargetText = (set: any) => {
+        const trackType = currentExercise.track_type || 'reps';
+        const resistanceType = currentExercise.resistance_type || 'weight';
+
+        if (trackType === 'time') {
+            return `${currentExercise.timeDuration || 0}s`;
+        } else if (resistanceType === 'text') {
+            return currentExercise.currentValText || '-';
+        } else {
+            // Reps + Weight
+            return `${set.targetReps} x ${set.targetWeight}kg`;
+        }
     };
 
     return (
         <SafeAreaView className="flex-1 bg-zinc-950" edges={['top', 'left', 'right', 'bottom']}>
-            {/* Header */}
             {/* Header */}
             <ScreenHeader
                 title={currentExercise.name}
@@ -203,13 +216,15 @@ export const ActiveExerciseScreen = () => {
 
                                 <View className="flex-1 items-center">
                                     <Text className={`text-base font-medium ${isCurrentSet ? 'text-zinc-50' : 'text-zinc-400'}`}>
-                                        {set.targetWeight}kg x {currentExercise.minReps}-{currentExercise.maxReps}
+                                        {getTargetText(set)}
                                     </Text>
                                 </View>
 
                                 <View className="w-16 items-center">
                                     {isCompleted ? (
-                                        <Text className="text-emerald-500 font-bold text-lg">{set.actualReps}</Text>
+                                        <Text className="text-emerald-500 font-bold text-lg">
+                                            {set.actualValue ? set.actualValue : set.actualReps}
+                                        </Text>
                                     ) : (
                                         <Text className="text-zinc-600 font-bold text-lg">-</Text>
                                     )}
@@ -260,12 +275,10 @@ export const ActiveExerciseScreen = () => {
 
             <SetCompletionModal
                 visible={modalVisible}
-                onConfirm={(reps) => {
-                    completeSet(reps);
-                    setModalVisible(false);
-                }}
+                onConfirm={onConfirmSet}
                 onCancel={() => setModalVisible(false)}
                 defaultReps={currentExercise.sets[currentSetIndex]?.targetReps || 0}
+                type={currentExercise.track_type || 'reps'}
             />
 
             <ConfirmationModal
