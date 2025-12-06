@@ -61,21 +61,6 @@ export class WorkoutService {
         // 3. Update User Program Progress (Last Completed Day) ONLY if completed
         if (isCompleted) {
             // Fetch the log to get program_id and day_id
-            // (Or we could pass them in, but fetching ensures consistency)
-            // Since we don't have getLogById exposed yet, we rely on what we know or add getById.
-            // For now, let's assume we can get it or we just use the ID passed if we had it.
-            // Actually, we need to know the program_id to find the user_program.
-            // Let's add getById to Repository or just fetch all logs and find (inefficient).
-            // Better: add getById to WorkoutRepository.
-            // For now, let's try to update without fetching if we can, but we need program_id.
-
-            // Wait, we can't easily get program_id without fetching the log.
-            // Let's add getById to WorkoutRepository quickly? 
-            // Or just trust the caller? The caller (WorkoutMenu) knows the program_id.
-            // But completeWorkout signature is (logId, setLogs, isCompleted).
-            // Let's fetch the log.
-
-            // Fetch the log to get program_id and day_id
             const completedLog = await this.workoutRepository.getById(logId);
 
             if (!completedLog || !completedLog.day_id || !completedLog.program_id) return;

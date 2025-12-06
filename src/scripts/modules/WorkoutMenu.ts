@@ -117,8 +117,39 @@ export const handleWorkoutMenu = async (
         console.log(`Loading exercises for: ${nextDayName}...`);
         const dayExercises = await services.programService.getDayExercisesWithDetails(nextDayId);
 
+        // Find the day object to check properties
+        const currentDay = days.find(d => d.id === nextDayId);
+
         if (dayExercises.length === 0) {
-            console.log("No exercises found for this day.");
+            if (currentDay && currentDay.is_rest_day) {
+                console.log(`\n--- Rest Day: ${nextDayName} ---`);
+                console.log("This is a planned Rest Day.");
+
+                const confirm = await askQuestion("Mark this day as completed? (Y/n): ");
+
+                if (confirm.toLowerCase() === 'y' || confirm === '') {
+                    console.log("Marking as completed...");
+                    const workoutLogId = await services.workoutService.startWorkout(nextDayId, selected.userProgram.program_id);
+                    // Complete with empty set logs, marking as completed
+                    await services.workoutService.completeWorkout(workoutLogId, [], true);
+                    console.log("Rest Day completed successfully.");
+                }
+            } else {
+                // Malformed Day: No exercises but NOT a rest day
+                console.log(`\n⚠️  WARNING: Day '${nextDayName}' has 0 exercises but is NOT marked as a Rest Day.`);
+                console.log("This might be a configuration error.");
+
+                const confirm = await askQuestion("Do you want to force complete this empty day? (y/N): ");
+                if (confirm.toLowerCase() === 'y') {
+                    console.log("Force completing empty day...");
+                    const workoutLogId = await services.workoutService.startWorkout(nextDayId, selected.userProgram.program_id);
+                    await services.workoutService.completeWorkout(workoutLogId, [], true);
+                    console.log("Day completed.");
+                } else {
+                    console.log("Action cancelled.");
+                }
+            }
+
             await waitForKey(askQuestion);
             continue;
         }

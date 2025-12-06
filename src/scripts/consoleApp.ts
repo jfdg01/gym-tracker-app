@@ -120,7 +120,13 @@ async function main() {
                     clearScreen();
                     console.log("\n--- Exercises ---");
                     const allExercises = await exerciseService.getAllExercises();
-                    console.table(allExercises);
+                    const displayExercises = allExercises.map(ex => ({
+                        ...ex,
+                        description: ex.description && ex.description.length > 10
+                            ? ex.description.substring(0, 10) + '...'
+                            : ex.description
+                    }));
+                    console.table(displayExercises);
                     await waitForKey(askQuestion);
                     break;
                 case '3':

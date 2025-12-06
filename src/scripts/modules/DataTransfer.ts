@@ -182,6 +182,7 @@ const processImport = async (
         // Fix dates
         const formattedLogs = importContent.workout_logs.map((log: any) => ({
             ...log,
+            created_at: new Date(log.created_at),
             completed_at: log.completed_at ? new Date(log.completed_at) : null
         }));
         await workoutService.importWorkoutLogs(formattedLogs);
