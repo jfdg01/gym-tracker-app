@@ -3,7 +3,7 @@ import * as path from 'path';
 import { db } from "../../db/client";
 import {
     exercises, programs, days, day_exercises,
-    user_settings, user_programs, workout_logs
+    user_settings, user_programs, workout_logs, workout_set_logs
 } from "../../db/schema";
 import { ExerciseService } from "../../services/ExerciseService";
 import { ProgramService } from "../../services/ProgramService";
@@ -39,6 +39,7 @@ interface ExportData {
         user_settings: any[];
         user_programs: any[];
         workout_logs: any[];
+        workout_set_logs: any[];
     };
 }
 
@@ -87,7 +88,8 @@ export const handleExportData = async (
                 day_exercises: allDayExercises,
                 user_settings: allUserSettings,
                 user_programs: allUserPrograms,
-                workout_logs: allWorkoutLogs
+                workout_logs: allWorkoutLogs,
+                workout_set_logs: await workoutService.getAllWorkoutSetLogs()
             }
         };
 
@@ -113,6 +115,7 @@ export const handleExportData = async (
 const wipeDatabase = async () => {
     console.log("⚠️  Wiping database...");
     // Order matters greatly due to foreign keys
+    await db.delete(workout_set_logs); // Delete set logs first
     await db.delete(workout_logs);
     await db.delete(user_programs);
     await db.delete(day_exercises);
@@ -187,6 +190,11 @@ const processImport = async (
         }));
         await workoutService.importWorkoutLogs(formattedLogs);
         console.log(`  - Workout Logs processed.`);
+    }
+
+    if (importContent.workout_set_logs?.length) {
+        await workoutService.importWorkoutSetLogs(importContent.workout_set_logs);
+        console.log(`  - Workout Set Logs processed.`);
     }
 
     console.log("\n✅ Import completed successfully.");

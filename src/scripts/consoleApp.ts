@@ -8,21 +8,14 @@ import { ProgramService } from "../services/ProgramService";
 import { UserService } from "../services/UserService";
 import { WorkoutService } from "../services/WorkoutService";
 import * as readline from 'readline';
-import * as fs from 'fs';
-import { db } from "../db/client";
+
+
 import { handleViewPrograms } from "./modules/ProgramMenu";
 import { handleExportData, handleImportData, DataServices } from "./modules/DataTransfer";
 import { handleWorkoutMenu } from "./modules/WorkoutMenu";
+import { handleSettingsMenu } from "./modules/SettingsMenu";
 import { clearScreen, waitForKey } from "./modules/ConsoleUI";
-import {
-    exercises,
-    programs,
-    days,
-    day_exercises,
-    user_settings,
-    user_programs,
-    workout_logs
-} from "../db/schema";
+
 
 // Initialize Repositories
 const exerciseRepo = new ExerciseRepository();
@@ -58,37 +51,7 @@ const askQuestion = (query: string): Promise<string> => {
 
 // Local handleViewPrograms removed - imported from modules/ProgramMenu
 
-const resetDatabase = async () => {
-    clearScreen();
-    const confirmation = await askQuestion("Are you sure you want to DELETE ALL DATA? (y/n): ");
-    if (confirmation.toLowerCase() !== 'y') {
-        console.log("Operation cancelled.");
-        await waitForKey(askQuestion);
-        return;
-    }
 
-    try {
-        console.log("Deleting workout logs...");
-        await db.delete(workout_logs);
-        console.log("Deleting user programs...");
-        await db.delete(user_programs);
-        console.log("Deleting day exercises...");
-        await db.delete(day_exercises);
-        console.log("Deleting days...");
-        await db.delete(days);
-        console.log("Deleting programs...");
-        await db.delete(programs);
-        console.log("Deleting exercises...");
-        await db.delete(exercises);
-        console.log("Deleting user settings...");
-        await db.delete(user_settings);
-
-        console.log("Database reset successfully.");
-    } catch (error) {
-        console.error("Error resetting database:", error);
-    }
-    await waitForKey(askQuestion);
-};
 
 async function main() {
     clearScreen();
@@ -102,12 +65,9 @@ async function main() {
         console.log("2. View Exercises");
         console.log("3. View Programs (Interactive)");
         console.log("4. View Days");
-        console.log("5. View User Settings");
-        console.log("6. Export Data");
-        console.log("7. Import Data");
-        console.log("8. View Workout Logs");
-        console.log("9. Reset Database");
-        console.log("10. Exit");
+        console.log("5. View Workout Logs");
+        console.log("6. Settings & Data");
+        console.log("7. Exit");
 
         const answer = await askQuestion("Select an option: ");
 
@@ -140,32 +100,58 @@ async function main() {
                     await waitForKey(askQuestion);
                     break;
                 case '5':
-                    clearScreen();
-                    console.log("\n--- User Settings ---");
-                    // Using generic getAllUserSettings to view all rows, though usually singleton
-                    const settings = await userService.getAllUserSettings();
-                    console.table(settings);
-                    await waitForKey(askQuestion);
+                    while (true) {
+                        clearScreen();
+                        console.log("\n--- Workout Logs ---");
+                        const logs = await workoutService.getAllWorkoutLogs();
+                        console.table(logs);
+
+                        const logIdStr = await askQuestion("\nEnter Workout ID to view details (or 0 to back): ");
+                        if (logIdStr === '0' || logIdStr === '') break;
+
+                        const logId = parseInt(logIdStr);
+                        if (isNaN(logId)) {
+                            console.log("Invalid ID.");
+                            await waitForKey(askQuestion);
+                            continue;
+                        }
+
+                        clearScreen();
+                        console.log(`\n--- Details for Workout #${logId} ---`);
+                        const details = await workoutService.getWorkoutDetails(logId);
+
+                        if (!details) {
+                            console.log("Workout not found.");
+                            await waitForKey(askQuestion);
+                            continue;
+                        }
+
+                        console.log("General Info:");
+                        console.table([details.log]);
+
+                        console.log("\nSets:");
+                        if (details.sets.length === 0) {
+                            console.log("No sets logged for this workout.");
+                        } else {
+                            const formattedSets = details.sets.map(s => ({
+                                Set: s.set_number,
+                                Exercise: s.exercise_name,
+                                Reps: s.reps,
+                                Time: s.time,
+                                Weight: s.weight,
+                                Difficulty: s.difficulty_qualitative,
+                                Skipped: s.is_skipped ? 'Yes' : 'No'
+                            }));
+                            console.table(formattedSets);
+                        }
+
+                        await waitForKey(askQuestion, "Press Enter to go back to logs list...");
+                    }
                     break;
                 case '6':
-                    await handleExportData(services, askQuestion);
-                    await waitForKey(askQuestion); // Export might finish quickly
+                    await handleSettingsMenu(services, askQuestion);
                     break;
                 case '7':
-                    await handleImportData(services, askQuestion);
-                    await waitForKey(askQuestion);
-                    break;
-                case '8':
-                    clearScreen();
-                    console.log("\n--- Workout Logs ---");
-                    const logs = await workoutService.getAllWorkoutLogs();
-                    console.table(logs);
-                    await waitForKey(askQuestion);
-                    break;
-                case '9':
-                    await resetDatabase();
-                    break;
-                case '10':
                     console.log("Goodbye!");
                     rl.close();
                     return;

@@ -32,4 +32,17 @@ export class WorkoutRepository extends BaseRepository<typeof workout_logs> {
         const result = await this.db.select().from(workout_logs).where(eq(workout_logs.id, id));
         return result[0];
     }
+
+    async getSetLogsByWorkoutId(workoutId: number) {
+        return await this.db.select().from(workout_set_logs).where(eq(workout_set_logs.workout_log_id, workoutId));
+    }
+
+    async getAllSetLogs() {
+        return await this.db.select().from(workout_set_logs);
+    }
+
+    async importSetLogs(data: any[]) {
+        if (!data || data.length === 0) return;
+        return await this.db.insert(workout_set_logs).values(data).onConflictDoNothing();
+    }
 }

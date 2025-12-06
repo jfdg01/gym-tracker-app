@@ -40,6 +40,13 @@ export class WorkoutService {
         return result.id;
     }
 
+    async saveSetLog(workoutLogId: number, setLog: any) {
+        await this.workoutRepository.createSetLogs([{
+            ...setLog,
+            workout_log_id: workoutLogId
+        }]);
+    }
+
     async completeWorkout(logId: number, setLogs: any[], isCompleted: boolean) {
         // 1. Mark as completed (update timestamp) if fully completed
         if (isCompleted) {
@@ -76,11 +83,101 @@ export class WorkoutService {
         }
     }
 
+    private async _calculateCompletionStatus(log: any, setLogs: any[]): Promise<string | Date | null> {
+        if (log.completed_at) return log.completed_at;
+
+        try {
+            const exercises = await this.dayRepository.getDayExercisesWithDetails(log.day_id);
+
+            const missingNames: string[] = [];
+            const partialNames: string[] = [];
+
+            for (const ex of exercises) {
+                const exerciseLogs = setLogs.filter(s => s.exercise_id === ex.exercise_id);
+                const setsLogged = exerciseLogs.length;
+                const setsRequired = ex.sets || 0;
+
+                if (setsLogged === 0) {
+                    missingNames.push(ex.name);
+                } else if (setsLogged < setsRequired) {
+                    const startSkipped = exerciseLogs.some(s => s.is_skipped);
+                    if (!startSkipped) {
+                        partialNames.push(`${ex.name} (${setsLogged}/${setsRequired})`);
+                    }
+                }
+            }
+
+            const parts: string[] = [];
+            if (missingNames.length > 0) {
+                parts.push(`Missing: ${missingNames.join(', ')}`);
+            }
+            if (partialNames.length > 0) {
+                parts.push(`Partial: ${partialNames.join(', ')}`);
+            }
+
+            if (parts.length > 0) {
+                return parts.join(' | ');
+            } else {
+                return 'Incomplete (Unknown)';
+            }
+        } catch (error) {
+            // Keep error generic or make it "Unknown" to look cleaner
+            return 'Incomplete (Unknown)';
+        }
+    }
+
     async getAllWorkoutLogs() {
-        return await this.workoutRepository.getAll();
+        const logs = await this.workoutRepository.getAll();
+
+        const enrichedLogs = await Promise.all(logs.map(async (log) => {
+            const setLogs = await this.workoutRepository.getSetLogsByWorkoutId(log.id);
+            const status = await this._calculateCompletionStatus(log, setLogs);
+            return {
+                ...log,
+                completed_at: status
+            };
+        }));
+
+        return enrichedLogs;
     }
 
     async importWorkoutLogs(data: any[]) {
         return await this.workoutRepository.importMany(data);
+    }
+
+    async getAllWorkoutSetLogs() {
+        return await this.workoutRepository.getAllSetLogs();
+    }
+
+    async importWorkoutSetLogs(data: any[]) {
+        return await this.workoutRepository.importSetLogs(data);
+    }
+
+    async getWorkoutDetails(workoutId: number) {
+        const log = await this.workoutRepository.getById(workoutId);
+        if (!log) return null;
+
+        const sets = await this.workoutRepository.getSetLogsByWorkoutId(workoutId);
+
+        // Calculate granular status if incomplete
+        if (!log.completed_at) {
+            const status = await this._calculateCompletionStatus(log, sets);
+            // Enrich log object for display
+            (log as any).completed_at = status;
+        }
+
+        // Enrich sets with exercise names
+        const enrichedSets = await Promise.all(sets.map(async (set) => {
+            const exercise = await this.exerciseRepository.getById(set.exercise_id);
+            return {
+                ...set,
+                exercise_name: exercise ? exercise.name : 'Unknown Exercise'
+            };
+        }));
+
+        return {
+            log,
+            sets: enrichedSets
+        };
     }
 }

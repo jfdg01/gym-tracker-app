@@ -156,7 +156,6 @@ export const handleWorkoutMenu = async (
 
         // Start Workout Logging
         const workoutLogId = await services.workoutService.startWorkout(nextDayId, selected.userProgram.program_id);
-        const allSetLogs: any[] = [];
         const exerciseSkippedStatus: { [key: number]: boolean } = {};
 
         // Session Loop
@@ -214,14 +213,23 @@ export const handleWorkoutMenu = async (
                 } else if (input.toLowerCase() === 's' && !allDone) {
                     exerciseSkippedStatus[exercise.id] = true;
                     exerciseCompleted = true; // Skip to next
+
+                    // Immediately save skipped log
+                    console.log("Skipping exercise...");
+                    await services.workoutService.saveSetLog(workoutLogId, {
+                        exercise_id: exercise.id,
+                        set_number: 1, // Generic set number for skipped exercise
+                        is_skipped: true
+                    });
+
                 } else if (allDone && input === '') {
                     exerciseCompleted = true;
                 } else if (input.toLowerCase() === 'c' && nextSetNum !== -1) {
                     const val = await askQuestion(`Enter ${exercise.tracking_type === 'reps' ? 'reps' : 'time'} completed: `);
                     setsStatus[nextSetNum] = { completed: true, value: val };
 
-                    // Add to log buffer
-                    allSetLogs.push({
+                    // Immediately save set log
+                    await services.workoutService.saveSetLog(workoutLogId, {
                         exercise_id: exercise.id,
                         set_number: nextSetNum,
                         reps: exercise.tracking_type === 'reps' ? parseInt(val) : null,
@@ -230,33 +238,58 @@ export const handleWorkoutMenu = async (
                         difficulty_qualitative: exercise.resistance_type === 'difficulty' ? exercise.difficulty_qualitative : null,
                         is_skipped: false
                     });
+
+                    // Progressive Overload Logic
+                    if (nextSetNum === totalSets) {
+                        const performedVal = parseInt(val);
+                        if (!isNaN(performedVal)) {
+                            let overloadTriggered = false;
+
+                            // Check max_reps or max_time
+                            if (exercise.tracking_type === 'reps' && exercise.max_reps && performedVal >= exercise.max_reps) {
+                                overloadTriggered = true;
+                            } else if (exercise.tracking_type === 'time' && exercise.max_time && performedVal >= exercise.max_time) {
+                                overloadTriggered = true;
+                            }
+
+                            if (overloadTriggered) {
+                                console.log(`\n🎉 Max Performance reached! (${performedVal} >= ${exercise.tracking_type === 'reps' ? exercise.max_reps : exercise.max_time})`);
+
+                                if (exercise.resistance_type === 'weight') {
+                                    const currentW = exercise.current_weight ?? 0;
+                                    const increase = exercise.weight_increase_rate ?? 0;
+
+                                    if (increase > 0) {
+                                        const newWeight = currentW + increase;
+                                        console.log(`💪 Progressive Overload: Increasing weight to ${newWeight}kg for next session.`);
+
+                                        // Update database using the real exercise ID
+                                        await services.exerciseService.updateExercise(exercise.exercise_id, {
+                                            current_weight: newWeight
+                                        });
+                                        // Update local object
+                                        exercise.current_weight = newWeight;
+                                    } else {
+                                        console.log(`💪 Target reached, but "weight_increase_rate" is not set.`);
+                                    }
+                                } else {
+                                    // Qualitative / Difficulty
+                                    console.log(`💪 Progressive Overload: Limit reached! User needs to update the exercise difficulty/variation.`);
+                                }
+                                await waitForKey(askQuestion, "Press Enter to acknowledge...");
+                            }
+                        }
+                    }
                 }
             }
         }
 
         // Determine Completion Status
-        // A workout is complete if all exercises are either fully completed or skipped.
-        // If the user exited early (sessionExit = true), it's likely incomplete unless they finished the last one and then exited?
-        // Actually, if they exit early, we assume incomplete.
-        // If they finished the loop, we check if every exercise was visited.
-
         let isWorkoutCompleted = !sessionExit;
 
-        // Add skipped logs for skipped exercises
-        for (const ex of dayExercises) {
-            if (exerciseSkippedStatus[ex.id]) {
-                allSetLogs.push({
-                    exercise_id: ex.id,
-                    // Schema: set_number integer not null.
-                    // Let's use 1 for skipped exercise generic log.
-                    set_number: 1,
-                    is_skipped: true
-                });
-            }
-        }
-
-        console.log("\nSaving workout data...");
-        await services.workoutService.completeWorkout(workoutLogId, allSetLogs, isWorkoutCompleted);
+        console.log("\nSaving workout final status...");
+        // Pass empty array for setLogs because they are already saved incrementally
+        await services.workoutService.completeWorkout(workoutLogId, [], isWorkoutCompleted);
 
         console.log(`\nWorkout ${isWorkoutCompleted ? 'Completed' : 'Saved (Incomplete)'}!`);
         await waitForKey(askQuestion);

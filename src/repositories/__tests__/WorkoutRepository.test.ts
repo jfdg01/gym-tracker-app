@@ -23,7 +23,7 @@ describe("WorkoutRepository", () => {
 
     describe("createLog", () => {
         it("should create a workout log for scheduled program", async () => {
-            const newLog = { program_id: 1, day_id: 1 };
+            const newLog = { program_id: 1, day_id: 1, created_at: new Date() };
             const mockResult = [{ id: 1, ...newLog }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
             const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
@@ -38,7 +38,7 @@ describe("WorkoutRepository", () => {
         });
 
         it("should create an ad-hoc workout log (no program/day)", async () => {
-            const newLog = { duration_seconds: 0 };
+            const newLog = { created_at: new Date() };
             const mockResult = [{ id: 2, ...newLog }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
             const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
@@ -54,7 +54,7 @@ describe("WorkoutRepository", () => {
 
     describe("updateLog", () => {
         it("should update a workout log", async () => {
-            const updateData = { duration_seconds: 3600 };
+            const updateData = { completed_at: new Date() };
             const mockResult = [{ id: 1, ...updateData }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
             const mockWhere = jest.fn().mockReturnValue({ returning: mockReturning });

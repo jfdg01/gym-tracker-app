@@ -42,7 +42,7 @@ describe("ExerciseRepository", () => {
                 name: "Plank",
                 description: "Hold position",
                 tracking_type: "time" as const,
-                resistance_type: "text" as const,
+                resistance_type: "difficulty" as const,
                 sets: 1
             };
             const mockResult = [{ id: 2, ...newExercise }];
@@ -77,7 +77,7 @@ describe("ExerciseRepository", () => {
         });
 
         it("should update exercise type fields", async () => {
-            const updateData = { tracking_type: "time" as const, resistance_type: "text" as const };
+            const updateData = { tracking_type: "time" as const, resistance_type: "difficulty" as const };
             const mockResult = [{ id: 1, ...updateData }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
             const mockWhere = jest.fn().mockReturnValue({ returning: mockReturning });
