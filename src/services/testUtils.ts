@@ -1,4 +1,4 @@
-import { NewExercise } from "../../repositories/ExerciseRepository";
+import { NewExercise } from "../repositories/ExerciseRepository";
 
 export const getRandomString = (length: number = 10): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ';

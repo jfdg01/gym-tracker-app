@@ -82,7 +82,8 @@ CREATE TABLE `workout_logs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`program_id` integer,
 	`day_id` integer,
-	`completed_at` integer NOT NULL,
+	`created_at` integer NOT NULL,
+	`completed_at` integer,
 	`duration_seconds` integer,
 	FOREIGN KEY (`program_id`) REFERENCES `programs`(`id`) ON UPDATE no action ON DELETE set null,
 	FOREIGN KEY (`day_id`) REFERENCES `days`(`id`) ON UPDATE no action ON DELETE set null

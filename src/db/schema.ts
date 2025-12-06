@@ -74,7 +74,8 @@ export const workout_logs = sqliteTable('workout_logs', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     program_id: integer('program_id').references(() => programs.id, { onDelete: 'set null' }),
     day_id: integer('day_id').references(() => days.id, { onDelete: 'set null' }),
-    completed_at: integer('completed_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+    created_at: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+    completed_at: integer('completed_at', { mode: 'timestamp' }),
     duration_seconds: integer('duration_seconds'),
 });
 

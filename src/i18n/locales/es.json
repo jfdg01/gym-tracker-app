@@ -6,5 +6,21 @@
         "title": "Bienvenido a Gym Tracker",
         "subtitle": "Tu compañero definitivo para seguir entrenamientos y progreso.",
         "get_started": "Comenzar"
+    },
+    "common": {
+        "error": "Error",
+        "success": "Éxito",
+        "finish": "Finalizar",
+        "skip": "Saltar"
+    },
+    "workout": {
+        "live_session": "Sesión en Vivo",
+        "rest_timer": "Temporizador de Descanso",
+        "target": "Objetivo",
+        "day_not_found": "Día no encontrado",
+        "init_failed": "Error al iniciar entrenamiento",
+        "log_failed": "Error al registrar serie",
+        "finish_failed": "Error al finalizar entrenamiento",
+        "completed": "¡Entrenamiento completado!"
     }
 }

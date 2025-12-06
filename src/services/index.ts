@@ -19,5 +19,5 @@ const userRepository = new UserRepository();
 // Services
 export const exerciseService = new ExerciseService(exerciseRepository);
 export const programService = new ProgramService(programRepository, dayRepository);
-export const workoutService = new WorkoutService(workoutRepository);
+export const workoutService = new WorkoutService(workoutRepository, dayRepository, exerciseRepository, userRepository);
 export const userService = new UserService(userRepository);
