@@ -62,4 +62,8 @@ export class ProgramService {
     async importDayExercises(data: any[]) {
         return await this.dayRepository.importDayExercises(data);
     }
+
+    async getDayExercisesWithDetails(dayId: number) {
+        return await this.dayRepository.getDayExercisesWithDetails(dayId);
+    }
 }
