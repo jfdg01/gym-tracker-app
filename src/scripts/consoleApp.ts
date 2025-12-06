@@ -12,6 +12,8 @@ import * as fs from 'fs';
 import { db } from "../db/client";
 import { handleViewPrograms } from "./modules/ProgramMenu";
 import { handleExportData, handleImportData, DataServices } from "./modules/DataTransfer";
+import { handleWorkoutMenu } from "./modules/WorkoutMenu";
+import { clearScreen, waitForKey } from "./modules/ConsoleUI";
 import {
     exercises,
     programs,
@@ -57,9 +59,11 @@ const askQuestion = (query: string): Promise<string> => {
 // Local handleViewPrograms removed - imported from modules/ProgramMenu
 
 const resetDatabase = async () => {
+    clearScreen();
     const confirmation = await askQuestion("Are you sure you want to DELETE ALL DATA? (y/n): ");
     if (confirmation.toLowerCase() !== 'y') {
         console.log("Operation cancelled.");
+        await waitForKey(askQuestion);
         return;
     }
 
@@ -83,60 +87,81 @@ const resetDatabase = async () => {
     } catch (error) {
         console.error("Error resetting database:", error);
     }
+    await waitForKey(askQuestion);
 };
 
 async function main() {
+    clearScreen();
     console.log("Welcome to the Gym Tracker Console App!");
+    await waitForKey(askQuestion, "Press Enter to start...");
 
     while (true) {
+        clearScreen();
         console.log("\n--- Menu ---");
-        console.log("1. View Exercises");
-        console.log("2. View Programs (Interactive)");
-        console.log("3. View Days");
-        console.log("4. View User Settings");
-        console.log("5. Export Data");
-        console.log("6. Import Data");
-        console.log("7. Reset Database");
-        console.log("8. Exit");
+        console.log("1. Start Workout");
+        console.log("2. View Exercises");
+        console.log("3. View Programs (Interactive)");
+        console.log("4. View Days");
+        console.log("5. View User Settings");
+        console.log("6. Export Data");
+        console.log("7. Import Data");
+        console.log("8. Reset Database");
+        console.log("9. Exit");
 
         const answer = await askQuestion("Select an option: ");
 
         try {
             switch (answer) {
                 case '1':
-                    const allExercises = await exerciseService.getAllExercises();
-                    console.table(allExercises);
+                    await handleWorkoutMenu(services, askQuestion);
                     break;
                 case '2':
-                    await handleViewPrograms(programService, askQuestion);
+                    clearScreen();
+                    console.log("\n--- Exercises ---");
+                    const allExercises = await exerciseService.getAllExercises();
+                    console.table(allExercises);
+                    await waitForKey(askQuestion);
                     break;
                 case '3':
-                    const allDays = await programService.getAllDays();
-                    console.table(allDays);
+                    await handleViewPrograms(programService, askQuestion);
                     break;
                 case '4':
+                    clearScreen();
+                    console.log("\n--- Days ---");
+                    const allDays = await programService.getAllDays();
+                    console.table(allDays);
+                    await waitForKey(askQuestion);
+                    break;
+                case '5':
+                    clearScreen();
+                    console.log("\n--- User Settings ---");
                     // Using generic getAllUserSettings to view all rows, though usually singleton
                     const settings = await userService.getAllUserSettings();
                     console.table(settings);
-                    break;
-                case '5':
-                    await handleExportData(services, askQuestion);
+                    await waitForKey(askQuestion);
                     break;
                 case '6':
-                    await handleImportData(services, askQuestion);
+                    await handleExportData(services, askQuestion);
+                    await waitForKey(askQuestion); // Export might finish quickly
                     break;
                 case '7':
-                    await resetDatabase();
+                    await handleImportData(services, askQuestion);
+                    await waitForKey(askQuestion);
                     break;
                 case '8':
+                    await resetDatabase();
+                    break;
+                case '9':
                     console.log("Goodbye!");
                     rl.close();
                     return;
                 default:
                     console.log("Invalid option, please try again.");
+                    await waitForKey(askQuestion, "Press Enter to try again...");
             }
         } catch (error) {
             console.error("An error occurred:", error);
+            await waitForKey(askQuestion, "Press Enter to continue...");
         }
     }
 }

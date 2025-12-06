@@ -1,15 +1,18 @@
 import { ProgramService } from "../../services/ProgramService";
+import { clearScreen, waitForKey } from "./ConsoleUI";
 
 export const handleViewPrograms = async (
     programService: ProgramService,
     askQuestion: (query: string) => Promise<string>
 ) => {
     while (true) {
+        clearScreen();
         console.log("\n--- Programs ---");
         const allPrograms = await programService.getAllPrograms();
 
         if (allPrograms.length === 0) {
             console.log("No programs found.");
+            await waitForKey(askQuestion);
             return;
         }
 
@@ -23,6 +26,7 @@ export const handleViewPrograms = async (
         const programId = parseInt(answer);
         if (isNaN(programId)) {
             console.log("Invalid Input");
+            await waitForKey(askQuestion);
             continue;
         }
 
@@ -34,6 +38,7 @@ export const handleViewPrograms = async (
 
         // Program Level
         while (true) {
+            clearScreen();
             console.log(`\n--- Program: ${selectedProgram.name} ---`);
             console.log(`Description: ${selectedProgram.description}`);
 
@@ -56,6 +61,7 @@ export const handleViewPrograms = async (
             const dayId = parseInt(dayAnswer);
             if (isNaN(dayId)) {
                 console.log("Invalid Input");
+                await waitForKey(askQuestion);
                 continue;
             }
 
@@ -83,7 +89,7 @@ export const handleViewPrograms = async (
                 })));
             }
 
-            await askQuestion("\nPress Enter to return to program details...");
+            await waitForKey(askQuestion, "Press Enter to return to program details...");
         }
     }
 };
