@@ -42,6 +42,7 @@ export class DayRepository extends BaseRepository<typeof days> {
             max_time: exercises.max_time,
             current_weight: exercises.current_weight,
             weight_increase_rate: exercises.weight_increase_rate,
+            difficulty_qualitative: exercises.difficulty_qualitative,
             rest_time_seconds: exercises.rest_time_seconds,
             name: exercises.name,
             description: exercises.description,

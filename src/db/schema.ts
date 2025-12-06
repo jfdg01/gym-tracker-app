@@ -6,8 +6,8 @@ export const exercises = sqliteTable('exercises', {
     name: text('name').notNull(),
     description: text('description'),
     // Configuration
-    tracking_type: text('tracking_type').notNull(), // "reps" or "time"
-    resistance_type: text('resistance_type').notNull(), // "weight" or "difficulty"
+    tracking_type: text('tracking_type').$type<'reps' | 'time'>().notNull(), // "reps" or "time"
+    resistance_type: text('resistance_type').$type<'weight' | 'difficulty'>().notNull(), // "weight" or "difficulty"
     // Targets
     sets: integer('sets').notNull(),
     max_reps: integer('max_reps'), // Trigger for progression if tracking >= current_reps
@@ -16,7 +16,6 @@ export const exercises = sqliteTable('exercises', {
     current_weight: real('current_weight'),
     weight_increase_rate: real('weight_increase_rate'),
     difficulty_qualitative: text('difficulty_qualitative'),
-
     rest_time_seconds: integer('rest_time_seconds'),
 });
 
@@ -60,6 +59,18 @@ export const workout_logs = sqliteTable('workout_logs', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     program_id: integer('program_id').references(() => programs.id),
     day_id: integer('day_id').references(() => days.id),
+    created_at: integer('created_at', { mode: 'timestamp' }).notNull(),
     completed_at: integer('completed_at', { mode: 'timestamp' }),
-    duration_seconds: integer('duration_seconds'),
+});
+
+export const workout_set_logs = sqliteTable('workout_set_logs', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    workout_log_id: integer('workout_log_id').references(() => workout_logs.id, { onDelete: 'cascade' }).notNull(),
+    exercise_id: integer('exercise_id').references(() => exercises.id).notNull(),
+    set_number: integer('set_number').notNull(),
+    reps: integer('reps'),
+    time: integer('time'),
+    weight: real('weight'),
+    difficulty_qualitative: text('difficulty_qualitative'),
+    is_skipped: integer('is_skipped', { mode: 'boolean' }).default(false).notNull(),
 });

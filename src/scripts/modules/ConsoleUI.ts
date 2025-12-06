@@ -1,7 +1,8 @@
 
 export const clearScreen = () => {
     // console.clear() works in most modern terminals (Windows Terminal, VS Code, etc.)
-    console.clear();
+    // console.clear();
+    console.log("------------------------ 'mocked clear' ---------------------------");
 };
 
 export const printHeader = (text: string) => {

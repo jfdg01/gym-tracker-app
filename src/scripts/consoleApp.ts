@@ -93,7 +93,7 @@ const resetDatabase = async () => {
 async function main() {
     clearScreen();
     console.log("Welcome to the Gym Tracker Console App!");
-    await waitForKey(askQuestion, "Press Enter to start...");
+
 
     while (true) {
         clearScreen();
@@ -105,8 +105,9 @@ async function main() {
         console.log("5. View User Settings");
         console.log("6. Export Data");
         console.log("7. Import Data");
-        console.log("8. Reset Database");
-        console.log("9. Exit");
+        console.log("8. View Workout Logs");
+        console.log("9. Reset Database");
+        console.log("10. Exit");
 
         const answer = await askQuestion("Select an option: ");
 
@@ -149,9 +150,16 @@ async function main() {
                     await waitForKey(askQuestion);
                     break;
                 case '8':
-                    await resetDatabase();
+                    clearScreen();
+                    console.log("\n--- Workout Logs ---");
+                    const logs = await workoutService.getAllWorkoutLogs();
+                    console.table(logs);
+                    await waitForKey(askQuestion);
                     break;
                 case '9':
+                    await resetDatabase();
+                    break;
+                case '10':
                     console.log("Goodbye!");
                     rl.close();
                     return;
