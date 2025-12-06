@@ -1,6 +1,6 @@
 import { DayRepository } from "../DayRepository";
 import { days } from "../../db/schema";
-import { db } from "../../db/client";
+import { db } from "../../db/client.native";
 import { eq } from "drizzle-orm";
 
 jest.mock("../../db/client", () => ({
