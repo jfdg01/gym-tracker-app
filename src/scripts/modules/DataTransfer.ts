@@ -1,5 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { db } from "../../db/client";
+import {
+    exercises, programs, days, day_exercises,
+    user_settings, user_programs, workout_logs
+} from "../../db/schema";
 import { ExerciseService } from "../../services/ExerciseService";
 import { ProgramService } from "../../services/ProgramService";
 import { UserService } from "../../services/UserService";
@@ -16,17 +21,53 @@ export interface DataServices {
 
 const DATA_DIR = path.join(__dirname, '../data');
 
+// --- Types ---
+
+interface ExportMetadata {
+    version: string;
+    exported_at: string;
+    app_version?: string;
+}
+
+interface ExportData {
+    metadata: ExportMetadata;
+    data: {
+        exercises: any[];
+        programs: any[];
+        days: any[];
+        day_exercises: any[];
+        user_settings: any[];
+        user_programs: any[];
+        workout_logs: any[];
+    };
+}
+
+// --- Helper Functions ---
+
+const ensureDataDir = () => {
+    if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+};
+
+const getTimestampFilename = (prefix: string = 'gym_tracker_export') => {
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+    return `${prefix}_${dateStr}_${timeStr}.json`;
+};
+
+// --- Export Logic ---
+
 export const handleExportData = async (
     services: DataServices,
     askQuestion: (query: string) => Promise<string>
 ) => {
-    const { exerciseService, programService, userService, workoutService, programRepo } = services;
+    const { exerciseService, programService, userService, workoutService } = services;
 
     try {
+        console.log("Gathering data...");
         const allExercises = await exerciseService.getAllExercises();
-        // Redundant in original code, but keeping for compatibility if needed, 
-        // though strictly they return the same structure usually.
-        // const allPrograms = await programRepo.getAll(); 
         const programsData = await programService.getAllPrograms();
         const allDays = await programService.getAllDays();
         const allDayExercises = await programService.getAllDayExercises();
@@ -34,141 +75,197 @@ export const handleExportData = async (
         const allUserPrograms = await userService.getAllUserPrograms();
         const allWorkoutLogs = await workoutService.getAllWorkoutLogs();
 
-        const data = {
-            exercises: allExercises,
-            programs: programsData,
-            days: allDays,
-            day_exercises: allDayExercises,
-            user_settings: allUserSettings,
-            user_programs: allUserPrograms,
-            workout_logs: allWorkoutLogs
+        const exportData: ExportData = {
+            metadata: {
+                version: "1.0",
+                exported_at: new Date().toISOString(),
+            },
+            data: {
+                exercises: allExercises,
+                programs: programsData,
+                days: allDays,
+                day_exercises: allDayExercises,
+                user_settings: allUserSettings,
+                user_programs: allUserPrograms,
+                workout_logs: allWorkoutLogs
+            }
         };
 
-        const filename = await askQuestion("Enter filename to export to (default: gym_tracker_export.json): ");
-        const finalFilename = filename || 'gym_tracker_export.json';
-        const finalPath = path.join(DATA_DIR, finalFilename);
+        const defaultFilename = getTimestampFilename();
+        const filenameInput = await askQuestion(`Enter filename to export to (default: ${defaultFilename}): `);
+        const finalFilename = filenameInput.trim() || defaultFilename;
+        // Append .json if missing
+        const finalFilenameWithExt = finalFilename.endsWith('.json') ? finalFilename : `${finalFilename}.json`;
 
-        // Ensure directory exists
-        if (!fs.existsSync(DATA_DIR)) {
-            fs.mkdirSync(DATA_DIR, { recursive: true });
-        }
+        ensureDataDir();
+        const finalPath = path.join(DATA_DIR, finalFilenameWithExt);
 
-        fs.writeFileSync(finalPath, JSON.stringify(data, null, 2));
-        console.log(`Data exported successfully to ${finalPath}`);
+        fs.writeFileSync(finalPath, JSON.stringify(exportData, null, 2));
+        console.log(`\n✅ Data exported successfully to: ${finalPath}`);
+
     } catch (error) {
-        console.error("Error exporting data:", error);
+        console.error("❌ Error exporting data:", error);
     }
+};
+
+// --- Import Logic ---
+
+const wipeDatabase = async () => {
+    console.log("⚠️  Wiping database...");
+    // Order matters greatly due to foreign keys
+    await db.delete(workout_logs);
+    await db.delete(user_programs);
+    await db.delete(day_exercises);
+    await db.delete(days);
+    await db.delete(programs); // user_programs, days ref programs
+    await db.delete(exercises); // day_exercises, workout_logs ref exercises (indirectly via logic or direct FKs depending on schema evolution)
+    await db.delete(user_settings);
+    console.log("✅ Database wiped.");
+};
+
+const processImport = async (
+    services: DataServices,
+    data: any,
+    mode: 'WIPE_RESTORE' | 'APPEND'
+) => {
+    const { exerciseService, programService, userService, workoutService } = services;
+
+    // If legacy format (direct keys), wrap it. If new format (under .data), use it.
+    const importContent = data.metadata ? data.data : data;
+
+    if (mode === 'WIPE_RESTORE') {
+        await wipeDatabase();
+    }
+
+    console.log(`Processing import (Mode: ${mode})...`);
+
+    // Helper to log results
+    const logResult = (entity: string, result: any) => {
+        if (mode === 'APPEND') {
+            // BaseRepository doesn't return counts for conflict ignores easily, 
+            // but we can assume success if no error thrown.
+            // console.log(`  Processed ${entity}.`);
+        }
+    };
+
+    if (importContent.exercises?.length) {
+        await exerciseService.importExercises(importContent.exercises);
+        console.log(`  - Exercises processed.`);
+    }
+
+    if (importContent.programs?.length) {
+        await programService.importPrograms(importContent.programs);
+        console.log(`  - Programs processed.`);
+    }
+
+    if (importContent.days?.length) {
+        await programService.importDays(importContent.days);
+        console.log(`  - Days processed.`);
+    }
+
+    if (importContent.day_exercises?.length) {
+        await programService.importDayExercises(importContent.day_exercises);
+        console.log(`  - Day Exercises processed.`);
+    }
+
+    if (importContent.user_settings?.length) {
+        await userService.importUserSettings(importContent.user_settings);
+        console.log(`  - User Settings processed.`);
+    }
+
+    if (importContent.user_programs?.length) {
+        await userService.importUserPrograms(importContent.user_programs);
+        console.log(`  - User Programs processed.`);
+    }
+
+    if (importContent.workout_logs?.length) {
+        // Fix dates
+        const formattedLogs = importContent.workout_logs.map((log: any) => ({
+            ...log,
+            completed_at: log.completed_at ? new Date(log.completed_at) : null
+        }));
+        await workoutService.importWorkoutLogs(formattedLogs);
+        console.log(`  - Workout Logs processed.`);
+    }
+
+    console.log("\n✅ Import completed successfully.");
 };
 
 export const handleImportData = async (
     services: DataServices,
     askQuestion: (query: string) => Promise<string>
 ) => {
-    const { exerciseService, programService, userService, workoutService } = services;
-
     try {
         if (!fs.existsSync(DATA_DIR)) {
-            console.error(`Data directory not found at ${DATA_DIR}`);
+            console.error(`❌ Data directory not found at ${DATA_DIR}`);
             return;
         }
 
         const files = fs.readdirSync(DATA_DIR).filter(file => file.endsWith('.json'));
 
         if (files.length === 0) {
-            console.log("No JSON files found in data directory.");
+            console.log("❌ No JSON files found in data directory.");
             return;
         }
 
-        console.log("\nAvailable files:");
+        console.log("\n--- Available Files ---");
         files.forEach((file, index) => {
             console.log(`${index + 1}. ${file}`);
         });
 
-        const answer = await askQuestion("\nSelect file number to import: ");
-        const fileIndex = parseInt(answer) - 1;
+        const fileAnswer = await askQuestion("\nSelect file number to import (or 'c' to cancel): ");
+        if (fileAnswer.toLowerCase() === 'c') return;
+
+        const fileIndex = parseInt(fileAnswer) - 1;
 
         if (isNaN(fileIndex) || fileIndex < 0 || fileIndex >= files.length) {
-            console.error("Invalid selection.");
+            console.error("❌ Invalid selection.");
             return;
         }
 
         const fileName = files[fileIndex];
         const filePath = path.join(DATA_DIR, fileName);
-
-        console.log(`Importing from ${filePath}...`);
-
         const fileContent = fs.readFileSync(filePath, 'utf-8');
 
-        if (!fileContent || fileContent.trim() === '') {
-            console.error("Error: The selected file is empty.");
+        if (!fileContent.trim()) {
+            console.error("❌ Selected file is empty.");
             return;
         }
 
-        let data;
+        let parsedData;
         try {
-            data = JSON.parse(fileContent);
-        } catch (parseError) {
-            console.error("Error: Failed to parse JSON file. It may be malformed.");
+            parsedData = JSON.parse(fileContent);
+        } catch (e) {
+            console.error("❌ Failed to parse JSON file.");
             return;
         }
 
-        if (data.exercises && Array.isArray(data.exercises)) {
-            try {
-                await exerciseService.importExercises(data.exercises);
-                console.log(`Processed exercises.`);
-            } catch (e) { console.error("Error importing exercises:", e); }
-        }
+        console.log("\n--- Import Modes ---");
+        console.log("1. APPEND (Skip existing): Add new data only. Ignores records with existing IDs.");
+        console.log("2. WIPE & RESTORE: ⚠️  DELETE ALL CURRENT DATA and replace with file data.");
 
-        if (data.programs && Array.isArray(data.programs)) {
-            try {
-                await programService.importPrograms(data.programs);
-                console.log(`Processed programs.`);
-            } catch (e) { console.error("Error importing programs:", e); }
-        }
+        const modeAnswer = await askQuestion("Select import mode: ");
 
-        if (data.days && Array.isArray(data.days)) {
-            try {
-                await programService.importDays(data.days);
-                console.log(`Processed days.`);
-            } catch (e) { console.error("Error importing days:", e); }
+        if (modeAnswer === '1') {
+            await processImport(services, parsedData, 'APPEND');
+        } else if (modeAnswer === '2') {
+            const confirm = await askQuestion("⚠️  DANGER: This will delete ALL data. Are you sure? (type 'yes' to confirm): ");
+            if (confirm.toLowerCase() === 'yes') {
+                // Optional: Force a backup?
+                const backup = await askQuestion("Do you want to create a backup first? (y/n): ");
+                if (backup.toLowerCase() === 'y') {
+                    await handleExportData(services, askQuestion);
+                }
+                await processImport(services, parsedData, 'WIPE_RESTORE');
+            } else {
+                console.log("Import cancelled.");
+            }
+        } else {
+            console.log("Invalid mode selected.");
         }
-
-        if (data.day_exercises && Array.isArray(data.day_exercises)) {
-            try {
-                await programService.importDayExercises(data.day_exercises);
-                console.log(`Processed day_exercises.`);
-            } catch (e) { console.error("Error importing day_exercises:", e); }
-        }
-
-        if (data.user_settings && Array.isArray(data.user_settings)) {
-            try {
-                await userService.importUserSettings(data.user_settings);
-                console.log(`Processed user_settings.`);
-            } catch (e) { console.error("Error importing user_settings:", e); }
-        }
-
-        if (data.user_programs && Array.isArray(data.user_programs)) {
-            try {
-                await userService.importUserPrograms(data.user_programs);
-                console.log(`Processed user_programs.`);
-            } catch (e) { console.error("Error importing user_programs:", e); }
-        }
-
-        if (data.workout_logs && Array.isArray(data.workout_logs)) {
-            try {
-                // Convert timestamp numbers/strings to Dates for Drizzle
-                const formattedLogs = data.workout_logs.map((log: any) => ({
-                    ...log,
-                    completed_at: log.completed_at ? new Date(log.completed_at) : null
-                }));
-                await workoutService.importWorkoutLogs(formattedLogs);
-                console.log(`Processed workout_logs.`);
-            } catch (e) { console.error("Error importing workout_logs:", e); }
-        }
-
-        console.log("Import process completed.");
 
     } catch (error) {
-        console.error("Error importing data:", error);
+        console.error("❌ Error importing data:", error);
     }
 };
+
