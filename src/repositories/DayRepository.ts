@@ -36,13 +36,17 @@ export class DayRepository extends BaseRepository<typeof days> {
             day_id: day_exercises.day_id,
             exercise_id: day_exercises.exercise_id,
             order_index: day_exercises.order_index,
-            target_sets: day_exercises.target_sets,
-            target_reps: day_exercises.target_reps,
-            target_weight: day_exercises.target_weight,
-            increase_rate: day_exercises.increase_rate,
-            rest_time_seconds: day_exercises.rest_time_seconds,
+            // Configuration now comes from exercises
+            sets: exercises.sets,
+            max_reps: exercises.max_reps,
+            max_time: exercises.max_time,
+            current_weight: exercises.current_weight,
+            weight_increase_rate: exercises.weight_increase_rate,
+            rest_time_seconds: exercises.rest_time_seconds,
             name: exercises.name,
             description: exercises.description,
+            tracking_type: exercises.tracking_type,
+            resistance_type: exercises.resistance_type,
         })
             .from(day_exercises)
             .innerJoin(exercises, eq(day_exercises.exercise_id, exercises.id))

@@ -1,5 +1,5 @@
 import { BaseRepository } from "./BaseRepository";
-import { exercises, day_exercises } from "../db/schema";
+import { exercises } from "../db/schema";
 import { InferInsertModel, eq } from "drizzle-orm";
 
 export type NewExercise = InferInsertModel<typeof exercises>;
@@ -18,14 +18,6 @@ export class ExerciseRepository extends BaseRepository<typeof exercises> {
         const result = await this.db.update(exercises)
             .set(exercise)
             .where(eq(exercises.id, id))
-            .returning();
-        return result[0];
-    }
-
-    async updateDayExercise(id: number, data: Partial<InferInsertModel<typeof day_exercises>>) {
-        const result = await this.db.update(day_exercises)
-            .set(data)
-            .where(eq(day_exercises.id, id))
             .returning();
         return result[0];
     }

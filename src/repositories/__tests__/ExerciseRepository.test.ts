@@ -23,7 +23,7 @@ describe("ExerciseRepository", () => {
 
     describe("create", () => {
         it("should create a new exercise with minimal required fields", async () => {
-            const newExercise = { name: "Squat", track_type: "reps" as const, resistance_type: "weight" as const };
+            const newExercise = { name: "Squat", tracking_type: "reps" as const, resistance_type: "weight" as const, sets: 3 };
             const mockResult = [{ id: 1, ...newExercise }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
             const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
@@ -41,8 +41,9 @@ describe("ExerciseRepository", () => {
             const newExercise = {
                 name: "Plank",
                 description: "Hold position",
-                track_type: "time" as const,
-                resistance_type: "text" as const
+                tracking_type: "time" as const,
+                resistance_type: "text" as const,
+                sets: 1
             };
             const mockResult = [{ id: 2, ...newExercise }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
@@ -76,7 +77,7 @@ describe("ExerciseRepository", () => {
         });
 
         it("should update exercise type fields", async () => {
-            const updateData = { track_type: "time" as const, resistance_type: "text" as const };
+            const updateData = { tracking_type: "time" as const, resistance_type: "text" as const };
             const mockResult = [{ id: 1, ...updateData }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
             const mockWhere = jest.fn().mockReturnValue({ returning: mockReturning });

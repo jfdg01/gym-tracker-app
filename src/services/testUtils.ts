@@ -25,13 +25,15 @@ export const generateRandomExercise = (): NewExercise => {
     return {
         name: getRandomString(15),
         description: getRandomString(50),
-        track_type: getRandomEnum(['reps', 'time']),
+        tracking_type: getRandomEnum(['reps', 'time']),
         resistance_type: getRandomEnum(['weight', 'text']),
-        // created_at and updated_at are usually handled by DB defaults, but we can provide them if needed
-        // For NewExercise (InsertModel), they might be optional or required depending on schema
-        // Looking at schema: .defaultFn(() => new Date()) means they are optional in insert if drizzle handles it, 
-        // but InferInsertModel might make them optional.
-        // Let's assume we don't need to pass them for creation.
+        sets: getRandomNumber(1, 5),
+        max_reps: getRandomNumber(1, 20),
+        max_time: getRandomNumber(10, 120),
+        current_weight: getRandomNumber(5, 50),
+        weight_increase_rate: 2.5,
+        rest_time_seconds: 60,
+        difficulty_qualitative: getRandomString(10),
     } as NewExercise;
 };
 
@@ -41,8 +43,9 @@ export const generateRandomPartialExercise = (): Partial<NewExercise> => {
 
     if (getRandomBoolean()) partial.name = exercise.name;
     if (getRandomBoolean()) partial.description = exercise.description;
-    if (getRandomBoolean()) partial.track_type = exercise.track_type;
+    if (getRandomBoolean()) partial.tracking_type = exercise.tracking_type;
     if (getRandomBoolean()) partial.resistance_type = exercise.resistance_type;
+    if (getRandomBoolean()) partial.sets = exercise.sets;
 
     return partial;
 };
@@ -84,8 +87,6 @@ export const generateRandomUserSettings = (): any => {
     return {
         language: getRandomEnum(['es', 'en', 'fr']),
         name: getRandomString(10),
-        current_program_id: getRandomNumber(),
-        last_day_id: getRandomNumber(),
     };
 };
 
@@ -94,8 +95,6 @@ export const generateRandomPartialUserSettings = (): any => {
     const partial: any = {};
     if (getRandomBoolean()) partial.language = settings.language;
     if (getRandomBoolean()) partial.name = settings.name;
-    if (getRandomBoolean()) partial.current_program_id = settings.current_program_id;
-    if (getRandomBoolean()) partial.last_day_id = settings.last_day_id;
     return partial;
 };
 
@@ -114,23 +113,6 @@ export const generateRandomPartialWorkoutLog = (): any => {
     if (getRandomBoolean()) partial.day_id = log.day_id;
     if (getRandomBoolean()) partial.duration_seconds = log.duration_seconds;
     return partial;
-};
-
-export const generateRandomWorkoutSet = (workoutLogId: number = 1): any => {
-    return {
-        workout_log_id: workoutLogId,
-        exercise_id: getRandomNumber(),
-        day_exercise_id: getRandomNumber(),
-        set_number: getRandomNumber(1, 5),
-        actual_reps: getRandomNumber(1, 20),
-        actual_weight: getRandomNumber(10, 100),
-        actual_time_seconds: getRandomNumber(10, 120),
-        actual_resistance_text: getRandomString(10),
-        target_reps: getRandomNumber(1, 20),
-        target_weight: getRandomNumber(10, 100),
-        target_time_seconds: getRandomNumber(10, 120),
-        skipped: getRandomBoolean(),
-    };
 };
 
 

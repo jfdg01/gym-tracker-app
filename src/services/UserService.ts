@@ -1,4 +1,4 @@
-import { UserRepository, NewUserSettings } from "../repositories/UserRepository";
+import { UserRepository, NewUserSettings, NewUserProgram } from "../repositories/UserRepository";
 
 export class UserService {
     constructor(private userRepository: UserRepository) { }
@@ -11,5 +11,19 @@ export class UserService {
     async updateUserSettings(settings: Partial<NewUserSettings>) {
         await this.userRepository.ensureSettingsExist();
         return await this.userRepository.updateSettings(settings);
+    }
+
+    async getActiveProgram() {
+        return await this.userRepository.getActiveProgram();
+    }
+
+    async joinProgram(programId: number) {
+        // Deactivate others? - Implementing simple create for now
+        // Ideally should check if already active, etc.
+        const newProgram: NewUserProgram = {
+            program_id: programId,
+            is_active: true,
+        };
+        return await this.userRepository.createUserProgram(newProgram);
     }
 }

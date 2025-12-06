@@ -63,9 +63,9 @@ describe("UserRepository", () => {
             const mockUpdate = jest.fn().mockReturnValue({ set: mockSet });
             mockDb.update.mockImplementation(mockUpdate);
 
-            const result = await repository.updateSettings({ current_program_id: null });
+            const result = await repository.updateSettings({ language: 'en' });
 
-            expect(mockSet).toHaveBeenCalledWith({ current_program_id: null });
+            expect(mockSet).toHaveBeenCalledWith({ language: 'en' });
             expect(result).toEqual(mockResult[0]);
         });
 

@@ -1,0 +1,128 @@
+@startuml main
+hide circle
+skinparam linetype ortho
+
+note top of "Exercise Library"
+    <b>Exercise Parameters</b>
+    Tracking: <i>reps</i> or <i>time</i>
+    Resistance: <i>weight</i> or <i>difficulty</i>
+
+    <b>Combinations:</b>
+    1. <b>Reps & Weight</b>
+       <i>Bench Press</i> (add reps or add weight)
+    2. <b>Reps & Difficulty</b>
+       <i>Push-ups</i> (add reps or change to harder var.)
+    3. <b>Time & Weight</b>
+       <i>Forearm holds</i> (add time or add weight)
+    4. <b>Time & Difficulty</b>
+       <i>Plank</i> (add time or change to harder var.)
+end note
+
+package "Exercise Library" #E8F5E9 {
+  class exercises {
+    + id : integer
+    ..
+    + name : text
+    + description : text
+    ..
+    ' Configuration
+    ' tracking_type: "reps" or "time"
+    + tracking_type : text 
+    ' resistance_type: "weight" or "difficulty"
+    + resistance_type : text 
+    ..
+    ' Targets
+    + sets : integer
+    ' max_reps: Trigger for progression if tracking >= current_reps
+    + max_reps : integer 
+    ' max_time: Trigger for progression if tracking >= current_time
+    + max_time : integer 
+    ..
+    ' Current Resistance
+    + current_weight : real
+    + weight_increase_rate : real
+    ' obviously we can't auto increase a type of exercise, 
+    ' so we either create a list of possible exercises to be switched to, or we make the user input it manually
+    + difficulty_qualitative : text
+    ..
+    + rest_time_seconds : integer
+  }
+  
+  note bottom of exercises
+    <b>Progression Logic</b>
+    Trigger: user input >= max_reps OR max_time
+    
+    <b>Action:</b>
+    1. If resistance_type == "weight":
+       <i>current_weight += weight_increase_rate</i>
+       
+    2. If resistance_type == "difficulty":
+       <i>Manual Update Required</i>
+       (User selects harder variation, 
+       sets new qualitative difficulty)
+  end note
+}
+
+package "Program Structure" #E3F2FD {
+  class programs {
+    + id : integer
+    ..
+    + name : text
+    + description : text
+  }
+
+  class days {
+    + id : integer
+    ..
+    # program_id : integer
+    + name : text
+    + is_rest_day : boolean
+    + order_index : integer
+  }
+
+  class day_exercises {
+    + id : integer
+    ..
+    # day_id : integer
+    # exercise_id : integer
+    + order_index : integer
+  }
+}
+
+package "User Data" #FFF3E0 {
+  class user_settings {
+    + id : integer
+    ..
+    + language : text
+    + name : text
+  }
+
+  class user_programs {
+    + id : integer
+    ..
+    # program_id : integer
+    # last_completed_day_id : integer
+    + is_active : boolean
+  }
+
+  class workout_logs {
+    + id : integer
+    ..
+    # program_id : integer
+    # day_id : integer
+    + completed_at : timestamp
+    + duration_seconds : integer
+  }
+}
+
+' Relationships
+programs "1" *-- "0..*" days
+days "1" *-- "0..*" day_exercises
+exercises "1" <-- "0..*" day_exercises
+user_settings "1" --> "0..*" user_programs
+user_programs "0..*" --> "1" programs
+user_programs "0..*" --> "0..1" days : last completed
+workout_logs "0..*" --> "1" programs
+workout_logs "0..*" --> "1" days
+
+@enduml

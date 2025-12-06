@@ -23,7 +23,7 @@ describe("DayRepository", () => {
 
     describe("create", () => {
         it("should create a new day", async () => {
-            const newDay = { name: "Leg Day", program_id: 1, order_index: 0 };
+            const newDay = { name: "Leg Day", program_id: 1, order_index: 0, is_rest_day: false };
             const mockResult = [{ id: 1, ...newDay }];
             const mockReturning = jest.fn().mockResolvedValue(mockResult);
             const mockValues = jest.fn().mockReturnValue({ returning: mockReturning });
