@@ -1,5 +1,5 @@
 import { DataServices } from "./DataTransfer";
-import { clearScreen, waitForKey } from "./ConsoleUI";
+import { clearScreen, waitForKey, startTimer } from "./ConsoleUI";
 
 export const handleWorkoutMenu = async (
     services: DataServices,
@@ -280,9 +280,16 @@ export const handleWorkoutMenu = async (
                             }
                         }
                     }
+
+                    // Rest Timer
+                    if (exercise.rest_time_seconds && exercise.rest_time_seconds > 0) {
+                        await startTimer(exercise.rest_time_seconds);
+                    }
                 }
+
             }
         }
+
 
         // Determine Completion Status
         let isWorkoutCompleted = !sessionExit;

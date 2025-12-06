@@ -9,7 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "console": "tsx src/scripts/consoleApp.ts"
+    "console": "tsx src/scripts/consoleApp.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.console.config.ts"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
