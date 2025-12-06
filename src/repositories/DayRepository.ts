@@ -53,4 +53,13 @@ export class DayRepository extends BaseRepository<typeof days> {
             .where(eq(day_exercises.day_id, dayId))
             .orderBy(day_exercises.order_index);
     }
+
+    async getAllDayExercises() {
+        return await this.db.select().from(day_exercises);
+    }
+
+    async importDayExercises(data: any[]) {
+        if (!data || data.length === 0) return;
+        return await this.db.insert(day_exercises).values(data).onConflictDoNothing();
+    }
 }

@@ -22,4 +22,8 @@ export class ExerciseService {
     async deleteExercise(id: number) {
         return await this.exerciseRepository.delete(id);
     }
+
+    async importExercises(data: any[]) {
+        return await this.exerciseRepository.importMany(data);
+    }
 }

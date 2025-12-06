@@ -26,4 +26,20 @@ export class UserService {
         };
         return await this.userRepository.createUserProgram(newProgram);
     }
+
+    async getAllUserSettings() {
+        return await this.userRepository.getAll();
+    }
+
+    async getAllUserPrograms() {
+        return await this.userRepository.getUserPrograms();
+    }
+
+    async importUserSettings(data: any[]) {
+        return await this.userRepository.importMany(data);
+    }
+
+    async importUserPrograms(data: any[]) {
+        return await this.userRepository.importUserPrograms(data);
+    }
 }

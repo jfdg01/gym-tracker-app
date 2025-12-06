@@ -42,4 +42,24 @@ export class ProgramService {
     async deleteDay(id: number) {
         return await this.dayRepository.delete(id);
     }
+
+    async getAllDays() {
+        return await this.dayRepository.getAll();
+    }
+
+    async getAllDayExercises() {
+        return await this.dayRepository.getAllDayExercises();
+    }
+
+    async importPrograms(data: any[]) {
+        return await this.programRepository.importMany(data);
+    }
+
+    async importDays(data: any[]) {
+        return await this.dayRepository.importMany(data);
+    }
+
+    async importDayExercises(data: any[]) {
+        return await this.dayRepository.importDayExercises(data);
+    }
 }

@@ -53,4 +53,9 @@ export class UserRepository extends BaseRepository<typeof user_settings> {
         const result = await this.db.select().from(user_programs).where(eq(user_programs.is_active, true));
         return result[0];
     }
+
+    async importUserPrograms(data: any[]) {
+        if (!data || data.length === 0) return;
+        return await this.db.insert(user_programs).values(data).onConflictDoNothing();
+    }
 }

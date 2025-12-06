@@ -1,0 +1,30 @@
+{
+  "exercises": [
+    {
+      "id": 1,
+      "name": "Dummy Pushups",
+      "description": "A dummy exercise for testing.",
+      "tracking_type": "reps",
+      "resistance_type": "weight",
+      "sets": 3,
+      "max_reps": 12,
+      "max_time": null,
+      "current_weight": 0,
+      "weight_increase_rate": 2.5,
+      "difficulty_qualitative": null,
+      "rest_time_seconds": null
+    }
+  ],
+  "programs": [
+    {
+      "id": 1,
+      "name": "Dummy Program",
+      "description": "A dummy program for testing."
+    }
+  ],
+  "days": [],
+  "day_exercises": [],
+  "user_settings": [],
+  "user_programs": [],
+  "workout_logs": []
+}

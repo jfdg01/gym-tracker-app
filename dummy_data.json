@@ -1,0 +1,20 @@
+{
+    "exercises": [
+        {
+            "name": "Dummy Pushups",
+            "description": "A dummy exercise for testing.",
+            "tracking_type": "reps",
+            "resistance_type": "weight",
+            "sets": 3,
+            "max_reps": 12,
+            "current_weight": 0,
+            "weight_increase_rate": 2.5
+        }
+    ],
+    "programs": [
+        {
+            "name": "Dummy Program",
+            "description": "A dummy program for testing."
+        }
+    ]
+}

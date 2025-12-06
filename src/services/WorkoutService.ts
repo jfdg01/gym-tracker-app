@@ -59,4 +59,12 @@ export class WorkoutService {
             });
         }
     }
+
+    async getAllWorkoutLogs() {
+        return await this.workoutRepository.getAll();
+    }
+
+    async importWorkoutLogs(data: any[]) {
+        return await this.workoutRepository.importMany(data);
+    }
 }

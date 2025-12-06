@@ -22,4 +22,9 @@ export abstract class BaseRepository<T extends SQLiteTableWithColumns<any>> {
     async delete(id: number) {
         return await this.db.delete(this.table).where(eq(this.table.id, id));
     }
+
+    async importMany(data: any[]) {
+        if (!data || data.length === 0) return;
+        return await this.db.insert(this.table).values(data).onConflictDoNothing();
+    }
 }
