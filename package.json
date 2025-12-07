@@ -23,6 +23,7 @@
     "better-sqlite3": "^12.5.0",
     "drizzle-orm": "^0.44.7",
     "expo": "~54.0.25",
+    "expo-file-system": "~19.0.20",
     "expo-localization": "^17.0.7",
     "expo-router": "~6.0.15",
     "expo-sqlite": "~16.0.9",
